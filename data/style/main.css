@@ -1,0 +1,528 @@
+﻿html,body 
+{
+	position: absolute;
+	margin:0;
+	padding:0;
+	height:100%; /* needed for container min-height */
+	width:100%;
+	background-color:#111;
+	
+	/*font-family:font-family:Courier New;  -- creates error*/
+	font-size:small;
+	color:#eee;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	/*user-select: none;  -- creates error*/
+	overflow-x: hidden;
+	overflow-y: hidden;
+	color:#eee;
+}
+@media screen and (max-width:1120px){#logo{width:320px;}}
+@media screen and (max-width:1000px){#logo{width:150px;}}
+h1 {font-size:23px; margin:0;padding:5px;}
+h2 {font-size:19.2px;}
+hm {font-size:14px;}
+h3 {font-size:11px;}
+a {font-weight:900; text-decoration:none;color:#eee;}
+a:hover{color:#fff;}
+ul{margin:0;padding:0;list-style:none;}
+
+header{
+	border-bottom:1px solid #aaa;
+	background-color:#222;
+	height:59px;
+}
+
+
+#webviewerlogo{
+	top: 0px;
+	float:left;
+	padding-top:10px;
+}
+/*                       */
+/* buttons in web viewer */
+/*                       */
+
+#ViewerButton{
+	margin:0px 5px 5px 0;
+	padding:0;
+	border: 1px solid #aaa;
+	border-radius:5px;
+/*width:150px;*/
+	height:40px;
+	background-color:#222;
+	background-image:none;
+	opacity:0.7;
+}
+
+#ButtonFullScreen,
+#ViewerButton {
+        width:150px;
+}
+
+#ButtonFullScreen:hover{
+	opacity:1;
+	border: 1px solid #eee;
+}
+
+#mainButtonsWrapper{
+	float:right;
+	position: relative;
+	height:50px;
+	padding: 10px 6px 0 5px;
+}
+#ButtonOpenFile,
+#ViewerButton  {
+	margin:0px 5px 5px 0;
+	padding:0;
+	border: 1px solid #aaa;
+	border-radius:5px;
+/*width:150px;*/
+	height:40px;
+	background-color:#222;
+	background-image:none;
+	opacity:0.7;
+        width:130px;
+}
+#ButtonOpenFile:hover{
+	opacity:1;
+	border: 1px solid #eee;
+}
+#fileinput{
+    display: block;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+.fullScreenWrapper{
+	top:10px;
+	left:10px;
+	position: relative;
+}
+#ButtonFullScreen{
+	margin:0px 5px 5px 0;
+	padding:0;
+	border: 1px solid #aaa;
+	border-radius:5px;
+	width:150px;
+	height:40px;
+	background-color:#222;
+	background-image:none;
+	opacity:0.7;
+}
+#ButtonFullScreen:hover{
+	opacity:1;
+	border: 1px solid #eee;
+}
+#radioset{
+	position: absolute;
+	right:315px;
+	display:none;
+	padding-right:10px;
+}
+
+#shaderset .ui-button-text-only .ui-button-text,#colorset .ui-button-text-only .ui-button-text, #reflectanceset .ui-button-text-only .ui-button-text{
+	padding:0px;
+	display: table-cell;
+	vertical-align: middle;
+}
+#radioset .ui-button-text-only .ui-button-text{
+	padding:5px !important;
+}
+#radioset .ui-button{
+	opacity:0.7;
+	border: 1px solid #aaa;
+	background-image: none;
+	background-color: #222;
+	width:40px;
+	height:40px;
+	margin: 10px 0 0 6px;
+}
+#leftAside .ui-state-default, #rightAside .ui-state-default{
+	opacity:0.7;
+	border: 1px solid #aaa;
+	background-image: none;
+	background-color: #222;
+}
+.ui-accordion-header{
+	border-left:0 !important;
+	border-right:0 !important;
+}
+#radioset .ui-state-hover, #radioset .ui-state-active{
+	opacity:1;
+	border: 1px solid #eee;
+	background-image: none;
+	background-color: #222;
+}
+#leftAside .ui-state-hover, #leftAside .ui-state-active,#rightAside .ui-state-hover, #rightAside .ui-state-active{
+	opacity:1;
+	border: 1px solid #eee;
+	background-image: none;
+	background-color: #222;
+}
+#shaderset .ui-button, #colorset .ui-button, #reflectanceset .ui-button, #positioning .ui-button{
+	border: 1px solid #aaa;
+	/*width:110px;*/
+	height:40px;
+	margin:10px;
+	margin-top:0px;
+	margin-left:0px;
+	display: table;
+	vertical-align: middle;
+	float: left;
+	border-radius:3px;
+}
+#shaderset .ui-state-hover {
+	border: 1px solid #eee;
+}
+.ui-icon-helpme{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/help.png);
+	background-repeat:no-repeat;
+}
+.ui-icon-mouse{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/mouse.png);
+	background-repeat:no-repeat;
+}
+.ui-icon-mouse2{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/help.png);
+	background-repeat:no-repeat;
+}
+.ui-icon-light{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/wand.png) ;
+	background-repeat:no-repeat;
+}
+.ui-icon-pan{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/expand.png);
+	background-repeat:no-repeat;
+}
+.ui-icon-zoom{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/arrow-up.png);
+	background-repeat:no-repeat;
+}
+.ui-icon-rotz{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/spinner6.png);
+	background-repeat:no-repeat;
+}
+.ui-icon-side{
+	width:40px;
+	height:40px;
+	background-size:30px 30px;
+	background-image: url(images/side.png);
+	background-repeat:no-repeat;
+}
+#shaderset, #colorset, #reflectanceset, #positioning, #filterparameters, #printing, #normalset{
+	width:255px;
+	float: right;
+	text-align:left;
+}
+#colorset h4, #shaderset h4, #reflectanceset h4, #positioning h4, #filterparameters h4, #printing h4, #normalset h4{
+	margin:5px 0 5px -10px;
+	text-align:left;
+
+}
+#rightAsideButton{
+	position: absolute;
+	right:0px;
+	width:14px;
+	height:100%;
+	z-index:1002;
+	border-left: 1px solid #aaa;
+	background-color: #333;
+}
+#rightAsideButton:hover{
+	border-left: 1px solid #eee;
+	background-size:100% 100%;
+	cursor:pointer;
+}
+
+
+#main{
+	position: absolute;
+	top: 60px;
+	bottom:16px;
+	width:100%;
+	overflow:hidden;
+}
+#contentwrapper{
+	position: absolute;
+	left:0px;
+	right:15px;
+	height: 100%;
+	z-index:1000;
+	background-color: #7F7F7F;
+}
+#content{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color:black;
+}
+#canvasMain{
+	position: absolute;
+	width:100%;
+	height:100%;
+}
+#loader{
+	width:100%;
+	height:100%;
+	display:none;
+	text-align:center;
+}
+#errorMessages{
+	width:100%;
+	height:100%;
+	background-color: #222;
+	display:none;
+}
+#errorMessages h1, #errorMessages h2, #errorMessages h3{
+	color: red;
+	padding: 15px;
+	margin: 0px;
+}
+#mainIntro{
+	width:100%;
+	height:100%;
+	
+}
+
+#radiosetIntro{
+	margin:00px auto 0 auto;
+	width:350px;
+	float: right;
+	height: 42px;
+	padding-top:10px;
+	display:none;
+}
+#radiosetIntro .ui-button{
+	border: 1px solid #aaa;
+	/*width:100px;*/
+	height:38px;
+	margin: 0 0px 0 10px;
+	float: right;
+	opacity:0.7;
+	border: 1px solid #aaa;
+	background-image: none;
+	background-color: #222;
+	border-radius:5px !important;
+}
+#radiosetIntro .ui-button-text{
+	padding: 9px;
+}
+#radiosetIntro .ui-state-hover, #radiosetIntro .ui-state-active {
+	border: 1px solid #eee;
+	opacity:1.0;
+}
+#introContentWrapper{
+	clear: both;
+	position:absolute;
+	top:15px;
+	bottom:16px;
+	left:10%;
+	right:10%;
+	background-color:#222222;
+	overflow: hidden;
+	border:1px solid #aaa;
+}
+#introHelp, #introFeatures, #introLinks{
+	position:absolute;
+	top:0px;
+	bottom:0px;
+	left:0px;
+	right:0px;
+}
+#introHelp, #introLinks{
+	opacity:0;
+	padding:20px;
+}
+#introHelp table{
+	border-collapse:collapse;
+}
+#introHelp table, td, th{
+	border:1px solid #eee;
+	padding:7px;
+}
+.introLinksItem{
+	border: 1px solid #aaa;
+	padding: 10px;
+	margin:10px;
+		float:left;
+}
+.introLinksItem h2{
+	padding:0;
+	margin:0;
+}
+#loader img{
+	position: absolute;
+	left:50%;
+	top:50%;
+	margin-left:-50px;
+	margin-top:-50px;
+}
+#loader h2{
+	color:#222;
+}
+#downloadIndicator{	
+	width:100%;
+	height:100%;
+	display:none;
+	text-align:center;
+}
+#downloadIndicator h2{
+	color:#222;
+}
+#progressbar {
+	
+    margin: 10px 0;
+    padding: 3px;
+    border: 1px solid #000;
+    font-size: 14px;
+    clear: both;
+    opacity: 0;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+	width:500px;
+	height:40px;
+	position:absolute;
+	left:50%;
+	top:50%;
+	margin:-20px 0 0 -250px;
+
+  }
+  #progressbar.loading {
+    opacity: 1.0;
+  }
+  #progressbar .percent {
+    background-color: #222;
+    height: 40px;
+    width: 0;
+	font-size:35px;
+	color:#eee;
+  }
+#canvasOverlay{
+	position: absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+#leftAside{
+	position: absolute;
+	left: 15px;
+	top: 0px;
+	width: 200px;
+	float:left;
+	background-color: #333333;
+	height: 100%;
+	z-index:1001;
+}
+.sidebarIcon{
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+}
+#rightAside{
+	position: absolute;
+	right: -300px;
+	top: 0px;
+	overflow:hidden;
+	margin-right:0;
+	width:300px;
+	float:right;
+	background-color: #333333;
+	height: 100%;
+	z-index:1001;
+}
+.aside {
+	margin: 5px 0px 5px 0px;
+	padding:0;
+	overflow:hidden;
+}
+.aside li{
+	list-style-type:none; 
+}
+.aside input, .aside textarea{
+	display:inline-block;
+	background-color: #222222;
+	color: #ffffff;
+	outline:none;
+	border:0;
+}
+.aside textarea{
+	width:184px;
+	max-width:184px;
+	height:8em;
+}
+.metadata li{
+	font-size:12px;
+	line-height:25px;
+}
+footer{
+	position:absolute;
+	clear:both;
+	width:100%;
+	border-top: 1px solid #aaa;
+	bottom:1px;
+	height:15px;
+	z-index:1010;
+}
+
+input, input:focus,textarea:focus{
+	border:0;
+	-webkit-appearance: none !important;
+	box-shadow: none !important;
+	outline: none;
+}
+
+.introLabel{
+	margin-top: 0 !important;
+	float: left;
+	padding-left:10px;
+	opacity:0.7;
+}
+.introLabel:hover{
+	cursor:pointer;
+	opacity:1.0;
+}
+.ui-icon-previous, .ui-icon-play3, .ui-icon-pause2, .ui-icon-next{
+	width:15px;
+	height:15px;
+	background-size:15px 15px;
+	background-repeat:no-repeat;
+}
+.ui-icon-previous{
+	background-image: url(images/previous.png);
+}
+.ui-icon-play3{
+	background-image: url(images/play3.png);
+}
+.ui-icon-pause2{
+	background-image: url(images/pause2.png);
+}
+.ui-icon-next{
+	background-image: url(images/next.png);
+}

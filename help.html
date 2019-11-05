@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<!--
+license
+-->
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>Minidome</title>
+	<!-- STYLE SHEETS -->
+	<link href='data/style/greyRed/jquery-ui-1.10.1.custom.css' type='text/css' rel='stylesheet' />
+	<link href='data/style/main.css' type='text/css' rel='stylesheet' />
+	<script src="data/js/jquery/jquery-1.9.1.min.js"></script> <!--Placed here to avoid flash of unstyled content (http://www.learningjquery.com/2008/10/1-way-to-avoid-the-flash-of-unstyled-content)-->
+</head>
+<header>
+	<div id="logo" style="float:left;">
+		<a href="home.html"><h1>Minidome</h1></a>
+	</div>
+	<div id="radiosetIntro">
+		<!-- <input type="radio" id="radioIntro2" name="radio"><label for="radioIntro2">Links</label> -->
+		<input type="radio" id="radioIntro1" name="radio"><label for="radioIntro1">Help</label>
+		<input type="radio" id="radioIntro0" name="radio" checked="checked"><label for="radioIntro0">Features</label>
+	</div>		
+</header>
+<body>
+
+<div id="main" style="overflow:scroll;">
+
+
+The Minidome's webviewer is a web-based interface. It allows users to interact with the digitized objects through the web withouth the need for installing specific software or the need for specific operating systems.
+
+<h1>Browser requirements</h1>
+<p>This viewer is based on the state-of-the-art WebGL API for rendering 3D graphics through your browser. Altough quite some progress is made to have WebGL standard on all browsers, whether or not it will work for you will depend on what browser and which version you use. 
+
+The webviewer has been tested for <b><font fgcolor="yellow">Google Chrome, Apple Safari and Mozilla Firefox</font></b>. Until further notice, Internet Explorer does not support WebGl unfortunately. Make sure <b>'WebGL' is activated</b> in your brower. You can verify whether your browser and graphics supports WebGL through <a href="http://get.webgl.org/" target="_blank">http://get.webgl.org/</a>. If you still have trouble, contact <it>info@minidome.be</it>.</p>
+<h1>Controls</h1>
+<p>The interactive visualization is controlled by mouse/keyboard or touch input. Specific visualization modes, as indicated in the Display tab on the right hand side of the screen, are set by clicking the corresponding buttons.</p>
+<h2>Mouse/Keyboard:</h2>
+<p> The table below shows the conventions for mouse button / keyboard combinations to control
+<table>
+<tr>
+	<td>Desired action</td>
+	<td>Mouse + Keyboard input</td>
+	<td>Touch input</td>
+</tr>
+<tr>
+	<td>Change lightdirection</td>
+	<td>Press L to show/hide the virtual lights<br>Drag virtual light</td>
+	<td>Tap the light mode icon<br>Drag virtual light</td>
+</tr>
+<tr>
+	<td>Pan</td>
+	<td>Press and hold Shift key<br>Drag object</td>
+	<td>Tap the Drag mode icon <br>Drag object</td>
+</tr>
+<tr>
+        <td>Zoom</td>
+        <td>Scroll</td>
+	<td>Tap the Zoom mode icon <br>Drag up or down on the scene</td>
+</tr>
+<tr>
+        <td>Rotate</td>
+	<td>Press and hold Shift<br>Scroll</td>
+        <td>Tap the rotate mode icon <br> Drag (counter)clockwise on the scene</td>
+</tr>
+<tr>
+	<td>Change active side</td>
+	<td>Press Up/Down/Left/Right key</td>
+	<td>Tap the side mode icon<br>Drag up/down/left/right</td>
+</tr>
+</table>
+<h2>Touch screen:</h2>
+In touch screen mode, so far a single-touch convention is used. The interactive modes described in the table above, are activated by the buttons in the top toolbar.</br></br>
+			
+
+</div>
+</body>
