@@ -26,7 +26,7 @@ var Utils = {
 	
 		for (var i = 0; i < names.length; ++i) {
 		try {
-			ctx = canvas.getContext(names[i], { antialias: false }); //,{preserveDrawingBuffer: true} //doesn't increase performance
+			ctx = canvas.getContext(names[i], { antialias: true }); //,{preserveDrawingBuffer: true} //doesn't increase performance
 		} 
 		catch(e) {}
 			if (ctx) {

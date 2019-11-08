@@ -349,8 +349,8 @@ function load(){
 * helper function that is invoked each time the canvas size changes. Note the difference between width and css width (resolution vs occupied pixels)
 */
 function updateCanvasSize(){
-	canvasWidth = $('#content').width()*2;
-	canvasHeight = $('#content').height()*2;
+	canvasWidth = $('#content').width()*1;
+	canvasHeight = $('#content').height()*1; //check for performance
 	$('#canvasMain').attr('width',canvasWidth	);
 	$('#canvasMain').attr('height',canvasHeight);
 	canvasWidth2 = $('#content').width();
@@ -368,6 +368,11 @@ function updateCanvasSize(){
 }
 
 function updateNormal(spectralNb){
+	if(boolGLTF){
+
+
+	}
+	else{
 	if(boolMultiSpectral){
 
 	var normalData;
@@ -415,14 +420,154 @@ switch(spectralNb){
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 render(0);
-	}
 }
+}
+
+}
+
+function updateTexture(gl, texture, url){
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	const level = 0;
+	const internalFormat = gl.RGBA;
+	const width = 1;
+	const height = 1;
+	const border = 0;
+	const srcFormat = gl.RGBA;
+	const srcType = gl.UNSIGNED_BYTE;
+	const pixel = new Uint8Array([0, 0, 0, 0]);  //  black
+	gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+				  width, height, border, srcFormat, srcType,
+				  pixel);
+	const image = new Image();
+	image.onload = function() {
+		console.log( "loading image " + image.src + "  with dimensions " + image.width + " x " + image.height );
+	  gl.bindTexture(gl.TEXTURE_2D, texture);
+	  console.log('binding');
+	  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+					srcFormat, srcType, image);
+					console.log('texim');
+	  // WebGL1 has different requirements for power of 2 images
+	  // vs non power of 2 images so check if the image is a
+	  // power of 2 in both dimensions.
+	  if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+		 // Yes, it's a power of 2. Generate mips.
+		 gl.generateMipmap(gl.TEXTURE_2D);
+	  } else {
+		 // No, it's not a power of 2. Turn off mips and set
+		 // wrapping to clamp to edge
+		 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	  }
+	  render(0);
+	};
+	image.src = url;
+	//render(0);
+}
+// loads and returns a gl texture from an image url
+function loadTexture(gl, url) {
+	const texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+  
+	// Because images have to be download over the internet
+	// they might take a moment until they are ready.
+	// Until then put a single pixel in the texture so we can
+	// use it immediately. When the image has finished downloading
+	// we'll update the texture with the contents of the image.
+	const level = 0;
+	const internalFormat = gl.RGBA;
+	const width = 1;
+	const height = 1;
+	const border = 0;
+	const srcFormat = gl.RGBA;
+	const srcType = gl.UNSIGNED_BYTE;
+	const pixel = new Uint8Array([0, 0, 0, 0]);  //  black
+	gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+				  width, height, border, srcFormat, srcType,
+				  pixel);
+  console.log(url);
+	const image = new Image();
+	image.onload = function() {
+		console.log( "loading image " + image.src + "  with dimensions " + image.width + " x " + image.height );
+	  gl.bindTexture(gl.TEXTURE_2D, texture);
+	  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
+					srcFormat, srcType, image);
+  
+	  // WebGL1 has different requirements for power of 2 images
+	  // vs non power of 2 images so check if the image is a
+	  // power of 2 in both dimensions.
+	  if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+		 // Yes, it's a power of 2. Generate mips.
+		 gl.generateMipmap(gl.TEXTURE_2D);
+	  } else {
+		 // No, it's not a power of 2. Turn off mips and set
+		 // wrapping to clamp to edge
+		 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	  }
+	  render(0);
+	};
+	image.src = url;
+  
+	return texture;
+  }
+  
+  function isPowerOf2(value) {
+	return (value & (value - 1)) == 0;
+  }
 
 
 /*
 * builds the texture plane, input: sideNr: front: 0, back: 1, bottom: 2, top: 3, left: 4, right: 5
 */
 function buildSidePlane(sideNr){
+
+	if(boolGLTF){
+
+		
+
+		scaleFactor[0] = 1;
+		var xOff,yOff=0;
+		var widthBack;
+		widthBack=0;
+		var widthLeft;
+		widthLeft=0;
+		var widthRight;
+		widthRight=0;
+		var heightBottom;
+		heightBottom=0;
+		var heightTop;
+		heightTop=0;
+		var heightFront = 50*textureData[0].height/textureData[0].width;
+		if((heightFront+heightBottom+heightTop)>canvasHeight/canvasWidth*(widthBack+50+widthRight+widthLeft)){
+			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(50*textureData[0].height/textureData[0].width+heightBottom+heightTop)];
+		}
+		else{
+			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(1/canvasWidth*canvasHeight*(widthBack+50+widthRight+widthLeft))];	
+		}
+		position = HOME.slice(0);
+		console.log(position);
+		offscreenRenderHeight = Math.round(((textureData[0]!== undefined)?textureData[0].height:0)+0*((textureData[1]!== undefined)?textureData[1].height:0)+((textureData[2]!== undefined)?textureData[2].height*scaleFactor[2]:0)+((textureData[3]!== undefined)?textureData[3].height*scaleFactor[3]:0));
+		offscreenRenderWidth = Math.round(((textureData[4]!== undefined)?textureData[4].height*scaleFactor[4]:0)+((textureData[0]!== undefined)?textureData[0].width:0)+((textureData[5]!== undefined)?textureData[5].height*scaleFactor[5]:0)+((textureData[1]!== undefined)?textureData[1].width*scaleFactor[1]:0));
+		offscreenRenderWidth = textureData[0].width*(1+((textureData[4]!== undefined)?1*scaleFactor[4]/*textureData[4].width/textureData[4].height*/:0)+((textureData[5]!== undefined)?1*scaleFactor[5]/*textureData[4].width/textureData[4].height*/:0)+((textureData[1]!== undefined)?1*scaleFactor[1]/*textureData[4].width/textureData[4].height*/:0));
+	
+		sidePlane[sideNr] = null;
+	sidePlane[sideNr] = new ObjectPlane(sideNr,200,200,scaleFactor[sideNr],textureData[sideNr].height/textureData[sideNr].width,xOff,yOff,textureData[sideNr].height,textureData[sideNr].width);
+	Scene.addObject(sidePlane[sideNr]);
+	console.log("added side "+sideNr);
+	changeSide(10);
+	normalTex[0] = loadTexture(gl, "data/samples/glTF/PLD_UNorm.png");
+	albedoTex[0] = loadTexture(gl, "data/samples/glTF/PLD_Dalb.png");
+			
+	
+	hshTex[0] = loadTexture(gl, "data/samples/glTF/HSH_Dhsh0.png");
+	hshTex[1] = loadTexture(gl, "data/samples/glTF/HSH_Dhsh1.png");
+	hshTex[2] = loadTexture(gl, "data/samples/glTF/HSH_Dhsh2.png");
+	hshTex[3] = loadTexture(gl, "data/samples/glTF/HSH_Dhsh3.png");
+
+	}
+	else{
 	
 	var normalData;
 	//floatingPointTextureSupport =0;
@@ -670,6 +815,7 @@ function buildSidePlane(sideNr){
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	render(0); //temp: is this necessary
 	
+ }
 }
 /*
 * changes the old net to a new net, depending on which side has to be in the middle
@@ -1166,6 +1312,7 @@ function animateM(n){
 * main idea: for each object in scene: update matrices, lightdirection and scene
 */
 function render(s) {
+	console.log("render");
 renderTime0 = new Date().getTime();
 	if(s==0){
 		gl.viewport(0, 0, canvasWidth, canvasHeight);
@@ -1265,6 +1412,9 @@ renderTime0 = new Date().getTime();
 			gl.uniform1f(curProgram.uLightIntensity0, object.lightIntensity0);
 			gl.uniform1f(curProgram.uLightIntensity1, object.lightIntensity1);
 			gl.uniform1f(curProgram.uFloatTex, floatingPointTextureSupport);
+			gl.uniform1f(curProgram.uBoolGLTF, boolGLTF);
+			gl.uniform4fv(curProgram.uScale, vec4Scale);
+			gl.uniform4fv(curProgram.uBias, vec4Bias);
 			if(moving){		
 				gl.uniform1f(curProgram.uParam0, 0.1);
 				gl.uniform1f(curProgram.uParam1, 0);
@@ -1284,7 +1434,7 @@ renderTime0 = new Date().getTime();
 
 			//if(object.id=="objectLight0" && boolLightToggle()){gl.uniform4fv(curProgram.uMaterialAmbient, [1.0, 1.0, 0, 1.0]);}
 			//else if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [1.0, 1.0, 0, 1.0]);}
-			//else{gl.uniform4fv(curProgram.uMaterialAmbient, [0, 0, 0, 0]);}
+			if(object.type!="lightCone"){gl.uniform4fv(curProgram.uMaterialAmbient, [0, 0, 0, 0]);}
 			gl.bindBuffer(gl.ARRAY_BUFFER, object.tbo);
 			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);		
 			gl.enableVertexAttribArray(1);
@@ -1326,21 +1476,21 @@ renderTime0 = new Date().getTime();
 				}
 
 				if(boolRti){
-					gl.activeTexture(gl.TEXTURE1);
+					gl.activeTexture(gl.TEXTURE11);
 					gl.bindTexture(gl.TEXTURE_2D, hshTex[0]);
-					gl.uniform1i(curProgram.hshCoeff0Tex, 1);
+					gl.uniform1i(curProgram.hshCoeff0Tex, 11);
 
-					gl.activeTexture(gl.TEXTURE2);
+					gl.activeTexture(gl.TEXTURE12);
 					gl.bindTexture(gl.TEXTURE_2D, hshTex[1]);
-					gl.uniform1i(curProgram.hshCoeff1Tex, 2);
+					gl.uniform1i(curProgram.hshCoeff1Tex, 12);
 
-					gl.activeTexture(gl.TEXTURE3);
+					gl.activeTexture(gl.TEXTURE13);
 					gl.bindTexture(gl.TEXTURE_2D, hshTex[2]);
-					gl.uniform1i(curProgram.hshCoeff2Tex, 3);
+					gl.uniform1i(curProgram.hshCoeff2Tex, 13);
 
-					gl.activeTexture(gl.TEXTURE4);
+					gl.activeTexture(gl.TEXTURE14);
 					gl.bindTexture(gl.TEXTURE_2D, hshTex[3]);
-					gl.uniform1i(curProgram.hshCoeff3Tex, 4);
+					gl.uniform1i(curProgram.hshCoeff3Tex, 14);
 				}
 				else if(boolPtm){
 					gl.activeTexture(gl.TEXTURE1);
@@ -1362,10 +1512,13 @@ renderTime0 = new Date().getTime();
 			}
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
 			if((object.type=="lightCone")&& boolLightToggle() &&(mainPrg != prg2 || mainPrg != prg2 )){
-                gl.drawElements(gl.LINE_STRIP, object.indices.length, gl.UNSIGNED_SHORT,0);
-				if(object.id=="objectLight0"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity0/2, lightIntensity0/2,0, 1.0]);}
-				if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity1/2, lightIntensity1/2,0, 1.0]);}
+              
+				if(object.id=="objectLight0"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity0/10+0.1, lightIntensity0/10+0.1,lightIntensity0/20, 1.0]);}
+				if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity1/10+0.1, lightIntensity1/10+0.1,lightIntensity1/20, 1.0]);}
+				
 				gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);
+				gl.uniform4fv(curProgram.uMaterialAmbient, [1.0,1.0,1.0, 1.0]);
+				gl.drawElements(gl.LINE_STRIP, object.indices.length, gl.UNSIGNED_SHORT,0);
             }    
             if(object.type=="sidePlane"){gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_SHORT,0);}
 			gl.bindBuffer(gl.ARRAY_BUFFER, null);

@@ -45,10 +45,15 @@ var startPointer = new Array();
 var beginPointer;
 var endPos = new Array(6);
 
+
+var vec4Scale = [1.0, 1.0, 1.0, 1.0];
+var vec4Bias = [0.0, 0.0, 0.0, 0.0];
+
 var boolRti = false;
 var boolPhotometric = false;
 var boolMultiSpectral = false;
 var boolPtm = false;
+var boolGLTF = false;
 
 function xhrTest(zurl){
 	
@@ -174,6 +179,10 @@ function loadFileWrapper(arrayBuffer, fileType){
 	console.log('Loading PTM file... ');
 	loadFilePTM(arrayBuffer);
  }
+ else if (fileType == 'ltf'){
+	console.log('Loading GTLF file... ');
+	loadFileGLTF(arrayBuffer);
+ }
 
 }
 
@@ -232,6 +241,42 @@ function updateShaderList(){
 	}
 	
 }
+function ab2str(buf){
+return String.fromCharCode.apply(null, new Uint8Array(buf));
+
+}
+function loadFileGLTF(arrayBuffer){
+	$("#downloadIndicator").css("display","none");
+	$("#loader").css("display","block");
+	$("#radiosetIntro").css("display","none");
+	var glTFObj = JSON.parse(ab2str(arrayBuffer));
+	boolGLTF = true;
+	vec4Bias = [parseFloat(glTFObj.hsh[0].hshCoef0[0].bias) , parseFloat(glTFObj.hsh[0].hshCoef1[0].bias), parseFloat(glTFObj.hsh[0].hshCoef2[0].bias), parseFloat(glTFObj.hsh[0].hshCoef3[0].bias)];
+	vec4Scale = [parseFloat(glTFObj.hsh[0].hshCoef0[0].scale) , parseFloat(glTFObj.hsh[0].hshCoef1[0].scale), parseFloat(glTFObj.hsh[0].hshCoef2[0].scale), parseFloat(glTFObj.hsh[0].hshCoef3[0].scale)];
+	
+	boolPtm = false;
+	boolRti = true;
+	boolPhotometric = true;
+
+	var sideData = new Object();
+	sideData.width = glTFObj.width;
+	sideData.height = glTFObj.height;
+
+	textureData.push(sideData);
+	
+//console.log(mHshData);
+	runWebGL();
+	//buildSidePlane(0);
+	var t = glTFObj.shaderConfig[0].lightDirection0.split(" ", 3);
+	lightDirection0 = [parseFloat(t[0]), parseFloat(t[1]), parseFloat(t[2]) ];
+	var style = parseInt(glTFObj.shaderConfig[0].shader);
+	param0 = parseFloat(glTFObj.shaderConfig[0].param0);
+	param1 = parseFloat(glTFObj.shaderConfig[0].param1);
+	updateProgram(style);
+	//$("#shader4")[0].checked=true;
+	$('#shader'+style).prop('checked',true);
+	$("#shaderset").change();
+}
 
 function loadFilePTM(arrayBuffer){
 	$("#downloadIndicator").css("display","none");
@@ -241,6 +286,7 @@ function loadFilePTM(arrayBuffer){
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = true;
+	boolGLTF = false;
 	updateShaderList();
 	
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
@@ -282,6 +328,7 @@ function loadFileRTI(arrayBuffer){
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = false;
+	boolGLTF = false;
 	updateShaderList();
 	
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
@@ -342,7 +389,7 @@ textureData.push(sideData);
 //console.log(mHshData);
 runWebGL();
 updateProgram(20);
-
+//animateTest();
 				
 			};
 			workerRti.postMessage({buffer: inputBuffer.buffer, currentIdx: inputBuffer.currentIndex, w: w, h:h, basisTerm: basisTerm,},[inputBuffer.buffer]);
@@ -440,6 +487,7 @@ function loadFile(arrayBuffer){
 	boolPhotometric = true;
 	boolMultiSpectral = false;
 	boolPtm = false;
+	boolGLTF = false;
 	updateShaderList();
 
 //loadDepthMap(0); //only for demo purposes with NP 29.ZUN file
