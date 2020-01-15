@@ -33,8 +33,8 @@ var msHeight;
 var lightEllipseFactor = 1.3;
 document.oncontextmenu = document.body.oncontextmenu = function() {return false;}
 
-function initInteraction(){
 
+function initInteraction(){
 	mouseDown = false;
 	touchXyRotationToggle = false;
 	touchZoomToggle = false;
@@ -52,8 +52,11 @@ function initInteraction(){
 	touchMouseToggle = true;
 	keyLightToggle = true;
 
-	leftAside = true;
-	rightAside = false;
+	leftAside = false;
+	rightAside = true;
+	$("#rightAside").animate({right:'15px'});
+	$("#contentwrapper").css("right","390px");
+	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e"); 
 
 	alreadyRendering = false;
 	boolAlreadyChangedSide = false;
@@ -63,10 +66,12 @@ function initInteraction(){
 	rotationHelper = 0;
 	rotAngle=0;
 
-	$("#sliderLight0").slider({value: 1});
+	$("#sliderLight0").slider({value: 3});
 	$("#sliderLight1").slider({value: 0});
 	$("#sliderParam0").slider({value: 0});
 	$("#sliderParam1").slider({value: 0});
+	$("#sliderParam2").slider({value: 0});
+	$("#sliderParam3").slider({value: 0});
 
 	rect = canvas.getBoundingClientRect();
 	twidth = rect.right - rect.left;
@@ -78,20 +83,84 @@ function initInteraction(){
 
 	$("#color0")[0].checked =true;
 	$("#color0").button("refresh");
-	$("#color1").button("widget").css({"display": "none"});
-	$("#color1").button("refresh");
+	//$("#color1").button("widget").css({"display": "none"});
+	//$("#color1").button("refresh");
 	$("#shader1")[0].checked =true;
 	$("#shader1").button("refresh");
 	$("#radio8")[0].checked =true;
 	$("#radio8").button("refresh");
 
-	$("#color1")[0].checked =true;
 	$("#colorIRG").button("refresh");
+
+	$('#lshader1').button();
+	$('#lshader2').button();
+	$('#lshader3').button();
+	$('#lshader4').button();
+	$('#lshader5').button();
+	$('#lshader6').button();
+	$('#lshader7').button();
+	$('#lshader8').button();
+	$('#lshader9').button();
+	$('#lshader10').button();
+	$('#lshader11').button();
+	$('#lshader12').button();
+	$('#lshader13').button();
+	$('#lshader14').button();
+	$('#lshader15').button();
+
+	$("#colorI").button();
+	$("#colorR").button();
+	$("#colorG").button();
+	$("#colorB").button();
+	$("#colorU").button();
+
+	$("#colorIRG").button();
+	$("#colorIGB").button();
+	$("#colorRGB").button();
+	$("#colorRGU").button();
+	$("#colorGBU").button();
+
+	if(!boolMultiSpectral){
+		$("#colorI").button("disable");
+		$("#colorU").button("disable");
+
+		$("#colorIRG").button("disable");
+		$("#colorIGB").button("disable");
+		$("#colorRGU").button("disable");
+		$("#colorGBU").button("disable");
+
+		$("#normalI").button("disable");
+		$("#normalR").button("disable");
+		$("#normalB").button("disable");
+		$("#normalU").button("disable");
+
+	} else{
+		$("#colorI").button("enable");
+		$("#colorU").button("enable");
+
+		$("#colorIRG").button("enable");
+		$("#colorIGB").button("enable");
+		$("#colorRGU").button("enable");
+		$("#colorGBU").button("enable");
+
+		$("#normalI").button("enable");
+		$("#normalR").button("enable");
+		$("#normalB").button("enable");
+		$("#normalU").button("enable");
+	}
+
+
 	
 }
 function boolLightToggle(){
 	return (touchLightToggle||keyLightToggle);
 }
+
+function openInNewTab(url) {
+  var win = window.open(url, '_blank');
+  win.focus();
+}
+
 //function to sync mouse mode and touch mode input
 function updateUi(number){
 	touchZoomToggle = false;
@@ -101,6 +170,7 @@ function updateUi(number){
 	touchXyRotationToggle = false;
 	touchMeasureToggle = false;
 	touchMouseToggle = false;
+	touchHelpToggle = false;
 	switch(number){
 		case 1: touchLightToggle = true; break;
 		case 2: touchPanToggle = true; keyLightToggle=false; break;
@@ -110,6 +180,7 @@ function updateUi(number){
 		case 6: touchSideToggle= true; keyLightToggle=false; break;
 		case 7: touchMeasureToggle= true; keyLightToggle=false; break;
 		case 8: touchMouseToggle= true; break;
+		case 9: touchHelpToggle= true; break;
 	}
 	document.getElementById("canvasOverlay").style.cursor="default";
 	if(touchLightToggle==true){
@@ -154,6 +225,10 @@ function updateUi(number){
 		$("#radio6")[0].checked =true;
 		$("#radio6").button("refresh");
 	}
+	else if(touchHelpToggle==true){
+		openInNewTab('http://www.heritage-visualisation.org/pixelplusviewer.html');
+
+	}
 	if(gl){render(0);}
 }
 
@@ -162,14 +237,14 @@ $(document).ready(function(){
 	$("#rightAsideButton").click(function(){
 		if(rightAside==true){
 			rightAside=false;
-			$("#rightAside").animate({right:'-300px'});
+			$("#rightAside").animate({right:'-375px'});
 			$("#contentwrapper").css("right","15px");
 			$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w"); 
 		}
 		else{	
 			rightAside=true;
 			$("#rightAside").animate({right:'15px'});
-			$("#contentwrapper").css("right","315px");
+			$("#contentwrapper").css("right","390px");
 			$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e"); 
 		}
 		updateCanvasSize();
@@ -186,9 +261,10 @@ $(document).ready(function(){
 		else if($("#radio3")[0].checked==true){updateUi(3);}
 		else if($("#radio4")[0].checked==true){updateUi(4);}
 		/*else if($("#radio5")[0].checked==true){}*/
-		else if($("#radio6")[0].checked==true){updateUi(6);}
+		else if($("#radio6")[0].checked==true){updateUi(5);}
 		/*else if($("#radio7")[0].checked==true){updateUi(7);}*/
 		else if($("#radio8")[0].checked==true){updateUi(8);}
+		else if($("#radio9")[0].checked==true){updateUi(9);}
 		
 	});
 	$("#radiosetIntro" ).buttonset();
@@ -292,9 +368,17 @@ $(document).ready(function(){
                 }
 		if($("#normalU")[0].checked==true){
 			updateNormal(4);
-                        if(gl){render(0);}
-                    
-                }
+                        if(gl){render(0);} 
+				}
+		if($("#normalHSH")[0].checked==true){
+			updateNormal(5);
+		 				if(gl){render(0);}		
+				}
+		if($("#normalPTM")[0].checked==true){
+			updateNormal(6);
+						 if(gl){render(0);}
+									
+				}		
 
 	});
 	$("#reflectanceset" ).buttonset();
@@ -314,6 +398,8 @@ $(document).ready(function(){
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 			document.getElementById("content").style.background="black";
 		}
 		/*else if($("#shader2")[0].checked==true){
@@ -334,6 +420,8 @@ $(document).ready(function(){
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 			document.getElementById("content").style.background="black";
 		}
 		else if($("#shader4")[0].checked==true){
@@ -343,6 +431,8 @@ $(document).ready(function(){
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 		}
 		else if($("#shader5")[0].checked==true){
 			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
@@ -353,6 +443,8 @@ $(document).ready(function(){
 			document.getElementById("param1wrapper").style.display="inline";
 			document.getElementById("param0").innerHTML = "Sensitivity";
 			document.getElementById("param1").innerHTML = "Thickness";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 		}
 		else if($("#shader6")[0].checked==true){
 			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
@@ -362,7 +454,9 @@ $(document).ready(function(){
 			document.getElementById("param0wrapper").style.display="inline";
 			document.getElementById("param1wrapper").style.display="inline";
 			document.getElementById("param0").innerHTML = "Sensitivity";
-			document.getElementById("param1").innerHTML = "Thickness";			
+			document.getElementById("param1").innerHTML = "Thickness";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";			
 		}
 		else if($("#shader7")[0].checked==true){if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}updateProgram(7);}
 		else if($("#shader8")[0].checked==true){
@@ -374,6 +468,8 @@ $(document).ready(function(){
 			document.getElementById("param1wrapper").style.display="inline";
 			document.getElementById("param0").innerHTML = "Percentage";
 			document.getElementById("param1").innerHTML = "Size";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 		}
 		else if($("#shader9")[0].checked==true){
 			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
@@ -383,6 +479,8 @@ $(document).ready(function(){
 			document.getElementById("param0wrapper").style.display="inline";
 			document.getElementById("param1wrapper").style.display="none";	
 			document.getElementById("param0").innerHTML = "Area";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 			document.getElementById("content").style.background="black";
 		}
 		else if($("#shader10")[0].checked==true){
@@ -394,6 +492,8 @@ $(document).ready(function(){
 			document.getElementById("light1wrapper").style.display="none";
 			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
 		
 		}
 		else if($("#shader11")[0].checked==true){
@@ -402,7 +502,9 @@ $(document).ready(function(){
             document.getElementById("light0wrapper").style.display="inline";
             document.getElementById("light1wrapper").style.display="inline";
             document.getElementById("param0wrapper").style.display="none";
-            document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
             document.getElementById("content").style.background="black";
 
 		}
@@ -413,8 +515,72 @@ $(document).ready(function(){
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
+
 			document.getElementById("content").style.background="black";
 		}
+		else if($("#shader13")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram(22);
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "exp";
+			document.getElementById("param1").innerHTML = "Ks";
+			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+			
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#shader14")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram(23);
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "exp";
+			document.getElementById("param1").innerHTML = "Ks";
+			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+			
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#shader15")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram(24);
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "Percentage";
+			document.getElementById("param1").innerHTML = "Size";
+			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+			
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#shader16")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram(25);
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param0").innerHTML = "Amount";
+			document.getElementById("param1").innerHTML = "Ks";
+			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+			
+			document.getElementById("content").style.background="black";
+		}
+
 	});
 	$("#shader2").button({disabled:true});
 	//$('#shader1')[0].hide();
@@ -444,6 +610,17 @@ $(document).ready(function(){
 		if(gl){render(0)};
 		console.log(position);
 	}
+	$( "#ButtonRotatePosition" )
+      .button()
+      .click(function( event ) {
+        event.preventDefault();
+		RotatePosition();
+	  });
+	  function RotatePosition(){
+		  rotation[2]-=90;
+		  if(gl){render(0);}
+	  }
+
 	$("#ButtonOpenFile")
       .button()
       .click(function( event ) {
@@ -459,7 +636,7 @@ $(document).ready(function(){
 		min:0,
       max: 10,
 		step:0.01,
-      value: 1,
+      value: 3,
       slide: updateLight0,
       change: updateLight0
 	});
@@ -491,6 +668,24 @@ $(document).ready(function(){
       slide: updateParam1,
       change: updateParam1
 	});
+	$( "#sliderParam2" ).slider({orientation: "horizontal",
+	range: "min",
+	  min:0,
+	max: 100,
+	  step:1,
+	value: 0,
+	slide: updateParam2,
+	change: updateParam2
+  });
+  $( "#sliderParam3" ).slider({orientation: "horizontal",
+  range: "min",
+	min:0,
+  max: 100,
+	step:1,
+  value: 0,
+  slide: updateParam3,
+  change: updateParam3
+});
 	function updateLight0(){
 		lightIntensity0 = $( "#sliderLight0" ).slider( "value" );	
 		if(gl&&!alreadyRendering){render(0)};
@@ -507,6 +702,15 @@ $(document).ready(function(){
 		param1 = $( "#sliderParam1" ).slider( "value" );	
 		if(gl&&!alreadyRendering){render(0)};
 	}
+	function updateParam2(){
+		param2 = $( "#sliderParam2" ).slider( "value" );	
+		if(gl&&!alreadyRendering){render(0)};
+	}
+	function updateParam3(){
+		param3 = $( "#sliderParam3" ).slider( "value" );	
+		if(gl&&!alreadyRendering){render(0)};
+	}
+
 	$( "#buttonPrint" ).button();
 	$( "#buttonPrint" ).click(function(){
 		takeScreenshot();
@@ -612,12 +816,12 @@ $(document).keydown(function (e){
 
 
 $(".ui-slider").mousedown(function(e){
-	if(gl&&!alreadyRendering){timeoutid = window.requestAnimFrame(animate);alreadyRendering=true;console.log("start rendering");};
+	if(gl&&!alreadyRendering){timeoutid = window.requestAnimFrame(animate);alreadyRendering=true;/*console.log("start rendering");*/};
 });
 $("canvas").mousedown(function(e){
 	moving =true;
-	if(gl&&!alreadyRendering){timeoutid = window.requestAnimFrame(animate);alreadyRendering=true;console.log("start rendering");};
-	console.log("mousedown: " +timeoutid);
+	if(gl&&!alreadyRendering){timeoutid = window.requestAnimFrame(animate);alreadyRendering=true;/*console.log("start rendering");*/};
+	//console.log("mousedown: " +timeoutid);
 	mouseDown = true;
 	var canvas = document.getElementById("canvasMain");
 	var rect = canvas.getBoundingClientRect();
@@ -819,7 +1023,7 @@ function toggleFullScreen() {
     }
 
 	rightAside=false;
-	$("#rightAside").css("right","-315px");
+	$("#rightAside").css("right","-390px");
 	$("#contentwrapper").css("right","15px");
 	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w"); 
 				
@@ -833,7 +1037,7 @@ function toggleFullScreen() {
     }
 	rightAside=true;
 	$("#rightAside").css("right","15px");
-	$("#contentwrapper").css("right","315px");
+	$("#contentwrapper").css("right","390px");
 	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e"); 
   }
 }
@@ -899,10 +1103,33 @@ $("#introContentWrapper").hover(
 });
 
 
-/*
+function handleOrientation(event) {
+	var absolute = event.absolute;
+	var alpha    = event.alpha;
+	var x     = event.beta;
+	var y    = event.gamma;
+	if(gl){
+		if(window.innerHeight < window.innerWidth){
+			rotation = [-y*1.5,x*1.5,0];
+		}
+		else{
+			rotation = [x*1.5,y*1.5,0];
+		}
+		render();
 
-var hammertime = $("#content").hammer();
-console.log(hammertime);
+	}
+  
+	// Do stuff with the new orientation data
+  }
+  window.addEventListener("deviceorientation", handleOrientation, true);
+
+
+var myOptions;
+var myTouchElement = document.getElementById("content");
+var hammertime = new Hammer(myTouchElement);//, myOptions);
+hammertime.get('pinch').set({ enable: true });
+hammertime.get('rotate').set({ enable: true });
+
 hammertime.on("touch", function(ev) {
   console.log("touched");
   dragStartPosition = position.slice(0);
@@ -966,4 +1193,4 @@ hammertime.on("transform", function(ev) {
 	position[2]=dragStartPosition[2]/ev.gesture.scale;
 	}
 	if(gl){render(0);}
-});*/
+});

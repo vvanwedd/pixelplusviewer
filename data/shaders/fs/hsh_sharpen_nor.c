@@ -9,6 +9,9 @@ uniform mat4 uNMatrix;
 uniform vec4 uLightAmbient;
 uniform float uLightIntensity0;
 uniform float uLightIntensity1;
+uniform float uParam0;
+uniform float uParam1;
+uniform float uParam2;
 uniform float uFloatTex;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
@@ -54,11 +57,12 @@ void main(void)
   
   }
   else{
- hsh0 = vec3( texture2D(hshCoeff0Tex, vTextureCoord) ).rgb;
+  hsh0 = vec3( texture2D(hshCoeff0Tex, vTextureCoord) ).rgb;
   hsh1 = vec3( texture2D(hshCoeff1Tex, vTextureCoord) ).rgb;
   hsh2 = vec3( texture2D(hshCoeff2Tex, vTextureCoord) ).rgb;
   hsh3 = vec3( texture2D(hshCoeff3Tex, vTextureCoord) ).rgb;
 }
+
 
   vec3 lightDirection = normalize(uLightDirection0.xyz);
   float phi = atan(lightDirection.y, lightDirection.x);
@@ -78,6 +82,19 @@ void main(void)
 	//float	hweights5 = sqrt(30.0f/M_PI)     *  (cosPhi*(-1.0f + 2.0f*cosTheta)*sqrt(cosTheta - cosTheta2));
 
  vec3 hsh = hweights0*hsh0 + hweights1*hsh1 + hweights2*hsh2 + hweights3*hsh3; 
+
+  // Unpack tangent-space normal from texture
+  vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
+  if(uBoolGLTF == 1.0){normal = 2.0*(normal - 0.5);}
+  //normal.x = -normal.x;
+  normal = (uNMatrix * vec4(normal, 0.0)).xyz;
+  vec3 h0 = vec3(0.0, 0.0, 1.0);
+  h0 += lightDirection;
+  h0 = normalize(h0);
+  float nDotH0 = max(0.0,dot(normal,h0));
+
+  nDotH0 = pow(nDotH0, uParam0*10.0);
+  float spec0 = (hsh.x + hsh.y + hsh.z) * uParam1 * 2.0/3.0 * nDotH0;
 
    vec3 lightDirection1 = normalize(uLightDirection1.xyz);
   float phi1 = atan(lightDirection1.y, lightDirection1.x);
@@ -100,11 +117,11 @@ void main(void)
 //hsh = 0.000005*hweights0*hsh0 + 10000.0*hweights1*hsh1;//+hsh0;
  //float nDotH = max(min(dot(normal, lightDirection), 0.0f), 1.0f);
  //gl_FragColor = vec4(hsh0.x,1.0,1.0,1.0);
-   
+  
   if(uMaterialAmbient.x != 66666666.0){
 		gl_FragColor = uMaterialAmbient;
 	}
 	else{
-	 gl_FragColor =  vec4(hsh*uLightIntensity0/2.0+hshl1*uLightIntensity1/2.0, 1.0);
+	 gl_FragColor =  vec4((hsh*uParam2/100.0+spec0)*uLightIntensity0/2.0+hshl1*uLightIntensity1/2.0, 1.0);
   }
 }

@@ -1,4 +1,13 @@
-﻿<!DOCTYPE html>
+﻿
+<?php
+header("Location: http:///www.heritage-visualisation.org/viewer/viewer.php"); /* Redirect browser */
+
+/* Make sure that code below does not get executed when we redirect. */
+exit;
+?>
+
+
+<!DOCTYPE html>
 <!--
 license
 -->

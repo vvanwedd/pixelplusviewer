@@ -88,6 +88,14 @@ var c;
 
 for(var j = 0; j < h; j++)
 {
+	//var progress = document.querySelector('.percent');
+	percentLoaded = Math.round((j / h) * 100);
+	//progress.style.width = percentLoaded + '%';
+	//progress.textContent = percentLoaded + '%';
+	if(j%10==0){
+	  self.postMessage(percentLoaded);
+	}
+//console.log(percentLoaded);
 	for(var i = 0; i < w; i++)
 	{				
 		offset = j * w + i;

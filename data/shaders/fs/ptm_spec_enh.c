@@ -9,6 +9,9 @@ uniform mat4 uNMatrix;
 uniform vec4 uLightAmbient;
 uniform float uLightIntensity0;
 uniform float uLightIntensity1;
+uniform float uParam0;
+uniform float uParam1;
+uniform float uParam2;
 uniform float uFloatTex;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
@@ -61,27 +64,22 @@ ptmCoeff1 = ptmCoeff1.bgr;
   vec3 tmp0 = ptmCoeff0*lm0;  
   vec3 tmp1 = ptmCoeff1*lm1;
 
-  float lum = (tmp0.x + tmp0.y + tmp0.z + tmp1.x + tmp1.y + tmp1.z)*uLightIntensity0/255.0/255.0/2.3;
-  
-  vec3 lightDirection1 = normalize(uLightDirection1.xyz);
-
-  vec3 lm10 = vec3(lightDirection1.x*lightDirection1.x, lightDirection1.y*lightDirection1.y, lightDirection1.x*lightDirection1.y);
-  vec3 lm11 = vec3(lightDirection1.x, lightDirection1.y, 1.0);
-
-  vec3 tmp10 = ptmCoeff0*lm10;  
-  vec3 tmp11 = ptmCoeff1*lm11;
-
-  float lum1 = (tmp10.x + tmp10.y + tmp10.z + tmp11.x + tmp11.y + tmp11.z)*uLightIntensity1/255.0/255.0/2.3;
-
-  lum += lum1;
-  
-  ///255.0/5.0;
+  float lum = (tmp0.x + tmp0.y + tmp0.z + tmp1.x + tmp1.y + tmp1.z)*uLightIntensity0/255.0/255.0/2.3;///255.0/5.0;
   if(uBoolGLTF==1.0){ lum *= 255.0;}
-  //hsh = 0.000005*hweights0*hsh0 + 10000.0*hweights1*hsh1;//+hsh0;
-  //float nDotH = max(min(dot(normal, lightDirection), 0.0f), 1.0f);
-  //gl_FragColor = vec4(hsh0.x,1.0,1.0,1.0);
+
+  // Unpack tangent-space normal from texture
+  vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
+  if(uBoolGLTF==1.0){normal = 2.0*(normal - 0.5);}
+  //normal.x = -normal.x;
+  normal = (uNMatrix * vec4(normal, 0.0)).xyz;
+  vec3 h0 = vec3(0.0, 0.0, 1.0);
+  h0 += lightDirection;
+  h0 = normalize(h0);
+  float nDotH0 = max(0.0,dot(normal,h0));
+  nDotH0 = pow(nDotH0, uParam0*10.0);
+  float spec0 = uParam1 * 1.0 * nDotH0;
   if(uMaterialAmbient.x == 66666666.0){
-    gl_FragColor = vec4(lum*ptmCoeffRgb, 1.0);//lum*ptmCoeffRgb *255.0
+    gl_FragColor = vec4((ptmCoeffRgb * uParam2/100.0 + spec0)*lum, 1.0);
   }
   else{
     gl_FragColor = uMaterialAmbient;

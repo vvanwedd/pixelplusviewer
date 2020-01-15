@@ -1,8 +1,24 @@
-﻿<!DOCTYPE html>
+﻿<?php
+header("Location: http:///www.heritage-visualisation.org/viewer/viewer.php"); /* Redirect browser */
+
+/* Make sure that code below does not get executed when we redirect. */
+exit;
+?>
+<!DOCTYPE html>
 <!--
 license
 -->
 <head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-155530128-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-155530128-1');
+</script>
+
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 	<title>Minidome Viewer</title>
 	<!-- STYLE SHEETS -->

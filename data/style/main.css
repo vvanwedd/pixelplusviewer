@@ -7,7 +7,7 @@
 	width:100%;
 	background-color:#111;
 	
-	/*font-family:font-family:Courier New;  -- creates error*/
+	font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
 	font-size:small;
 	color:#eee;
 	-webkit-touch-callout: none;
@@ -35,6 +35,11 @@ header{
 	background-color:#222;
 	height:59px;
 }
+#logo h1{
+	margin: 7px;
+	float: left;
+
+}
 
 
 #webviewerlogo{
@@ -50,7 +55,7 @@ header{
 	margin:0px 5px 5px 0;
 	padding:0;
 	border: 1px solid #aaa;
-	border-radius:5px;
+/*	border-radius:5px;*/
 /*width:150px;*/
 	height:40px;
 	background-color:#222;
@@ -79,7 +84,7 @@ header{
 	margin:0px 5px 5px 0;
 	padding:0;
 	border: 1px solid #aaa;
-	border-radius:5px;
+/*	border-radius:5px;*/
 /*width:150px;*/
 	height:40px;
 	background-color:#222;
@@ -106,7 +111,7 @@ header{
 	margin:0px 5px 5px 0;
 	padding:0;
 	border: 1px solid #aaa;
-	border-radius:5px;
+/*	border-radius:5px;*/
 	width:150px;
 	height:40px;
 	background-color:#222;
@@ -124,7 +129,7 @@ header{
 	padding-right:10px;
 }
 
-#shaderset .ui-button-text-only .ui-button-text,#colorset .ui-button-text-only .ui-button-text, #reflectanceset .ui-button-text-only .ui-button-text{
+#shaderset .ui-button-text-only .ui-button-text,#colorset .ui-button-text-only .ui-button-text, #reflectanceset .ui-button-text-only .ui-button-text, #normalset .ui-button-text-only .ui-button-text{
 	padding:0px;
 	display: table-cell;
 	vertical-align: middle;
@@ -157,26 +162,44 @@ header{
 	background-image: none;
 	background-color: #222;
 }
+.ui-state-disabled{
+	opacity:1;
+	border: 1px solid #777 !important;
+	background-image: none;
+	background-color: #353535 !important;
+	color: #777 !important;
+}
 #leftAside .ui-state-hover, #leftAside .ui-state-active,#rightAside .ui-state-hover, #rightAside .ui-state-active{
 	opacity:1;
 	border: 1px solid #eee;
 	background-image: none;
 	background-color: #222;
 }
-#shaderset .ui-button, #colorset .ui-button, #reflectanceset .ui-button, #positioning .ui-button{
+#shaderset .ui-button, #colorset .ui-button, #reflectanceset .ui-button, #positioning .ui-button, #normalset .ui-button{
 	border: 1px solid #aaa;
-	/*width:110px;*/
-	height:40px;
-	margin:10px;
+	/*width:110px;
+	height:20px;*/
+	margin:5px;
 	margin-top:0px;
 	margin-left:0px;
 	display: table;
 	vertical-align: middle;
 	float: left;
-	border-radius:3px;
+/*	border-radius:3px;*/
+	padding: 5px;
+}
+#buttonPrint{
+padding: 5px;
 }
 #shaderset .ui-state-hover {
 	border: 1px solid #eee;
+}
+.paramwrapper{
+/*background: red;*/
+position: relative;
+padding-bottom: 5px;
+float: left;
+
 }
 .ui-icon-helpme{
 	width:40px;
@@ -235,14 +258,18 @@ header{
 	background-repeat:no-repeat;
 }
 #shaderset, #colorset, #reflectanceset, #positioning, #filterparameters, #printing, #normalset{
-	width:255px;
+	width:345px;
 	float: right;
 	text-align:left;
 }
-#colorset h4, #shaderset h4, #reflectanceset h4, #positioning h4, #filterparameters h4, #printing h4, #normalset h4{
-	margin:5px 0 5px -10px;
+#colorset h4, #shaderset h4, #reflectanceset h4, #positioning h4, #filterparameters h4, #printing h4, #normalset h4, .visualstyle h5, .normalsource h5{
+	margin:5px 0 5px -5px;
 	text-align:left;
 
+}
+.visualstyle h5{
+	margin:5px 0 5px 5px;
+	text-align:left;
 }
 #rightAsideButton{
 	position: absolute;
@@ -327,7 +354,7 @@ header{
 	border: 1px solid #aaa;
 	background-image: none;
 	background-color: #222;
-	border-radius:5px !important;
+/*	border-radius:5px !important;*/
 }
 #radiosetIntro .ui-button-text{
 	padding: 9px;
@@ -385,14 +412,19 @@ header{
 #loader h2{
 	color:#222;
 }
-#downloadIndicator{	
+#progressIndicator{	
+
 	width:100%;
 	height:100%;
 	display:none;
 	text-align:center;
 }
-#downloadIndicator h2{
+#progressIndicator h2{
 	color:#222;
+	position:absolute;
+	left:50%;
+	top: 50%;
+	margin: -70px 0 0 -250px;
 }
 #progressbar {
 	
@@ -423,6 +455,21 @@ header{
 	font-size:35px;
 	color:#eee;
   }
+.visualstyle{
+	background: #444444;
+	float: right;
+	margin: 5px 0 0 -5px;
+	width:100%;
+	padding-left: 5px;
+	padding-top: 5px;
+}
+.normalsource{
+	background: #444444;
+	float: right;
+	margin: 5px 0 0 -5px;
+	width:100%;
+	padding-left: 5px;
+}
 #canvasOverlay{
 	position: absolute;
 	top:0;
@@ -447,11 +494,11 @@ header{
 }
 #rightAside{
 	position: absolute;
-	right: -300px;
+	right: -375px;
 	top: 0px;
 	overflow:hidden;
 	margin-right:0;
-	width:300px;
+	width:375px;
 	float:right;
 	background-color: #333333;
 	height: 100%;
@@ -473,14 +520,15 @@ header{
 	border:0;
 }
 .aside textarea{
-	width:184px;
-	max-width:184px;
+	width:330px;
+	max-width:330px;
 	height:8em;
 }
-.metadata li{
+/*.metadata li{
 	font-size:12px;
 	line-height:25px;
 }
+*/
 footer{
 	position:absolute;
 	clear:both;

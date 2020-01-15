@@ -186,9 +186,10 @@
 	padding: 0 5px 0 5px;
 	border-top: 0;
 	overflow: auto;
-	text-align: right;
+/*	text-align: right; */
 	background:#555555;
 	padding:5px;
+	text-size: 1.1em;
 }
 .ui-accordion p{
 	margin:0 0 7px 0;
@@ -238,7 +239,7 @@ button.ui-button-icons-only {
 	line-height: normal;
 }
 .ui-button-text-only .ui-button-text {
-	padding: .4em !important;
+	padding: .1em !important;
 	/*padding: .4em 1em;*/
 }
 .ui-button-icon-only .ui-button-text,
@@ -298,7 +299,7 @@ input.ui-button {
 	margin-right: -.3em;
 	margin-right:15px;
 	margin-top:10px;
-	border-radius:3px;
+/*	border-radius:3px; */
 	border: 1px solid #222222;
 }
 
@@ -806,17 +807,17 @@ body .ui-tooltip {
 /* Component containers
 ----------------------------------*/
 .ui-widget {
-	font-family: Segoe UI,Arial,sans-serif;
+	/*font-family: Segoe UI,Arial,sans-serif;*/
 	font-size: 1.1em;
 }
 .ui-widget .ui-widget {
-	font-size: 1em;
+/*	font-size: 1em;*/
 }
 .ui-widget input,
 .ui-widget select,
 .ui-widget textarea,
 .ui-widget button {
-	font-family: Segoe UI,Arial,sans-serif;
+	/*font-family: Segoe UI,Arial,sans-serif;*/
 	font-size: 1em;
 }
 .ui-widget-content {
@@ -844,7 +845,7 @@ body .ui-tooltip {
 .ui-widget-header .ui-state-default {
 	border: 1px solid #222222;
 	background: #222222 url(images/ui-bg_highlight-soft_20_222222_1x100.png) 50% 50% repeat-x;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	color: #eeeeee;
 }
 .ui-state-default a,
@@ -862,7 +863,7 @@ body .ui-tooltip {
 	border: 1px solid #cc0000;
 	background: #ff0000 url(images/ui-bg_highlight-soft_40_ff0000_1x100.png) 50% 50% repeat-x;
 	background-size:100% 100%;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	color: #ffffff;
 	outline:none;
 }

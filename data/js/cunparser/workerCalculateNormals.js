@@ -1,52 +1,464 @@
-importScripts('bzip2a.js');
-importScripts('zlib_and_gzip.min.js');
+
+var zerotol = 1.0e-5;
+
+function isZero(x){
+
+	var limit = 1e-9;
+	return x > -limit && x < limit;
+}
+
+function solveQuadric(c, s, n){
+
+	var p = c[1] / (2 * c[2]);
+	var q = c[0] / c[2];
+
+	var D = p * p - q;
+
+	if (isZero(D))
+	{
+		s[0 + n] = -p;
+		return 1;
+	} 
+	else if (D < 0)
+	{
+		return 0;
+	} 
+	else if (D > 0)
+	{
+        var sqrt_D = Math.sqrt(D);
+		s[0 + n] = sqrt_D - p;
+		s[1 + n] = -sqrt_D - p;
+		return 2;
+	}
+	return -1;
+}
+
+function solveCubic(c, s)
+{
+	var i, num;
+    var sub;
+    var A, B, C;
+    var sq_A, p, q;
+    var cb_p, D;
+
+	/* normal form: x^3 + Ax^2 + Bx + C = 0 */
+	A = c[2] / c[3];
+	B = c[1] / c[3];
+	C = c[0] / c[3];
+
+	/* substitute x = y - A/3 to eliminate quadric term: x^3 +px + q = 0 */
+	sq_A = A * A;
+	p = 1.0 / 3 * (-1.0 / 3 * sq_A + B);
+	q = 1.0 / 2 * (2.0 / 27 * A * sq_A - 1.0 / 3 * A * B + C);
+
+	/* use Cardano's formula */
+	cb_p = p * p * p;
+	D = q * q + cb_p;
+
+	if (isZero(D))
+	{
+		if (isZero(q)) /* one triple solution */
+		{
+			s[0] = 0;
+			num = 1;
+		}
+        else /* one single and one float solution */
+		{
+            var u = Math.cbrt(-q);
+			s[0] = 2 * u;
+			s[1] = -u;
+			num = 2;
+		}
+	} 
+	else if (D < 0) /* Casus irreducibilis: three real solutions */
+	{
+    	var phi = 1.0 / 3 * Math.acos(-q / Math.sqrt(-cb_p));
+        var t = 2 * Math.sqrt(-p);
+
+		s[0] = t * Math.cos(phi);
+		s[1] = -t * Math.cos(phi + Math.PI / 3);
+		s[2] = -t * Math.cos(phi - Math.PI / 3);
+		num = 3;
+	} 
+	else /* one real solution */
+	{
+        var sqrt_D = Math.sqrt(D);
+        var u = Math.cbrt(sqrt_D - q);
+    	var v = - Math.cbrt(sqrt_D + q);
+
+		s[0] = u + v;
+		num = 1;
+	}
+
+	/* resubstitute */
+	sub = 1.0 / 3 * A;
+	for (i = 0; i < num; i++){
+		s[i] -= sub;
+	}
+	return num;
+}
+
+function solveQuartic(c, s)
+{
+    var coeffs = new Array(4);
+    var z, u, v, sub;
+    var A, B, C, D;
+    var sq_A, p, q, r;
+	var i, num;
+
+	/* normal form: x^4 + Ax^3 + Bx^2 + Cx + D = 0 */
+	A = c[3] / c[4];
+	B = c[2] / c[4];
+	C = c[1] / c[4];
+	D = c[0] / c[4];
+
+	/* substitute x = y - A/4 to eliminate cubic term: x^4 + px^2 + qx + r = 0 */
+	sq_A = A * A;
+	p = -3.0 / 8 * sq_A + B;
+	q = 1.0 / 8 * sq_A * A - 1.0 / 2 * A * B + C;
+	r = -3.0 / 256 * sq_A * sq_A + 1.0 / 16 * sq_A * B - 1.0 / 4 * A * C + D;
+
+	if (isZero(r)) {
+		/* no absolute term: y(y^3 + py + q) = 0 */
+		coeffs[0] = q;
+		coeffs[1] = p;
+		coeffs[2] = 0;
+		coeffs[3] = 1;
+
+		num = solveCubic(coeffs, s);
+
+		s[num++] = 0;
+	}
+	else
+	{
+		/* solve the resolvent cubic ... */
+		coeffs[0] = 1.0 / 2 * r * p - 1.0 / 8 * q * q;
+		coeffs[1] = -r;
+		coeffs[2] = -1.0 / 2 * p;
+		coeffs[3] = 1;
+		solveCubic(coeffs, s);
+
+		/* ... and take the one real solution ... */
+		z = s[0];
+
+		/* ... to build two quadric equations */
+		u = z * z - r;
+		v = 2 * z - p;
+		if (isZero(u))
+			u = 0;
+		else if (u > 0)
+			u = Math.sqrt(u);
+		else
+			return 0;
+		if (isZero(v))
+			v = 0;
+		else if (v > 0)
+			v = Math.sqrt(v);
+		else
+			return 0;
+
+		coeffs[0] = z - u;
+		coeffs[1] = q < 0 ? -v : v;
+		coeffs[2] = 1;
+		num = solveQuadric(coeffs, s, 0);
+		coeffs[0] = z + u;
+		coeffs[1] = q < 0 ? v : -v;
+		coeffs[2] = 1;
+		num += solveQuadric(coeffs, s, num);
+	}
+
+	/* resubstitute */
+	sub = 1.0 / 4 * A;
+	for (i = 0; i < num; i++){
+		s[i] -= sub;
+	}
+	return num;
+}
 
 
-//loadblockcompresseddiffuse
-var mData = 0;
-var minValue = 0;
-var maxValue = 0;
+function computeMaximumOnCircle( a, passByRefObj)
+{
+	var db0, db1, db2, db3, db4;
+	var zeros = new Array(4);
+	var u, v, maxval, maxu = -1, maxv = -1, inc, arg, polyval;
+	var index, nroots;
 
-//normalquantization
-var TOP_MASK = 0x1f80;
-var BOTTOM_MASK = 0x007f;
-var SIGN_MASK = 0xe000;
-var XSIGN_MASK = 0x8000;
-var YSIGN_MASK = 0x4000;
-var ZSIGN_MASK = 0x2000;
-var mUVAdjustment = new Array(0x2000);
-var sideData = new Object();
-var textureData = new Array(); 
+	index = -1;
+	nroots = -1;
 
-var endPos = new Array(6);
-var boolHasAmbient = new Array(6);
+	db0 = a[2] - a[3];
+	db1 = 4 * a[1] - 2 * a[4] - 4 * a[0];
+	db2 = -6 * a[2];
+	db3 = -4 * a[1] - 2 * a[4] + 4 * a[0];
+	db4 = a[2] + a[3];
 
-var ptmCoeffs0;
-var ptmCoeffs1;
-var ptmRgbCoeffs;
+	/* polynomial is constant on circle, pick (0,1) as a solution */
+	if (Math.abs(db0) < zerotol && Math.abs(db1) < zerotol && 
+			Math.abs(db2) < zerotol && Math.abs(db3) < zerotol)
+	{
+		passByRefObj.lx = 0.0;
+		passByRefObj.ly = 1.0;
+		return 1;
+	}
+
+	if (db0 != 0)
+	{
+        var c = [db4, db3, db2, db1, db0];
+		nroots = solveQuartic(c, zeros);
+	} 
+	else if (db1 != 0)
+	{
+		var c = [db4, db3, db2, db1];
+		nroots = solveCubic(c, zeros);
+	}
+	else 
+	{
+ 		var c = [db4, db3, db2 ];
+		nroots = solveQuadric(c, zeros, 0);
+	}
+			
+
+	if (nroots <= 0)
+		return -1;
+	
+	switch (nroots) {
+		case 1:
+			index = 0;
+			break;
+		default:
+                       var vals = new Array(nroots);
+			index = 0;
+			for (var i = 0; i < nroots; i++) 
+			{
+				u = 2 * zeros[i] / (1 + zeros[i] * zeros[i]);
+				v = (1 - zeros[i] * zeros[i]) / (1 + zeros[i] * zeros[i]);
+				vals[i] = a[0] * u * u + a[1] * v * v + a[2] * u * v + a[3] * u + a[4] * v + a[5];
+				if (vals[i] > vals[index])
+					index = i;
+			}
+	}
+
+	/*
+	 * I noticed that the fact that the pont (0,-1) on the circle can only
+	 * be attained in the limit causes it to be missed in case it really is
+	 * the maximum. Hence it is necessary to investigate a neighboring
+	 * region to find the potential maximum there, we look at the segment
+	 * from 260 degress to 280 degrees (270 degrees being the limit point).
+	 */
+
+	passByRefObj.lx = 2 * zeros[index] / (1 + zeros[index] * zeros[index]);
+	passByRefObj.ly = (1 - zeros[index] * zeros[index])/ (1 + zeros[index] * zeros[index]);
+
+	/*
+	 * test the correctness of solution:
+	 */
+
+	maxval = -1000;
+
+	for (var k = 0; k <= 20; k++)
+	{
+		inc = (1 / 9.0) / 20 * k;
+		arg =Math.PI * (26.0 / 18.0 + inc);
+		u = Math.cos(arg);
+		v = Math.sin(arg);
+		polyval = a[0] * u * u + a[1] * v * v + a[2] * u * v + a[3] * u	+ a[4] * v + a[5];
+		if (maxval < polyval) {
+			maxval = polyval;
+			maxu = u;
+			maxv = v;
+		}
+	}
+
+	u = 2 * zeros[index] / (1 + zeros[index] * zeros[index]);
+	v = (1 - zeros[index] * zeros[index]) / (1 + zeros[index] * zeros[index]);
+        var val1 = a[0] * u * u + a[1] * v * v + a[2] * u * v + a[3] * u + a[4] * v + a[5];
+	if (maxval > val1) {
+		passByRefObj.lx = maxu;
+		passByRefObj.ly = maxv;
+	}
+	return 1;
+}
 
 self.onmessage = function(event){
-	var buffer  = event.data.buffer;
-	var currentIndex = event.data.currentIdx;
-	let inputBuffer = {buffer:buffer,  currentIndex:currentIndex};
-	var width = event.data.w;
-	var height = event.data.h;
-	var version = event.data.version;
-	ptmCoeffs0 = new Float32Array(width*height*3);
-	ptmCoeffs1 = new Float32Array(width*height*3);
-	ptmRgbCoeffs = new Float32Array(width*height*3);
-	//var basisTerm = event.data.basisTerm;
-	//var dataView = new DataView(arrayBuffer);
-	//bytePointer = event.data.startPtr;
-	//int CuneiformSingleSidePhotometricData::loadDataLrgbPtm(FILE* file, int width, int height, int basisTerm, bool urti, bool jpegCompressed=false)
+	var normalsBuf;
+	if( event.data.coef0){
+		var coef0  = event.data.coef0;
+		var coef1  = event.data.coef1;
+		var coef2  = event.data.coef2;
+		var coef3  = event.data.coef3;
+		var width = event.data.width;
+		var height = event.data.height;
+		normalsBuf = new Float32Array(width*height*3);
+		//ptmCoeffs1 = new Float32Array(width*height*3);
+		//ptmRgbCoeffs = new Float32Array(width*height*3);
+		//var basisTerm = event.data.basisTerm;
+		//var dataView = new DataView(arrayBuffer);
+		//bytePointer = event.data.startPtr;
+		//int CuneiformSingleSidePhotometricData::loadDataLrgbPtm(FILE* file, int width, int height, int basisTerm, bool urti, bool jpegCompressed=false)
 
-	loadDataLrgbPtm(inputBuffer, width, height, false, version);
-		//textureData.push(sideData);
-	self.postMessage({ptmCoeff0:ptmCoeffs0,ptmCoeff1:ptmCoeffs1,ptmRgbCoeff:ptmRgbCoeffs,},[ptmCoeffs0.buffer,ptmCoeffs1.buffer,ptmRgbCoeffs.buffer]);
+		calculateHshNormals(coef0,coef1,coef2,coef3,width,height,normalsBuf);
+	}
+	else if( event.data.ptmCoeffs0){
+		var ptmCoeffs0 = event.data.ptmCoeffs0;
+		var ptmCoeffs1 = event.data.ptmCoeffs1;
+		var width = event.data.width;
+		var height = event.data.height;
+		normalsBuf = new Float32Array(width*height*3);
+		calculateNormalsPtm(true, 75, 0, height,width, ptmCoeffs0, ptmCoeffs1, normalsBuf);
+
+	}
+			//textureData.push(sideData);
+	self.postMessage({normalsBuf:normalsBuf,},[normalsBuf.buffer]);
 
 	close();
 
+
 }
+function getHSH( theta,  phi, hweights, order)
+{
+	var cosPhi = Math.cos(phi);
+	var cosTheta = Math.cos(theta);
+	var cosTheta2 = cosTheta * cosTheta;
+	hweights[0] = 1/Math.sqrt(2*Math.PI);
+	hweights[1] = Math.sqrt(6/Math.PI)      *  (cosPhi*Math.sqrt(cosTheta-cosTheta2));
+	hweights[2] = Math.sqrt(3/(2*Math.PI))  *  (-1. + 2.*cosTheta);
+	hweights[3] = Math.sqrt(6/Math.PI)      *  (Math.sqrt(cosTheta - cosTheta2)*Math.sin(phi));
+	if (order > 2)
+	{
+		hweights[4] = Math.sqrt(30/Math.PI)     *  (Math.cos(2.*phi)*(-cosTheta + cosTheta2));
+		hweights[5] = Math.sqrt(30/Math.PI)     *  (cosPhi*(-1. + 2.*cosTheta)*Math.sqrt(cosTheta - cosTheta2));
+		hweights[6] = Math.sqrt(5/(2*Math.PI))  *  (1 - 6.*cosTheta + 6.*cosTheta2);
+		hweights[7] = Math.sqrt(30/Math.PI)     *  ((-1 + 2.*cosTheta)*Math.sqrt(cosTheta - cosTheta2)*Math.sin(phi));
+		hweights[8] = Math.sqrt(30/Math.PI)     *  ((-cosTheta + cosTheta2)*Math.sin(2.*phi));
+	}
+	if (order > 3)
+	{
+		hweights[9]  = 2*Math.sqrt(35/Math.PI)	*	(Math.cos(3.0*phi)*Math.pow((cosTheta - cosTheta2), 1.5));
+		hweights[10] = Math.sqrt(210/Math.PI)	*	(Math.cos(2.0*phi)*(-1 + 2*cosTheta)*(-cosTheta + cosTheta2));
+		hweights[11] = 2*Math.sqrt(21/Math.PI)  *	(Math.cos(phi)*Math.sqrt(cosTheta - cosTheta2)*(1 - 5*cosTheta + 5*cosTheta2));
+		hweights[12] = Math.sqrt(7/(2*Math.PI)) *	(-1 + 12*cosTheta - 30*cosTheta2 + 20*cosTheta2*cosTheta);
+		hweights[13] = 2*Math.sqrt(21/Math.PI)  *	(Math.sqrt(cosTheta - cosTheta2)*(1 - 5*cosTheta + 5*cosTheta2)*Math.sin(phi));
+		hweights[14] = Math.sqrt(210/Math.PI)  *	(-1 + 2*cosTheta)*(-cosTheta + cosTheta2)*Math.sin(2*phi);
+		hweights[15] = 2*Math.sqrt(35/Math.PI)  *	Math.pow((cosTheta - cosTheta2), 1.5)*Math.sin(3*phi);
+	}
+}
+
+function calculateHshNormals(coef0,coef1,coef2,coef3,width,height,normalsBuf){
+	var ordlen = 4;
+	var l0 = [Math.sin(Math.PI/4)*Math.cos(Math.PI/6), Math.sin(Math.PI/4)*Math.sin(Math.PI/6), Math.cos(Math.PI/4)];
+	var l1 = [Math.sin(Math.PI/4)*Math.cos(5*Math.PI / 6), Math.sin(Math.PI/4)*Math.sin(5*Math.PI / 6), Math.cos(Math.PI/4)];
+	var l2 = [Math.sin(Math.PI/4)*Math.cos(3*Math.PI / 2), Math.sin(Math.PI/4)*Math.sin(3*Math.PI/ 2), Math.cos(Math.PI/4)];
+	var L = [Math.sin(Math.PI/4)*Math.cos(Math.PI/6), Math.sin(Math.PI/4)*Math.sin(Math.PI/6), Math.cos(Math.PI/4), Math.sin(Math.PI/4)*Math.cos(5*Math.PI / 6), Math.sin(Math.PI/4)*Math.sin(5*Math.PI / 6), Math.cos(Math.PI/4), Math.sin(Math.PI/4)*Math.cos(3*Math.PI / 2), Math.sin(Math.PI/4)*Math.sin(3*Math.PI/ 2), Math.cos(Math.PI/4)];
+	var Linverse = [ L[4]*L[8]-L[5]*L[7], L[2]*L[7]-L[1]*L[8], L[1]*L[5]-L[2]*L[4], L[5]*L[6]-L[3]*L[8], L[0]*L[8]-L[2]*L[6], L[2]*L[3]-L[0]*L[5], L[3]*L[7]-L[4]*L[6], L[1]*L[6]*L[0]*L[7], L[0]*L[4]-L[1]*L[3] ];
+	var Ldet = 1.0/(L[0]*(L[4]*L[8]-L[5]*L[7])-L[1]*(L[3]*L[8]-L[5]*L[6])+L[2]*	(L[3]*L[7]-L[4]*L[6]));
+	for (var i = 0; i<9; i++){Linverse[i] *= Ldet;}
+
+	var hweights0 = new Array(16);
+	var hweights1 = new Array(16); 
+	var hweights2 = new Array(16);
+	getHSH(Math.PI / 4, Math.PI / 6, hweights0, ordlen);
+	getHSH(Math.PI / 4, 5*Math.PI / 6, hweights1, ordlen);
+	getHSH(Math.PI / 4, 3*Math.PI / 2, hweights2, ordlen);
+	for (var y = 0; y < height; y++){
+		for(var x = 0; x < width; x++){
+			var tmp = [0.0,0.0,0.0];
+			var offset = y * width + x;
+			tmp[0] = (coef0[offset*3] + coef0[offset*3+1] + coef0[offset*3+2])*hweights0[0] + (coef1[offset*3] + coef1[offset*3+1] + coef1[offset*3+2])*hweights0[1] + (coef2[offset*3] + coef2[offset*3+1] + coef2[offset*3+2])*hweights0[2] + (coef3[offset*3] + coef3[offset*3+1] + coef3[offset*3+2])*hweights0[3];
+			tmp[1] = (coef0[offset*3] + coef0[offset*3+1] + coef0[offset*3+2])*hweights1[0] + (coef1[offset*3] + coef1[offset*3+1] + coef1[offset*3+2])*hweights1[1] + (coef2[offset*3] + coef2[offset*3+1] + coef2[offset*3+2])*hweights1[2] + (coef3[offset*3] + coef3[offset*3+1] + coef3[offset*3+2])*hweights1[3];
+			tmp[2] = (coef0[offset*3] + coef0[offset*3+1] + coef0[offset*3+2])*hweights2[0] + (coef1[offset*3] + coef1[offset*3+1] + coef1[offset*3+2])*hweights2[1] + (coef2[offset*3] + coef2[offset*3+1] + coef2[offset*3+2])*hweights2[2] + (coef3[offset*3] + coef3[offset*3+1] + coef3[offset*3+2])*hweights2[3];
+			tmp[0] /= 3.0; tmp[1] /= 3.0; tmp[2] /= 3.0;
+			normalsBuf[offset*3+0] = Linverse[0]*tmp[0]+Linverse[1]*tmp[1]+Linverse[2]*tmp[2];
+			normalsBuf[offset*3+1] = Linverse[3]*tmp[0]+Linverse[4]*tmp[1]+Linverse[5]*tmp[2];
+			normalsBuf[offset*3+2] = Linverse[6]*tmp[0]+Linverse[7]*tmp[1]+Linverse[8]*tmp[2];
+
+			normalsBuf[offset*3+0]*=0.5; // why?
+			normalsBuf[offset*3+1]*=0.5; // why?
+			var no = Math.sqrt(normalsBuf[offset*3+0]*normalsBuf[offset*3+0]+normalsBuf[offset*3+1]*normalsBuf[offset*3+1]+normalsBuf[offset*3+2]*normalsBuf[offset*3+2]);
+			normalsBuf[offset*3+0] /=no;
+			normalsBuf[offset*3+1] /=no;
+			normalsBuf[offset*3+2] /=no;
+
+			//console.log(Linverse[0]);
+		//console.log(tmp[0]);	
+		}
+	}
+}
+
+function calculateNormalsPtm(isLRGB, offset, limit,height, width, ptmCoeffs0,ptmCoeffs1, normalsBuf){
+	
+	for ( var y = 0; y < height; y++){
+		for (var x = 0; x < width; x++){
+
+			var offset = y*width + x;
+			var a = new Array(6)
+			for ( var k = 0; k < 3; k++){
+				a[k] = ptmCoeffs0[offset*3+k] / 255;
+				a[k+3] = ptmCoeffs1[offset*3+k] / 255;
+			}
+			var lx, ly, lz;
+			if ( Math.abs( 4 * a[1] * a[0] - a[2]*a[2] ) < zerotol ){
+				lx = 0.0;
+				ly = 0.0;
+			} else {
+				if( Math.abs(a[2]) < zerotol ){
+					lx = -a[3] / (2.0 * a[0]);
+					ly = -a[4] / (2.0 * a[1]);
+				}
+				else
+				{
+					lx = (a[2]*a[4] - 2.0*a[1]*a[3])/(4.0*a[0]*a[1] - a[2]*a[2]);
+					ly = (a[2]*a[3] - 2.0*a[0]*a[4])/(4.0*a[0]*a[1] - a[2]*a[2]);
+				}
+			}
+
+			if (Math.abs(a[0]) < zerotol && Math.abs(a[1]) < zerotol && Math.abs(a[2]) < zerotol && Math.abs(a[3]) < zerotol && Math.abs(a[4]) < zerotol)
+			{
+				lx = 0.0;
+				ly = 0.0;
+				lz = 1.0;
+			}
+			else
+			{	
+            	var length2d = lx * lx + ly * ly;
+				var maxfound;
+				if (4 * a[0] * a[1] - a[2] * a[2] > zerotol && a[0] < -zerotol)
+					maxfound = 1;
+				else
+					maxfound = 0;
+				if (length2d > 1 - zerotol || maxfound == 0) {
+					var passByRefObj = {lx:lx, ly:ly };
+					//passByRefObj.lx = lx;
+					//passByRefObj.ly = ly;
+					var stat = computeMaximumOnCircle(a,passByRefObj);
+					lx = passByRefObj.lx;
+					ly = passByRefObj.ly;
+
+					if (stat == -1) // failed
+					{
+						length2d = Math.sqrt(length2d);
+						if (length2d > zerotol) {
+							lx /= length2d;
+							ly /= length2d;
+						}
+					}
+				}
+             	var disc = 1.0 - lx*lx - ly*ly;
+				if (disc < 0.0)
+					lz = 0.0;
+				else 
+					lz = Math.sqrt(disc);
+			}
+			
+    		//var temp = [lx, ly, lz];
+			var no = Math.sqrt(lx*lx+ly*ly+lz*lz);
+			normalsBuf[offset*3+0] = lx/no;
+			normalsBuf[offset*3+1] = ly/no;
+			normalsBuf[offset*3+2] = lz/no;		
+		}
+	}
+}
+
+
 
 function loadDataLrgbPtm(inputBuffer, width, height, urti, version){
 	var w = width;

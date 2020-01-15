@@ -24,7 +24,7 @@ var Scene = {
     
 	var indexBufferObject = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBufferObject);
-	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(object.indices), gl.STATIC_DRAW);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(object.indices), gl.STATIC_DRAW);
 
 	object.vbo = vertexBufferObject;
 	object.ibo = indexBufferObject;

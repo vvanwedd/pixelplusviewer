@@ -23,7 +23,7 @@ var Utils = {
     		window.location = "http://get.webgl.org";
  		}	
 		var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
-	
+		//var names = ["webgl2"];
 		for (var i = 0; i < names.length; ++i) {
 		try {
 			ctx = canvas.getContext(names[i], { antialias: true }); //,{preserveDrawingBuffer: true} //doesn't increase performance
@@ -81,6 +81,22 @@ var Utils = {
 			gl.deleteProgram(prg8);
 			gl.deleteProgram(prg9);
 			gl.deleteProgram(prg10);
+			gl.deleteProgram(prg11);
+			gl.deleteProgram(prg12);
+			gl.deleteProgram(prg13);
+			gl.deleteProgram(prg14);
+			gl.deleteProgram(prg15);
+			gl.deleteProgram(prg16);
+			gl.deleteProgram(prg17);
+			gl.deleteProgram(prg18);
+			gl.deleteProgram(prg19);
+			gl.deleteProgram(prg20);
+			gl.deleteProgram(prg21);
+			gl.deleteProgram(prg22);
+			gl.deleteProgram(prg23);
+			gl.deleteProgram(prg24);
+			gl.deleteProgram(prg25);
+
 			
 		}
 	},

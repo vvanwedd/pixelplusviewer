@@ -20,10 +20,15 @@ var relativeDate = "";
 var publicationInfo = "";
 var description = "";
 var notes = "";
+var inputFilename= '';
+var inputType = "";
+var inputDimensions = "";
 var creator = "";
 var creationDate = "";
 var copyright = "";
 var mMmPerPixel;
+
+var glTFObj;
 
 //var boolTemp = true;
 
@@ -31,9 +36,6 @@ var mMmPerPixel;
 var mData = 0;
 var minValue = 0;
 var maxValue = 0;
-
-var dieptemap = new Array(6);
-var boolDepthMap = false;
 
 var textureData = new Array(); //to pass data to webgl program
 var worker = new Array(); //not necessary anymore when only using 1 worker
@@ -46,19 +48,26 @@ var beginPointer;
 var endPos = new Array(6);
 
 
-var vec4Scale = [1.0, 1.0, 1.0, 1.0];
-var vec4Bias = [0.0, 0.0, 0.0, 0.0];
+var vec3ScalePTM0 = [1.0, 1.0, 1.0];
+var vec3ScalePTM1 = [1.0, 1.0, 1.0];
+var vec3BiasPTM0 = [0.0, 0.0, 0.0];
+var vec3BiasPTM1 = [0.0, 0.0, 0.0];
+
+var vec4ScaleHSH = [1.0, 1.0, 1.0, 1.0];
+var vec4BiasHSH = [0.0, 0.0, 0.0, 0.0];
+
 
 var boolRti = false;
 var boolPhotometric = false;
 var boolMultiSpectral = false;
 var boolPtm = false;
 var boolGLTF = false;
+var boolDepthMap = false;
 
 function xhrTest(zurl){
 	
 	$("#mainIntro").css("display","none");
-	$("#downloadIndicator").css("display","block");
+	$("#progressIndicator").css("display","block");
 	var xhr = new XMLHttpRequest();
 	xhr.withCredentials = true;
 	xhr.open('GET', decodeURIComponent(zurl), true);
@@ -70,27 +79,10 @@ function xhrTest(zurl){
 		progress.style.width = '100%';
 		progress.textContent = '100%';
 		//loadFile(this.response);
-		loadFileWrapper(this.response, this.responseURL.substr(-3));
+		loadFileWrapper(this.response, this.responseURL);
 	};
 	xhr.onerror = errorHandler;
 	xhr.onprogress = updateProgress;
-	xhr.send();
-}
-
-function loadDepthMap(nr){
-var xhr = new XMLHttpRequest();
-	xhr.withCredentials = true;
-	xhr.open('GET', "/~vvanwedd/3d/depthmaps/"+nr+".jpg", true);
-	xhr.responseType = 'blob';
-
-	xhr.onload = function(e) {
-		
-		if(this.status==200){
-			var blob = this.response;
-			dieptemap[nr].src = window.URL.createObjectURL(blob);
-			if(collectionNumber.localeCompare("NP 29")==0){boolDepthMap=true;}
-		}
-	};
 	xhr.send();
 }
 
@@ -131,12 +123,13 @@ function updateProgress(evt) {
 function handleFileSelect(evt) {
     // Reset progress indicator on new file selection.
 	$("#mainIntro").css("display","none");
-	$("#downloadIndicator").css("display","block");
+	$("#progressIndicator").css("display","block");
     reader = new FileReader();
     reader.onerror = errorHandler;
     reader.onprogress = updateProgress;
     reader.onabort = function(e) {
-      alert('File read cancelled');
+	  alert('File read cancelled');
+	  abortExecution();
     };
     reader.onloadstart = function(e) {
       document.getElementById('progressbar').className = 'loading';
@@ -146,7 +139,7 @@ function handleFileSelect(evt) {
 		progress.textContent = '100%';
 		bytePointer = 0;
 		
-		initParser();
+		//initParser();
 		loadFileWrapper(e.target.result, evt.target.files[0].name.substr(-3));
     }
 				
@@ -156,17 +149,9 @@ function handleFileSelect(evt) {
 
 document.getElementById('fileinput').addEventListener('change', handleFileSelect, false);
   
-function initParser(){
-	for(var i=0;i<6;i++){
-		boolHasAmbient[i]=false;
-	}
-	textureData = new Array(); 
-	for(var i=0;i<6;i++){
-		dieptemap[i]=new Image();
-	}
-	boolDepthMap = false;
-}
-function loadFileWrapper(arrayBuffer, fileType){
+function loadFileWrapper(arrayBuffer, filename){
+	inputFilename = filename;
+	fileType = filename.substr(-3);
  if(fileType == 'cun' || fileType == 'zun' ){
 	 console.log('Loading PLD file... ');
 	 loadFile(arrayBuffer);
@@ -181,7 +166,14 @@ function loadFileWrapper(arrayBuffer, fileType){
  }
  else if (fileType == 'ltf'){
 	console.log('Loading GTLF file... ');
-	loadFileGLTF(arrayBuffer);
+	loadFileGLTF(arrayBuffer, filename);
+ } else{
+	         $("#loader").css("display","none");
+                $("#errorMessages").css("display","block");
+                document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The requested file type is not supported. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>.</h3>";
+	 abortExecution();
+
+
  }
 
 }
@@ -203,41 +195,54 @@ function readTillNewLine (inputBuffer) {
 	return str
 }
 function updateShaderList(){
+	
 	if(boolRti){
-		$('#lshader11').show();
+		$('#lshader11').button( "enable");
+		$('#lshader13').button( "enable");
+		$('#lshader15').button( "enable");
 	}
 	else{
-		$('#lshader11').hide();
+		$('#lshader11').button( "disable");
+		$('#lshader13').button( "disable");
+		$('#lshader15').button( "disable");
+	}
+	if(boolHasAmbient[0]){
+		$('#color1').button( "enable");
+	}
+	else{
+		$('#color1').button( "disable");
 	}
 	if(boolPhotometric){
-		$('#lshader1').show();
-		$('#lshader2').show();
-		$('#lshader3').show();
-		$('#lshader4').show();
-		$('#lshader5').show();
-		$('#lshader6').show();
-		$('#lshader7').show();
-		$('#lshader8').show();
-		$('#lshader9').show();
-		$('#lshader10').show();
+		$('#lshader1').button( "enable");
+		$('#lshader2').button( "enable");
+		$('#lshader3').button( "enable");
+		$('#lshader4').button( "enable");
+		$('#lshader5').button( "enable");
+		$('#lshader6').button( "enable");
+		$('#lshader7').button( "enable");
+		$('#lshader8').button( "enable");
+		$('#lshader9').button( "enable");
+		$('#lshader10').button( "enable");
 	}
 	else{
-		$('#lshader1').hide();
-		$('#lshader2').hide();
-		$('#lshader3').hide();
-		$('#lshader4').hide();
-		$('#lshader5').hide();
-		$('#lshader6').hide();
-		$('#lshader7').hide();
-		$('#lshader8').hide();
-		$('#lshader9').hide();
-		$('#lshader10').hide();
+		$('#lshader1').button( "disable");
+		$('#lshader2').button( "disable");
+		$('#lshader3').button( "disable");
+		$('#lshader4').button( "disable");
+		$('#lshader5').button( "disable");
+		$('#lshader6').button( "disable");
+		$('#lshader7').button( "disable");
+		$('#lshader8').button( "disable");
+		$('#lshader9').button( "disable");
+		$('#lshader10').button( "disable");
 	}
 	if(boolPtm){
-		$('#lshader12').show();
+		$('#lshader12').button( "enable");
+		$('#lshader14').button( "enable");
 	}
 	else{
-		$('#lshader12').hide();
+		$('#lshader12').button( "disable");
+		$('#lshader14').button( "disable");
 	}
 	
 }
@@ -245,26 +250,52 @@ function ab2str(buf){
 return String.fromCharCode.apply(null, new Uint8Array(buf));
 
 }
-function loadFileGLTF(arrayBuffer){
-	$("#downloadIndicator").css("display","none");
+
+function loadFileGLTF(arrayBuffer,filename){
+	$("#progressIndicator").css("display","none");
 	$("#loader").css("display","block");
 	$("#radiosetIntro").css("display","none");
-	var glTFObj = JSON.parse(ab2str(arrayBuffer));
-	boolGLTF = true;
-	vec4Bias = [parseFloat(glTFObj.hsh[0].hshCoef0[0].bias) , parseFloat(glTFObj.hsh[0].hshCoef1[0].bias), parseFloat(glTFObj.hsh[0].hshCoef2[0].bias), parseFloat(glTFObj.hsh[0].hshCoef3[0].bias)];
-	vec4Scale = [parseFloat(glTFObj.hsh[0].hshCoef0[0].scale) , parseFloat(glTFObj.hsh[0].hshCoef1[0].scale), parseFloat(glTFObj.hsh[0].hshCoef2[0].scale), parseFloat(glTFObj.hsh[0].hshCoef3[0].scale)];
 	
+	try {
+	  glTFObj = JSON.parse(ab2str(arrayBuffer));
+	} 
+	catch(e){
+$("#errorMessages").css("display","block");
+                                document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The glTF file could not be parsed.</h3><h3>" + e.name + " "+ e.message + ". Redirecting to <a href=\"http://www.heritage-visualisation.org\">heritage-visualisation.org</a> ... ";
+                        abortExecution();
+	}
+	glTFObj.filename = filename.substr(0,filename.lastIndexOf('/')+1);
+	boolGLTF = true;
 	boolPtm = false;
-	boolRti = true;
-	boolPhotometric = true;
+	boolRti = false;
+	
+	//setting length to 0 deletes all elements from array in js
+	textureData.length = 0;
 
+	if(glTFObj.hsh){
+	  vec4BiasHSH = [parseFloat(glTFObj.hsh[0].hshCoef0[0].bias) , parseFloat(glTFObj.hsh[0].hshCoef1[0].bias), parseFloat(glTFObj.hsh[0].hshCoef2[0].bias), parseFloat(glTFObj.hsh[0].hshCoef3[0].bias)];
+	  vec4ScaleHSH = [parseFloat(glTFObj.hsh[0].hshCoef0[0].scale) , parseFloat(glTFObj.hsh[0].hshCoef1[0].scale), parseFloat(glTFObj.hsh[0].hshCoef2[0].scale),parseFloat(glTFObj.hsh[0].hshCoef3[0].scale)];
+	  boolRti = true;
+	}
+	if(glTFObj.pld[0].depthTex){boolDepthMap = true;}
+	if(glTFObj.ptm){
+		var lst = glTFObj.ptm[0].ptmCoef0[0].bias.split(",", 3);
+		vec3BiasPTM0 = [parseFloat(lst[0]),parseFloat(lst[1]),parseFloat(lst[2])];
+		lst = glTFObj.ptm[0].ptmCoef1[0].bias.split(",", 3);
+		vec3BiasPTM1 = [parseFloat(lst[0]),parseFloat(lst[1]),parseFloat(lst[2])];
+		lst = glTFObj.ptm[0].ptmCoef0[0].scale.split(",", 3);
+		vec3ScalePTM0 = [parseFloat(lst[0]),parseFloat(lst[1]),parseFloat(lst[2])];
+		lst = glTFObj.ptm[0].ptmCoef0[0].scale.split(",", 3);
+		vec3ScalePTM1 = [parseFloat(lst[0]),parseFloat(lst[1]),parseFloat(lst[2])];
+		boolPtm = true;
+	}
+	boolPhotometric = true;
 	var sideData = new Object();
 	sideData.width = glTFObj.width;
 	sideData.height = glTFObj.height;
 
 	textureData.push(sideData);
 	
-//console.log(mHshData);
 	runWebGL();
 	//buildSidePlane(0);
 	var t = glTFObj.shaderConfig[0].lightDirection0.split(" ", 3);
@@ -273,25 +304,30 @@ function loadFileGLTF(arrayBuffer){
 	param0 = parseFloat(glTFObj.shaderConfig[0].param0);
 	param1 = parseFloat(glTFObj.shaderConfig[0].param1);
 	updateProgram(style);
-	//$("#shader4")[0].checked=true;
 	$('#shader'+style).prop('checked',true);
 	$("#shaderset").change();
+	updateShaderList();
+
 }
 
 function loadFilePTM(arrayBuffer){
-	$("#downloadIndicator").css("display","none");
-	$("#loader").css("display","block");
-	$("#radiosetIntro").css("display","none");
+
+	$("#progressIndicator").css("display","block");
+	$("#progressText").text("Parsing PTM file");
+	$("#content").css("display","none");
 	boolRti = false;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = true;
 	boolGLTF = false;
-	updateShaderList();
+
+	//setting length to 0 deletes all elements from array in js
+	textureData.length = 0;
+
 	
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
-	var version = readTillNewLine(inputBuffer); console.log(type);
-	var type = readTillNewLine(inputBuffer); console.log(type);
+	var version = readTillNewLine(inputBuffer); console.log("PTM Version: " + version);
+	var type = readTillNewLine(inputBuffer); console.log("PTM Type: " + type);
 	var w = parseInt(readTillNewLine(inputBuffer));
 	var h = parseInt(readTillNewLine(inputBuffer));
 
@@ -302,6 +338,7 @@ function loadFilePTM(arrayBuffer){
 		throw new Error(e.message + " (" + e.filename + ":" + e.lineno + ")" );
 	};
 	workerPtm.onmessage = function(event) {
+	  if(event.data.ptmCoeff0){
 		var sideData = new Object();
 		sideData.ptmCoeff0 = event.data.ptmCoeff0;
 		sideData.ptmCoeff1 = event.data.ptmCoeff1;
@@ -312,25 +349,57 @@ function loadFilePTM(arrayBuffer){
 		sideData.height = h;
 
 		textureData.push(sideData);
+
+		$("content").css("display","block");
+		$("#progressIndicator").css("display","none");
+
 	//console.log(mHshData);
 		runWebGL();
 		updateProgram(21);
+		updateShaderList();
+
+		workerPtmNorm = new Worker('data/js/cunparser/workerCalculateNormals.js');
+		workerPtmNorm.onerror = function(e){
+			throw new Error(e.message + " (" + e.filename + ":" + e.lineno + ")" );
+		};
+		workerPtmNorm.onmessage = function(event) {
+			textureData[0].ptmNormals = event.data.normalsBuf;
+			updateNormal(0);
+			boolPhotometric = true;
+			updateShaderList();
+		};
+		workerPtmNorm.postMessage({width:w, height:h, ptmCoeffs0:sideData.ptmCoeff0,ptmCoeffs1:sideData.ptmCoeff1,},[sideData.ptmCoeff0.buffer,sideData.ptmCoeff1.buffer]);
+
+
+
+	  }
+	  else{
+		percentLoaded = event.data;
+		progress.style.width = percentLoaded + '%';
+		progress.textContent = percentLoaded + '%';
+	  }
 	}
 	workerPtm.postMessage({buffer: inputBuffer.buffer, currentIdx: inputBuffer.currentIndex, w: w, h:h,version:version,},[inputBuffer.buffer]);
 
 }
 
 function loadFileRTI(arrayBuffer){
-	$("#downloadIndicator").css("display","none");
-	$("#loader").css("display","block");
-	$("#radiosetIntro").css("display","none");
+	$("#progressIndicator").css("display","block");
+	$("#progressText").text("Parsing RTI file");
+	$("#content").css("display","none");
+	//$("#progressIndicator").css("display","none");
+	//$("#loader").css("display","block");
+	//$("#radiosetIntro").css("display","none");
 	boolRti = true;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = false;
 	boolGLTF = false;
-	updateShaderList();
 	
+	//setting length to 0 deletes all elements from array in js
+	textureData.length = 0;
+
+
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
 	var str = '';
 	//var inputBuffer = Buffer.from(arrayBuffer);
@@ -375,6 +444,7 @@ else if (basisTerm == 2)
 				throw new Error(e.message + " (" + e.filename + ":" + e.lineno + ")" );
 			};
 			workerRti.onmessage = function(event) {
+				if(event.data.coef0){
 var sideData = new Object();
 sideData.hshCoef0 = event.data.coef0;
 sideData.hshCoef1 = event.data.coef1;
@@ -386,10 +456,35 @@ sideData.width = w;
 sideData.height = h;
 
 textureData.push(sideData);
+$("content").css("display","block");
+$("#progressIndicator").css("display","none");
 //console.log(mHshData);
 runWebGL();
+updateShaderList();
 updateProgram(20);
+
+workerHshNorm = new Worker('data/js/cunparser/workerCalculateNormals.js');
+workerHshNorm.onerror = function(e){
+	throw new Error(e.message + " (" + e.filename + ":" + e.lineno + ")" );
+};
+workerHshNorm.onmessage = function(event) {
+	textureData[0].hshNormals = event.data.normalsBuf;
+	updateNormal(0);
+	boolPhotometric = true;
+	updateShaderList();
+};
+workerHshNorm.postMessage({width:w, height:h, coef0:sideData.hshCoef0,coef1:sideData.hshCoef1,coef2:sideData.hshCoef2,coef3:sideData.hshCoef3,},[sideData.hshCoef0.buffer,sideData.hshCoef1.buffer,sideData.hshCoef2.buffer,sideData.hshCoef3.buffer]);
+
+
+
 //animateTest();
+}
+else{
+	//console.log(event.data);
+	percentLoaded = event.data;
+	progress.style.width = percentLoaded + '%';
+	progress.textContent = percentLoaded + '%';
+}
 				
 			};
 			workerRti.postMessage({buffer: inputBuffer.buffer, currentIdx: inputBuffer.currentIndex, w: w, h:h, basisTerm: basisTerm,},[inputBuffer.buffer]);
@@ -397,10 +492,13 @@ updateProgram(20);
 		break;
 		case 4: break;
 	}
+	populateMetaFields();
+
 }
 
 function loadDataHSH(inputBuffer, width, height, basisTerm, urti)
 {
+	
 	var w  = width;
 	var h = height;
 	
@@ -488,18 +586,16 @@ function loadFile(arrayBuffer){
 	boolMultiSpectral = false;
 	boolPtm = false;
 	boolGLTF = false;
-	updateShaderList();
+	
+	//$("#loader").css("display","block");
+	//$("#radiosetIntro").css("display","none");
+	$("#progressIndicator").css("display","block");
+	$("#progressText").text("Parsing PLD file");
+	$("#content").css("display","none");
 
-//loadDepthMap(0); //only for demo purposes with NP 29.ZUN file
-//loadDepthMap(1);
-//loadDepthMap(2);
-//loadDepthMap(3);
-//loadDepthMap(4);
-//loadDepthMap(5);
-	$("#downloadIndicator").css("display","none");
-	$("#loader").css("display","block");
-	$("#radiosetIntro").css("display","none");
-	console.log("Let's begin to load the file");	
+	//setting length to 0 deletes all elements from array in js
+	textureData.length = 0;
+
 	dd1 = new Date().getTime();
 	var dataView = new DataView(arrayBuffer);
 	var uintHeader1 = new Uint8Array(arrayBuffer,0,5);
@@ -548,6 +644,7 @@ function loadFile(arrayBuffer){
 				throw new Error(e.message + " (" + e.filename + ":" + e.lineno + ")" );
 			};
 			workerOtherSides.onmessage = function(event) {
+			  if(event.data.msNormals0){
 				textureData[event.data.sideNr].normals = event.data.msNormals0;
 				textureData[event.data.sideNr].normals0 = event.data.msNormals0;
 				textureData[event.data.sideNr].normals1 = event.data.msNormals1;
@@ -559,9 +656,16 @@ function loadFile(arrayBuffer){
 				textureData[event.data.sideNr].albedo1 = event.data.msAlbedo1;
 				//textureData[event.data.sideNr].MSnormals = event.data.msnormals0;
 				if(boolHasAmbient[event.data.sideNr]){textureData[event.data.sideNr].ambient = event.data.msAmbient0;textureData[event.data.sideNr].ambient0 = event.data.msAmbient0;textureData[event.data.sideNr].ambient1 = event.data.msAmbient1;}
-				if(event.data.sideNr==0){runWebGL();}
+				if(event.data.sideNr==0){$("content").css("display","block");
+				$("#progressIndicator").css("display","none");runWebGL();updateShaderList();}
 				else{buildSidePlane(event.data.sideNr);render(0);}
-				
+			  }	
+			  else{
+			    //console.log(event.data);
+				percentLoaded = event.data;
+				progress.style.width = percentLoaded + '%';
+				progress.textContent = percentLoaded + '%';
+			  }
 			};
 			workerOtherSides.postMessage({buffer: arrayBuffer, startPtr: beginPointer,},[arrayBuffer]);
 }
@@ -641,7 +745,7 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 			loadBlockCompressedNormal(ArrayBuffer,dataView,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("NORZ")==0 || stringTag.s.localeCompare("NOZ2")==0 || stringTag.s.localeCompare("NOZ3")==0 || stringTag.s.localeCompare("NOZ4")==0 || stringTag.s.localeCompare("NOZ5")==0){	
-			if(stringTag.s.localeCompare("NOZ2")==0){boolMultiSpectral = true;updateShaderList();}
+			if(stringTag.s.localeCompare("NOZ2")==0){boolMultiSpectral = true;initInteraction();updateShaderList();}
 			loadBlockZippedNormal(ArrayBuffer,dataView,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("ALBC")==0){	
@@ -882,15 +986,21 @@ function charCodeArrayToString(charCodeArray,StringObject){
 }
 
 function populateMetaFields(){
-	if(collectionNumber.localeCompare("NP 29")!=0){boolDepthMap=false;}
 	$('#rightAside').accordion({active:0});
-	document.getElementById("inputColNum").value= collectionNumber;
-	document.getElementById("inputOffscreenName").value= collectionNumber;
-	document.getElementById("inputDbNum").value= databaseNumber;
-	document.getElementById("inputPubNum").value= publicationNumber;
-	document.getElementById("inputSiteProv").value= siteProvenance;
-	document.getElementById("inputColNum").value= collectionNumber;
+	//document.getElementById("inputColNum").value= collectionNumber;
+	//document.getElementById("inputOffscreenName").value= collectionNumber;
+	//document.getElementById("inputDbNum").value= databaseNumber;
+	//document.getElementById("inputPubNum").value= publicationNumber;
+	//document.getElementById("inputSiteProv").value= siteProvenance;
+	//document.getElementById("inputColNum").value= collectionNumber;
+	document.getElementById("inputFilename").innerHTML= inputFilename;
+	document.getElementById("inputType").innerHTML= inputType;
+	document.getElementById("inputDimensions").innerHTML= inputDimensions;
+
 	document.getElementById("inputPublication").innerHTML= publicationInfo;
+	document.getElementById("inputDescription").innerHTML= description;
+	document.getElementById("inputNotes").innerHTML= notes;
+
 	rightAside=true;
 	$("#rightAside").animate({right:'15px'});
 	$("#contentwrapper").css("right","315px");
@@ -900,5 +1010,6 @@ function populateMetaFields(){
 }
 
 function abortExecution(){ //to be called when something went terribly wrong
-	thiswill.StopExecution;
+  var delay = 10000; 
+  setTimeout(function(){ window.location = "http://www.heritage-visualisation.org"; }, delay);
 }

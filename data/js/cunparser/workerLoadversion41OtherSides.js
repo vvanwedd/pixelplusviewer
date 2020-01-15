@@ -141,6 +141,9 @@ function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 
 	//var MSnormals = new Array(5);
 	while(((endPos[SideNr]==0) || (bytePointer<endPos[SideNr]) /*&& i<4*/ ) /*&& (fread(tag, 1, 4, fd) == 4)*/ ) {
+		percentLoaded = Math.round((bytePointer / endPos[SideNr]) * 100);
+		self.postMessage(percentLoaded);
+		
    	//var tag = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
 		//bytePointer +=4;
 		var uintTag = new Uint8Array(arrayBuffer,bytePointer,4);
@@ -195,10 +198,11 @@ function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 			sideData.msAmbient0 = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
 		}
 		else if(stringTag.s.localeCompare("AMZ2")==0){	
+		
 			sideData.msAmbient1 = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
 		}	
 	
-		console.log("Loaded " + stringTag.s);
+		console.log("Parsed " + stringTag.s);
 		sideData.width = mWidth;
 		sideData.height = mHeight;
 	i++;
