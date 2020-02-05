@@ -12,6 +12,7 @@
 
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>pixel+ Viewer</title>
+  <link href="https://fonts.googleapis.com/css?family=Didact+Gothic&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext" rel="stylesheet">
   <link href='data/style/greyRed/jquery-ui-1.10.1.custom.css' type='text/css' rel='stylesheet' />
   <link href='data/style/main.css' type='text/css' rel='stylesheet' />
   <script src="data/js/jquery/jquery-1.9.1.min.js"></script> <!--Placed here to avoid flash of unstyled content (http://www.learningjquery.com/2008/10/1-way-to-avoid-the-flash-of-unstyled-content)-->
@@ -67,7 +68,7 @@
 		  <h3 style="margin-bottom:0;">Display</h3>
 
 		  <div>
-		        
+
 		  <div id="shaderset">
 				<h4>Visual style</h4>
 				<div class="visualstyle">
@@ -119,31 +120,31 @@
 				<div id="colorset">
 					<h4>Color source</h4>
 					<div class="visualstyle">
+                                                <input type="radio" id="colorI" name="radioColorSet"><label for="colorI">IR</label>
+                                                <input type="radio" id="colorR" name="radioColorSet"><label for="colorR">R</label>
+                                                <input type="radio" id="colorG" name="radioColorSet"><label for="colorG">G</label>
+                                                <input type="radio" id="colorB" name="radioColorSet"><label for="colorB">B</label>
+                                                <input type="radio" id="colorU" name="radioColorSet"><label for="colorU">UV</label>
 						<input type="radio" id="colorIRG" name="radioColorSet"><label for="colorIRG">IRG</label>
 						<input type="radio" id="colorIGB" name="radioColorSet"><label for="colorIGB">IGB</label>
 						<input type="radio" id="colorRGB" name="radioColorSet" checked="checked"><label for="colorRGB">RGB</label>
 						<input type="radio" id="colorRGU" name="radioColorSet"><label for="colorRGU">RGU</label>
 						<input type="radio" id="colorGBU" name="radioColorSet"><label for="colorGBU">GBU</label>
-						<input type="radio" id="colorI" name="radioColorSet"><label for="colorI">I</label>
-						<input type="radio" id="colorR" name="radioColorSet"><label for="colorR">R</label>
-						<input type="radio" id="colorG" name="radioColorSet"><label for="colorG">G</label>
-						<input type="radio" id="colorB" name="radioColorSet"><label for="colorB">B</label>
-						<input type="radio" id="colorU" name="radioColorSet"><label for="colorU">U</label>
 					</div>
 				</div>
 				<div id="normalset">
                 	<h4>Normal source</h4>
 					<div class="normalsource">
 				  		<h5>PLD</h5>
-                        <input type="radio" id="normalI" name="radioNormalSet"><label for="normalI">I</label>
+                        <input type="radio" id="normalI" name="radioNormalSet"><label for="normalI">IR</label>
                         <input type="radio" id="normalR" name="radioNormalSet"><label for="normalR">R</label>
                         <input type="radio" id="normalG" name="radioNormalSet" checked="checked"><label for="normalG">G</label>
                         <input type="radio" id="normalB" name="radioNormalSet"><label for="normalB">B</label>
-                        <input type="radio" id="normalU" name="radioNormalSet"><label for="normalU">U</label>
-								
+                        <input type="radio" id="normalU" name="radioNormalSet"><label for="normalU">UV</label>
+
 					</div>
 					<div class="normalsource">
-				  		<h5>HSH</h5>
+				  		<h5>HSH RTI</h5>
 							<input type="radio" id="normalHSH" name="radioNormalSet"><label for="normalHSH">HSH</label>
 					</div>
 					<div class="normalsource">
@@ -151,20 +152,20 @@
 							<input type="radio" id="normalPTM" name="radioNormalSet"><label for="normalPTM">PTM</label>
 					</div>
                 </div>
-		        
-                        
+
+
 				<div id="positioning">
-					<h4>Position</h4>	
+					<h4>Position</h4>
 					<div class="visualstyle">
 
 					<button id="ButtonResetPosition">Reset</button>
-					<button id="Button1on1Position">Display 1:1</button>	
-					<button id="ButtonRotatePosition" >Rotate 90 degrees</button>			
+					<button id="Button1on1Position">Display 1:1</button>
+					<button id="ButtonRotatePosition" >Rotate 90 degrees</button>
 					</div>
 				</div>
 			<!--	<button onclick="animateTest()">lightanimationtest</button>-->
-			
-			
+
+
 			<p><br><br></p>
 			<div id="printing">
 				<h4>Printing</h4>
@@ -173,7 +174,7 @@
 						<li>Name: <input type="text" id="inputOffscreenName" value="" width="90%"></li>
 						<li><button id="buttonPrint">Take 1:1 printout</button></li>
 					</ul>
-				</div>	
+				</div>
 				<a id="aOffscreenHelper" download="a.jpg" href="" style="display:none;">link</a>
 				<canvas id="canvasOffscreenHelper" style="display:none;"></canvas>
 			<img id="imgOffscreenHelper" style="display:none;">
@@ -201,7 +202,7 @@
 
 <script src="data/js/jquery/jquery-ui-1.10.1.min.js"></script>
 <script src="data/js/hammer.min.js"></script>
-	
+
 <script src="data/js/cunparser/parser.js"></script>
 <script src="data/js/cunparser/zlib_and_gzip.min.js"></script>
 <script src="data/js/cunparser/bzip2min.js"></script>

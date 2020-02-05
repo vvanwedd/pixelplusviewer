@@ -1,4 +1,4 @@
-﻿html,body 
+﻿html,body
 {
 	position: absolute;
 	margin:0;
@@ -6,8 +6,10 @@
 	height:100%; /* needed for container min-height */
 	width:100%;
 	background-color:#111;
-	
-	font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;
+
+	/*font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif !important;*/
+	font-family: 'Didact Gothic', sans-serif !important;
+
 	font-size:small;
 	color:#eee;
 	-webkit-touch-callout: none;
@@ -175,6 +177,9 @@ header{
 	background-image: none;
 	background-color: #222;
 }
+#rightAside .ui-state-highlight{
+	background-color: #ff00aa;
+}
 #shaderset .ui-button, #colorset .ui-button, #reflectanceset .ui-button, #positioning .ui-button, #normalset .ui-button{
 	border: 1px solid #aaa;
 	/*width:110px;
@@ -333,7 +338,7 @@ float: left;
 #mainIntro{
 	width:100%;
 	height:100%;
-	
+
 }
 
 #radiosetIntro{
@@ -412,7 +417,7 @@ float: left;
 #loader h2{
 	color:#222;
 }
-#progressIndicator{	
+#progressIndicator{
 
 	width:100%;
 	height:100%;
@@ -427,7 +432,7 @@ float: left;
 	margin: -70px 0 0 -250px;
 }
 #progressbar {
-	
+
     margin: 10px 0;
     padding: 3px;
     border: 1px solid #000;
@@ -510,7 +515,7 @@ float: left;
 	overflow:hidden;
 }
 .aside li{
-	list-style-type:none; 
+	list-style-type:none;
 }
 .aside input, .aside textarea{
 	display:inline-block;
