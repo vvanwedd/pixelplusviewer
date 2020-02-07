@@ -204,6 +204,7 @@ function initWebGL(){
 	HOME     = [0,0,-200];
 	position = [0,0,-200];
 	rotation = [0,0,0];
+	rotation[2] = boolZRotation ? pZRotation : 0;
 	lrotation = [0,0,0];
 
 	lightDirection0 = [-0.5,0.5,0.7];

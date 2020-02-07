@@ -64,6 +64,13 @@ var boolPtm = false;
 var boolGLTF = false;
 var boolDepthMap = false;
 
+var boolZRotation = false;
+
+function initViewerParameters(){
+  boolZRotation = false;
+}
+
+
 function loadDataSource(zurl){
   $("#mainIntro").css("display","none");
   $("#progressIndicator").css("display","block");
@@ -86,6 +93,8 @@ function loadDataSource(zurl){
 }
 
 function parseURL(){
+  initViewerParameters();
+
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   if(urlParams.has('ds')){
@@ -93,7 +102,8 @@ function parseURL(){
     loadDataSource(dataSource);
   }
   if(urlParams.has('zrotation')){
-    rotation[2] = parseFloat(urlParams.get('zrotation'));
+    boolZRotation = true;
+    pZRotation = parseFloat(urlParams.get('zrotation'));
   }
 }
 $(document).ready(function(){
@@ -138,7 +148,9 @@ function handleFileSelect(evt) {
     // Reset progress indicator on new file selection.
 	$("#mainIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
-    reader = new FileReader();
+  initViewerParameters();
+window.history.pushState("object or string", "Title", "/viewer/");
+  reader = new FileReader();
     reader.onerror = errorHandler;
     reader.onprogress = updateProgress;
     reader.onabort = function(e) {
