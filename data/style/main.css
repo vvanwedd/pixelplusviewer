@@ -65,11 +65,6 @@ header{
 	opacity:0.7;
 }
 
-#ButtonFullScreen,
-#ViewerButton {
-        width:150px;
-}
-
 #ButtonFullScreen:hover{
 	opacity:1;
 	border: 1px solid #eee;
@@ -80,9 +75,10 @@ header{
 	position: relative;
 	height:50px;
 	padding: 10px 6px 0 5px;
+	width: 405px;
 }
 #ButtonOpenFile,
-#ViewerButton  {
+#ViewerButton,#ButtonExamples  {
 	margin:0px 5px 5px 0;
 	padding:0;
 	border: 1px solid #aaa;
@@ -92,7 +88,8 @@ header{
 	background-color:#222;
 	background-image:none;
 	opacity:0.7;
-        width:130px;
+        width:120px;
+	float: left;
 }
 #ButtonOpenFile:hover{
 	opacity:1;
@@ -126,7 +123,7 @@ header{
 }
 #radioset{
 	position: absolute;
-	right:315px;
+	right:412px;
 	display:none;
 	padding-right:10px;
 }
@@ -377,6 +374,7 @@ float: left;
 	right:10%;
 	background-color:#222222;
 	overflow: hidden;
+	overflow-y: auto;
 	border:1px solid #aaa;
 }
 #introHelp, #introFeatures, #introLinks{
@@ -578,4 +576,12 @@ input, input:focus,textarea:focus{
 }
 .ui-icon-next{
 	background-image: url(images/next.png);
+}
+
+.viewer_samples{
+  float: left;
+  margin: 10px;
+}
+.viewer_samples img{ 
+height: 200px;
 }

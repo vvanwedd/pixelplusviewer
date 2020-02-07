@@ -626,7 +626,13 @@ $(document).ready(function(){
       .click(function( event ) {
         $("#fileinput").click();
 	});
-	$("#ButtonFullScreen")
+       $("#ButtonExamples")
+      .button()
+      .click(function( event ) {
+       location.href = "index.html";
+        });
+
+       $("#ButtonFullScreen")
       .button()
       .click(function( event ) {
        toggleFullScreen();
