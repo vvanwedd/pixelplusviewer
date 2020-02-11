@@ -714,7 +714,7 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 	bytePointer+=5;
 
 	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0){
-		$("#loader").css("display","none");
+		$("#progressIndicator").css("display","none");
 		$("#errorMessages").css("display","block");
 		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader1.s + " </h3>";
 		bytePointer-=5;
