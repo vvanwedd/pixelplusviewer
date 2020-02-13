@@ -1,5 +1,5 @@
 // this file generally describes ui functions, see technical paper for explanation
-///globals   
+///globals
 var mouseDown = false;
 var touchXyRotationToggle = false;
 var touchZoomToggle = false;
@@ -56,7 +56,7 @@ function initInteraction(){
 	rightAside = true;
 	$("#rightAside").animate({right:'15px'});
 	$("#contentwrapper").css("right","390px");
-	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e"); 
+	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e");
 
 	alreadyRendering = false;
 	boolAlreadyChangedSide = false;
@@ -107,6 +107,8 @@ function initInteraction(){
 	$('#lshader13').button();
 	$('#lshader14').button();
 	$('#lshader15').button();
+	$('#lshader31').button();
+	$('#lshader32').button();
 
 	$("#colorI").button();
 	$("#colorR").button();
@@ -150,7 +152,7 @@ function initInteraction(){
 	}
 
 
-	
+
 }
 function boolLightToggle(){
 	return (touchLightToggle||keyLightToggle);
@@ -226,7 +228,7 @@ function updateUi(number){
 		$("#radio6").button("refresh");
 	}
 	else if(touchHelpToggle==true){
-		openInNewTab('http://www.heritage-visualisation.org/pixelplusviewer.html');
+		openInNewTab('http://www.heritage-visualisation.org/manual.html');
 
 	}
 	if(gl){render(0);}
@@ -239,16 +241,16 @@ $(document).ready(function(){
 			rightAside=false;
 			$("#rightAside").animate({right:'-375px'});
 			$("#contentwrapper").css("right","15px");
-			$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w"); 
+			$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w");
 		}
-		else{	
+		else{
 			rightAside=true;
 			$("#rightAside").animate({right:'15px'});
 			$("#contentwrapper").css("right","390px");
-			$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e"); 
+			$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e");
 		}
 		updateCanvasSize();
-	}); 
+	});
 	$("#rightAside" ).accordion({
 		collapsible: true,
 		heightStyle: "fill"
@@ -265,7 +267,7 @@ $(document).ready(function(){
 		/*else if($("#radio7")[0].checked==true){updateUi(7);}*/
 		else if($("#radio8")[0].checked==true){updateUi(8);}
 		else if($("#radio9")[0].checked==true){updateUi(9);}
-		
+
 	});
 	$("#radiosetIntro" ).buttonset();
 	$("#radiosetIntro").change(function(){
@@ -354,31 +356,31 @@ $(document).ready(function(){
 		if($("#normalR")[0].checked==true){
                         updateNormal(1);
 			if(gl){render(0);}
-                        
+
                 }
 		if($("#normalG")[0].checked==true){
                         updateNormal(2);
 			if(gl){render(0);}
-                        
+
                 }
 		if($("#normalB")[0].checked==true){
                         updateNormal(3);
 			if(gl){render(0);}
-                        
+
                 }
 		if($("#normalU")[0].checked==true){
 			updateNormal(4);
-                        if(gl){render(0);} 
+                        if(gl){render(0);}
 				}
 		if($("#normalHSH")[0].checked==true){
 			updateNormal(5);
-		 				if(gl){render(0);}		
+		 				if(gl){render(0);}
 				}
 		if($("#normalPTM")[0].checked==true){
 			updateNormal(6);
 						 if(gl){render(0);}
-									
-				}		
+
+				}
 
 	});
 	$("#reflectanceset" ).buttonset();
@@ -391,7 +393,7 @@ $(document).ready(function(){
 
 	$("#shaderset" ).buttonset();
 	$("#shaderset").change(function(){
-		if($("#shader1")[0].checked==true){ 
+		if($("#shader1")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
 			updateProgram(1);
 			document.getElementById("light0wrapper").style.display="inline";
@@ -456,7 +458,7 @@ $(document).ready(function(){
 			document.getElementById("param0").innerHTML = "Sensitivity";
 			document.getElementById("param1").innerHTML = "Thickness";
 			document.getElementById("param2wrapper").style.display="none";
-			document.getElementById("param3wrapper").style.display="none";			
+			document.getElementById("param3wrapper").style.display="none";
 		}
 		else if($("#shader7")[0].checked==true){if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}updateProgram(7);}
 		else if($("#shader8")[0].checked==true){
@@ -477,7 +479,7 @@ $(document).ready(function(){
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="none";
 			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="none";	
+			document.getElementById("param1wrapper").style.display="none";
 			document.getElementById("param0").innerHTML = "Area";
 			document.getElementById("param2wrapper").style.display="none";
 			document.getElementById("param3wrapper").style.display="none";
@@ -494,10 +496,10 @@ $(document).ready(function(){
 			document.getElementById("param1wrapper").style.display="none";
 			document.getElementById("param2wrapper").style.display="none";
 			document.getElementById("param3wrapper").style.display="none";
-		
+
 		}
 		else if($("#shader11")[0].checked==true){
-            if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}				
+            if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
 			updateProgram(20);
             document.getElementById("light0wrapper").style.display="inline";
             document.getElementById("light1wrapper").style.display="inline";
@@ -532,7 +534,7 @@ $(document).ready(function(){
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-			
+
 			document.getElementById("content").style.background="black";
 		}
 		else if($("#shader14")[0].checked==true){
@@ -547,7 +549,7 @@ $(document).ready(function(){
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-			
+
 			document.getElementById("content").style.background="black";
 		}
 		else if($("#shader15")[0].checked==true){
@@ -562,12 +564,27 @@ $(document).ready(function(){
 			document.getElementById("param1").innerHTML = "Size";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-			
+
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader16")[0].checked==true){
+		else if($("#shader31")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(25);
+			updateProgram(31);
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param0").innerHTML = "rel Amount";
+			document.getElementById("param1").innerHTML = "Ks";
+			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#shader32")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram(32);
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
@@ -577,7 +594,7 @@ $(document).ready(function(){
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-			
+
 			document.getElementById("content").style.background="black";
 		}
 
@@ -693,27 +710,27 @@ $(document).ready(function(){
   change: updateParam3
 });
 	function updateLight0(){
-		lightIntensity0 = $( "#sliderLight0" ).slider( "value" );	
+		lightIntensity0 = $( "#sliderLight0" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateLight1(){
-		lightIntensity1 = $( "#sliderLight1" ).slider( "value" );		
+		lightIntensity1 = $( "#sliderLight1" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam0(){
-		param0 = $( "#sliderParam0" ).slider( "value" );	
+		param0 = $( "#sliderParam0" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam1(){
-		param1 = $( "#sliderParam1" ).slider( "value" );	
+		param1 = $( "#sliderParam1" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam2(){
-		param2 = $( "#sliderParam2" ).slider( "value" );	
+		param2 = $( "#sliderParam2" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam3(){
-		param3 = $( "#sliderParam3" ).slider( "value" );	
+		param3 = $( "#sliderParam3" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 
@@ -725,7 +742,7 @@ $(document).ready(function(){
 	$("#buttonMeasure").click(function(){
 		measure();
 	});
-	
+
 });
 
 $(window).resize(function(){
@@ -752,7 +769,7 @@ $("#canvasOverlay").bind('mousewheel DOMMouseScroll',function(e) {
 		}
 		else{
 			rotation[2]=(rotation[2]+90)%360;
-			rotationHelper +=90; 
+			rotationHelper +=90;
 		}
 console.log(rotation[2]);
 	changeSide(10);
@@ -768,16 +785,16 @@ console.log(rotation[2]);
 		if(hasMeasurement){drawUpdateZoom();}
 	}
 		if(gl&&!alreadyRendering){timeoutid = window.requestAnimFrame(animate);alreadyRendering=true;console.log("start rendering");};
-		
+
 });
 });
 
- 
+
 
 
 $(document).ready(function(){
 
-$(document).mouseup(function(e){	
+$(document).mouseup(function(e){
 	//console.log("mouseup: " + timeoutid);
 	mouseDown = false;
 	alreadyRendering = false;
@@ -796,7 +813,7 @@ $(document).mouseup(function(e){
 	window.cancelAnimFrame(timeoutid);
 	moving=false; // to be able to render more rapidly
 	if(gl){render(0);}
-	
+
 	snapped2=false;
 });
 $(document).keyup(function (e){
@@ -807,7 +824,7 @@ $(document).keyup(function (e){
 $(document).keydown(function (e){
 	if(e.altKey){updateUi(5);}
 	if(e.shiftKey){/*updateUi(2);*/ shiftToggle=true;document.getElementById("canvasOverlay").style.cursor="move";}		//pan
-	if(e.keyCode==76){keyLightToggle=!keyLightToggle;}  				//l for light	
+	if(e.keyCode==76){keyLightToggle=!keyLightToggle;}  				//l for light
 	if(e.keyCode==82){updateUi(4);}	//r for rotation around z axis
 	if(e.keyCode==71){toggleGrid = !toggleGrid;}	//g for toggleGrid
 
@@ -864,19 +881,19 @@ function changeSideHelper(direction){
 																					case 0: 	changeSide(1);break;
 																					case 1: 	changeSide(0);break;
 																					case 2: 	changeSide(3);break;
-																					case 3: 	changeSide(2);break;																					
+																					case 3: 	changeSide(2);break;
 																							}}
 	else if(rotation[2] == 90 || rotation[2] == -270){switch(direction){
 																					case 0: 	changeSide(3);break;
 																					case 1: 	changeSide(2);break;
 																					case 2: 	changeSide(0);break;
-																					case 3: 	changeSide(1);break;																					
+																					case 3: 	changeSide(1);break;
 																							}}
 	else if(rotation[2] == -90 || rotation[2] == 270){switch(direction){
 																					case 0: 	changeSide(2);break;
 																					case 1: 	changeSide(3);break;
 																					case 2: 	changeSide(1);break;
-																					case 3: 	changeSide(0);break;																					
+																					case 3: 	changeSide(0);break;
 																							}}
 }
 var boolAlreadyChangedSide = false;
@@ -890,7 +907,7 @@ function handleMouseMove(event) {
 	if(touchPanToggle==true || shiftToggle == true){
 		moving=true;
 		position[0]=dragStartPosition[0]-(newX-oldX)/canvasWidth2*position[2]*Math.tan(15/180*Math.PI)*2*canvasWidth/canvasHeight;
-		position[1]=dragStartPosition[1]+(newY-oldY)/canvasHeight2*(position[2])*Math.tan(15/180*Math.PI)*2;	
+		position[1]=dragStartPosition[1]+(newY-oldY)/canvasHeight2*(position[2])*Math.tan(15/180*Math.PI)*2;
 		if(hasMeasurement){drawUpdatePan();}
 	}
 	else if((keyLightToggle==true||touchLightToggle==true)&&(mainPrg != prg2 || mainPrg != prg2) ){
@@ -898,15 +915,15 @@ function handleMouseMove(event) {
 		if(Math.pow(newX-oldX0,2) + Math.pow(newY-oldY0,2) > Math.pow(newX-oldX1,2) + Math.pow(newY-oldY1,2)){
 			closerToLight0 = false;
 		}
-		
+
 		else {closerToLight0=true;}
 		if(closerToLight0){
 			oldX0 = newX;
 			oldY0 = newY;
-			lightDirection0[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;		
+			lightDirection0[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;
 			lightDirection0[1] = -lightEllipseFactor*(newY-canvasHeight2/2)/canvasHeight2*2;
-			
-			var d = Math.sqrt(Math.pow(lightDirection0[0],2)+Math.pow(lightDirection0[1],2)); 
+
+			var d = Math.sqrt(Math.pow(lightDirection0[0],2)+Math.pow(lightDirection0[1],2));
 			if(d>1){
 				lightDirection0[0] = lightDirection0[0]/d;
 				lightDirection0[1] = lightDirection0[1]/d;
@@ -918,7 +935,7 @@ function handleMouseMove(event) {
 		else{
 			oldX1 = newX;
 			oldY1 = newY;
-			lightDirection1[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;			
+			lightDirection1[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;
 			lightDirection1[1] = -lightEllipseFactor*(newY-canvasHeight2/2)/canvasHeight2*2;
 			var d = Math.sqrt(Math.pow(lightDirection1[0],2)+Math.pow(lightDirection1[1],2));
 			if(d>1){
@@ -931,9 +948,9 @@ function handleMouseMove(event) {
 	}
 	else if((keyLightToggle==true||touchLightToggle==true)&&(mainPrg == prg5 || mainPrg == prg6)){
 		if(rotation[2]==0 || rotation[2]==360){
-			
+
 			split[1]=-(newY-canvasHeight2/2)/canvasHeight2*2*position[2]/(-1/Math.tan(15/180*Math.PI)*(50*msHeight/msWidth*((msHeight<msWidth) ? msWidth/textureData[0].width:msHeight/msHeight*msWidth/textureData[0].height)))-position[1]/50/msHeight*msWidth;
-			
+
 		}
 		else if(rotation[2]==90 || rotation[2]==-270){
 			split[1]=-(newX-canvasWidth2/2)/canvasHeight2*2*position[2]/(-1/Math.tan(15/180*Math.PI)*(50*msHeight/msWidth))+position[0]/50/msHeight*msWidth;
@@ -944,7 +961,7 @@ function handleMouseMove(event) {
 		else if(rotation[2]==270 || rotation[2]==-90){
 			split[1]=(newX-canvasWidth2/2)/canvasHeight2*2*position[2]/(-1/Math.tan(15/180*Math.PI)*(50*msHeight/msWidth))-position[0]/50/msHeight*msWidth;
 		}
-		
+
 	}
 	else if(touchZoomToggle==true){
 		position[2]=dragStartPosition[2]*((newY-oldY)/canvasHeight2+1);
@@ -952,7 +969,7 @@ function handleMouseMove(event) {
 	}
 	else if(touchZRotationToggle==true){
 		moving = true;
-		
+
 		v1x = oldX-canvasWidth2/2;
 		v1y = oldY-canvasHeight2/2;
 		v2x =	newX-canvasWidth2/2;
@@ -970,26 +987,26 @@ function handleMouseMove(event) {
 					oldX=canvasWidth2/2+v1y;
 					oldY=canvasHeight2/2-v1x;
 					rotationHelper+=90;
-					snapped2=true;				
+					snapped2=true;
 				} else if(v1x<=0 && v1y>0 && v2x>0 && v2y<=0){
 					oldX=canvasWidth2/2+v1y;
 					oldY=canvasHeight2/2-v1x;
 					rotationHelper+=90;
-					snapped2=true;						
+					snapped2=true;
 				} else if(v1x>0 && v1y>0 && v2x<=0 && v2y<=0){
 					oldX=canvasWidth2/2+v1y;
-					oldY=canvasHeight2/2-v1x;	
+					oldY=canvasHeight2/2-v1x;
 					rotationHelper+=90;
-					snapped2=true;					
+					snapped2=true;
 				} else if(v1x>0 && v1y<=0 && v2x<=0 && v2y>0){
 					oldX=canvasWidth2/2+v1y;
-					oldY=canvasHeight2/2-v1x;	
+					oldY=canvasHeight2/2-v1x;
 					rotationHelper+=90;
-					snapped2=true;					
+					snapped2=true;
 				}
 				console.log("oldx: "+ oldX + "oldy: " + oldY);
 			}
-			
+
 		}
 		if(rotAngle<=-45){
 			rotAngle=-90;
@@ -1014,7 +1031,7 @@ function handleMouseMove(event) {
 		else if(-newX+oldX>0.2*canvasHeight2&&!boolAlreadyChangedSide){changeSideHelper(3); boolAlreadyChangedSide=true;}
 	}
 	//if(gl){render(0)};
-			
+
 }
 
 function toggleFullScreen() {
@@ -1031,8 +1048,8 @@ function toggleFullScreen() {
 	rightAside=false;
 	$("#rightAside").css("right","-390px");
 	$("#contentwrapper").css("right","15px");
-	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w"); 
-				
+	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w");
+
   } else {
     if (document.cancelFullScreen) {
       document.cancelFullScreen();
@@ -1044,7 +1061,7 @@ function toggleFullScreen() {
 	rightAside=true;
 	$("#rightAside").css("right","15px");
 	$("#contentwrapper").css("right","390px");
-	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e"); 
+	$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e");
   }
 }
 
@@ -1053,7 +1070,7 @@ var introID =0;
 function animateIntroSlider(){
 	introID=(introID+1)%($('.featureWrapper').length);
 	$("#featureWrapper"+introID).animate(
-		{opacity:'1.0'},500, 
+		{opacity:'1.0'},500,
 		function(){$("#featureWrapper"+((introID!=0)?introID-1:$('.featureWrapper').length-1)).css("opacity","0.0");}
 	);
 }
@@ -1062,12 +1079,12 @@ function changeIntroSlider(direction){
 		introID=((introID!=0)?introID-1:$('.featureWrapper').length-1);
 		$('#featureWrapper'+introID).css("opacity","1.0");
 		$("#featureWrapper"+((introID+1)%($('.featureWrapper').length))).animate(
-		{opacity:'0.0'},200, 
+		{opacity:'0.0'},200,
 		function(){});
 	}else if(direction==1){
 		introID=(introID+1)%($('.featureWrapper').length);
 		$("#featureWrapper"+introID).animate(
-		{opacity:'1.0'},200, 
+		{opacity:'1.0'},200,
 		function(){$("#featureWrapper"+((introID!=0)?introID-1:$('.featureWrapper').length-1)).css("opacity","0.0");
 		});
 	}
@@ -1124,7 +1141,7 @@ function handleOrientation(event) {
 		render();
 
 	}
-  
+
 	// Do stuff with the new orientation data
   }
   window.addEventListener("deviceorientation", handleOrientation, true);
@@ -1154,22 +1171,22 @@ hammertime.on("drag", function(ev) {
    if(touchPanToggle==true || shiftToggle == true){
 		moving=true;
 		position[0]=dragStartPosition[0]-(newX-oldX)/canvasWidth2*position[2]*Math.tan(15/180*Math.PI)*2*canvasWidth/canvasHeight;
-		position[1]=dragStartPosition[1]+(newY-oldY)/canvasHeight2*(position[2])*Math.tan(15/180*Math.PI)*2;	
+		position[1]=dragStartPosition[1]+(newY-oldY)/canvasHeight2*(position[2])*Math.tan(15/180*Math.PI)*2;
 	}
 	else if(touchLightToggle==true){
    var closerToLight0;
 		if(Math.pow(newX-oldX0,2) + Math.pow(newY-oldY0,2) > Math.pow(newX-oldX1,2) + Math.pow(newY-oldY1,2)){
 			closerToLight0 = false;
 		}
-		
+
 		else {closerToLight0=true;}
 		if(closerToLight0){
 			oldX0 = newX;
 			oldY0 = newY;
-			lightDirection0[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;		
+			lightDirection0[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;
 			lightDirection0[1] = -lightEllipseFactor*(newY-canvasHeight2/2)/canvasHeight2*2;
-			
-			var d = Math.sqrt(Math.pow(lightDirection0[0],2)+Math.pow(lightDirection0[1],2)); 
+
+			var d = Math.sqrt(Math.pow(lightDirection0[0],2)+Math.pow(lightDirection0[1],2));
 			if(d>1){
 				lightDirection0[0] = lightDirection0[0]/d;
 				lightDirection0[1] = lightDirection0[1]/d;
@@ -1181,7 +1198,7 @@ hammertime.on("drag", function(ev) {
 		else{
 			oldX1 = newX;
 			oldY1 = newY;
-			lightDirection1[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;			
+			lightDirection1[0] = lightEllipseFactor*(newX-canvasWidth2/2)/canvasWidth2*2;
 			lightDirection1[1] = -lightEllipseFactor*(newY-canvasHeight2/2)/canvasHeight2*2;
 			var d = Math.sqrt(Math.pow(lightDirection1[0],2)+Math.pow(lightDirection1[1],2));
 			if(d>1){

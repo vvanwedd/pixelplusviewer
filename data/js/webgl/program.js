@@ -53,6 +53,21 @@ function Programm(vss,fss,prg){
     this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
     this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
     this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
+
+    this.rbfCoeff0Tex = gl.getUniformLocation(prg, "rbfCoeff0Tex");
+    this.rbfCoeff1Tex = gl.getUniformLocation(prg, "rbfCoeff1Tex");
+    this.rbfCoeff2Tex = gl.getUniformLocation(prg, "rbfCoeff2Tex");
+    this.rbfCoeff3Tex = gl.getUniformLocation(prg, "rbfCoeff3Tex");
+    this.rbfCoeff4Tex = gl.getUniformLocation(prg, "rbfCoeff4Tex");
+    this.rbfCoeff5Tex = gl.getUniformLocation(prg, "rbfCoeff5Tex");
+    if(boolRbf){
+        //relightObj.baseLocation = gl.getUniformLocation(prg, "base");
+	//gl.uniform1fv(gl.getUniformLocation(prg, "scale"), relightObj.factor);
+         // gl.uniform1fv(gl.getUniformLocation(prg, "bias"), relightObj.bias);    
+   this.scale = gl.getUniformLocation(prg, "scale");
+	  this.base = gl.getUniformLocation(prg, "base");
+	    this.bias = gl.getUniformLocation(prg, "bias");
+    }
     this.uScaleHSH = gl.getUniformLocation(prg, "uScaleHSH");
     this.uBiasHSH = gl.getUniformLocation(prg, "uBiasHSH");
     this.uScalePTM0 = gl.getUniformLocation(prg, "uScalePTM0");

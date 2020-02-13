@@ -7,14 +7,14 @@ var useVertexColors = false;
 var texture = null;
 var gl = null;     		// WebGL context
 var program1 = null; 	//WebGL program
-var program2 = null; 
-var program3 = null; 
-var program4 = null; 
-var program5 = null; 
-var program6 = null; 
-var program7 = null; 
-var program8 = null; 
-var program9 = null; 
+var program2 = null;
+var program3 = null;
+var program4 = null;
+var program5 = null;
+var program6 = null;
+var program7 = null;
+var program8 = null;
+var program9 = null;
 var program10 = null;
 var program11 = null;
 var program12 = null;
@@ -31,6 +31,8 @@ var program22 = null;
 var program23 = null;
 var program24 = null;
 var program25 = null;
+var program31 = null;
+var program32 = null;
 
 var prg1 = null;
 var prg2 = null;
@@ -57,15 +59,17 @@ var prg22 = null;
 var prg23 = null;
 var prg24 = null;
 var prg25 = null;
+var prg31 = null;
+var prg32 = null;
 
 var tan15 = Math.tan(15/180*Math.PI);
 var tan30 = Math.tan(30/180*Math.PI);
 var piDev180 = Math.PI/180;
 
-var mainPrg = null;	
+var mainPrg = null;
 var mainProgram = null;
 
-var canvasWidth = 0;  	
+var canvasWidth = 0;
 var canvasHeight = 0;
 var canvasWidth2 = 0;
 var canvasHeight2 = 0;
@@ -86,7 +90,7 @@ var lightDirection0 = [-0.5,0.5,0.7];
 var lightDirection1 = [0.5,0.5,0.7];
 
 var lightIntensity0 = 3;
-var lightIntensity1 = 0;
+var lightIntensity1 = 1;
 var param0 = 0;
 var param1 = 0;
 var param2 = 0;
@@ -114,10 +118,12 @@ var normalTex = new Array(6);
 var ambientTex = new Array(6);
 var disTex = new Array(6);
 var albedo2Tex = new Array(6); //contains ir and uv channels
-var ambient2Tex = new Array(6); 
+var ambient2Tex = new Array(6);
 
 var hshTex = new Array(4);
 var ptmTex = new Array(3);
+var rbfTex = new Array(6);
+
 var kerneltest = new Array(1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.375, 0.25, 0.062, 0, 0, 0, 0, 0, 0, 0, 0, 0.312, 0.234, 0.093, 0.015, 0, 0, 0, 0, 0, 0, 0, 0.274, 0.219, 0.109, 0.03, 0.003, 0, 0, 0, 0, 0, 0, 0.247, 0.206, 0.117, 0.043, 0.009, 0, 0, 0, 0, 0, 0, 0.227, 0.194, 0.121, 0.053, 0.015, 0.002, 0, 0, 0, 0, 0, 0.211, 0.184, 0.122, 0.06, 0.021, 0.004, 0, 0, 0, 0, 0, 0.198, 0.176, 0.122, 0.066, 0.026, 0.007, 0.001, 0, 0, 0, 0, 0.188, 0.169, 0.122, 0.07, 0.031, 0.01, 0.002, 0, 0, 0, 0, 0.179, 0.162, 0.121, 0.073, 0.035, 0.013, 0.003, 0, 0, 0, 0, 0.171, 0.157, 0.12, 0.076, 0.039, 0.016, 0.004, 0, 0, 0, 0);
 
 var nuoud;
@@ -137,14 +143,14 @@ function initWebGL(){
 	texture = null;
 	gl = null;     		// WebGL context
 	program1 = null; 		//WebGL program
-	program2 = null; 
-	program3 = null; 
-	program4 = null; 
-	program5 = null; 
-	program6 = null; 
-	program7 = null; 
-	program8 = null; 
-	program9 = null; 
+	program2 = null;
+	program3 = null;
+	program4 = null;
+	program5 = null;
+	program6 = null;
+	program7 = null;
+	program8 = null;
+	program9 = null;
 	program10 = null;
 	program11 = null;
 	program12 = null;
@@ -161,6 +167,8 @@ function initWebGL(){
 	program23 = null;
 	program24 = null;
 	program25 = null;
+	program31 = null;
+	program32 = null;
 
 	prg1 = null;
 	prg2 = null;
@@ -187,11 +195,13 @@ function initWebGL(){
 	prg23 = null;
 	prg24 = null;
 	prg25 = null;
+	prg31 = null;
+	prg32 = null;
 
 	mainPrg = null;
 	mainProgram = null;
 
-	canvasWidth = 0;  	
+	canvasWidth = 0;
 	canvasHeight = 0;
 
 	mvMatrix    = mat4.create();    // Model-View matrix
@@ -211,7 +221,7 @@ function initWebGL(){
 	lightDirection1 = [0.5,0.5,0.7];
 
 	lightIntensity0 = 3;
-	lightIntensity1 = 0;
+	lightIntensity1 = 1;
 	param0 = 0.1;
 	param1 = 0;
 	param2 = 0;
@@ -259,7 +269,7 @@ function runWebGL() {
 	updateCanvasSize();
 	initInteraction();
 	initWebGL();
-	
+
 	gl = Utils.getGLContext("canvasMain");
 
 	configure();
@@ -267,7 +277,7 @@ function runWebGL() {
 	load();
 	updateCanvasSize();
 	$(document).ready(function(){updateProgram(1);});
-	
+
 }
 
 
@@ -292,8 +302,8 @@ function configure(){
 	try { ext = gl.getExtension("OES_element_index_uint");} catch(e) {}
 	if(!ext){floatingPointTextureSupport=0;
  	console.log("OES_element_index_uint not supported");}
- 
-	
+
+
 	gl.depthFunc(gl.LEQUAL);
 	//gl.enable(gl.BLEND);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
@@ -351,6 +361,10 @@ function configure(){
 	program24 = new Programm("vs/hsh_spec_enh","fs/hsh_sharpen_hsh",prg24);
 	prg25 = gl.createProgram();
 	program25 = new Programm("vs/hsh_spec_enh","fs/hsh_sharpen_nor",prg25);
+	prg31 = gl.createProgram();
+	program31 = new Programm("vs/hsh_spec_enh","fs/rbf_default_color",prg31);
+	prg32 = gl.createProgram();
+	program32 = new Programm("vs/hsh_spec_enh","fs/rbf_spec_enh",prg32);
 	/*
 	prg21 = gl.createProgram();
 	program21 = new Programm("vs/ptm","fs/ptm",prg21);
@@ -367,7 +381,7 @@ function initTransforms(){
 	mat4.translate(mvMatrix, HOME);
 
 	mat4.identity(pMatrix);
-	  
+
 	mat4.identity(nMatrix);
 	mat4.set(mvMatrix, nMatrix);
 	mat4.inverse(nMatrix);
@@ -375,9 +389,9 @@ function initTransforms(){
 }
 
 /*
-* Initializes the scene object, adds the light cones and the first texture plane to the scene 
+* Initializes the scene object, adds the light cones and the first texture plane to the scene
 */
-function load(){ 
+function load(){
 	Scene.init();
 	buildSidePlane(0);
 	light0 = new ObjectLight("objectLight0");
@@ -417,7 +431,7 @@ function updateNormal(spectralNb){
 			break;
 		case 1:
 			normalData = textureData[0].normals1;
-			break;		
+			break;
 		case 2:
 			normalData = textureData[0].normals2;
 			break;
@@ -431,19 +445,19 @@ function updateNormal(spectralNb){
 		case 5:
 		 	normalData = new Uint8Array(textureData[0].hshNormals);
 			break;
-		case 6: 
+		case 6:
 			normalData = new Uint8Array(textureData[0].ptmNormals);
 			break;
-		default: 	
+		default:
 			normalData = new Uint8Array(textureData[0].normals0);
 			break;
-	
-		}		
+
+		}
 		gl.bindTexture(gl.TEXTURE_2D, normalTex[0]);
 		//if floatingpointtexturesupport
 		//console.log(normalData);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[0].width,textureData[0].height,0, gl.RGBA, gl.UNSIGNED_BYTE, normalData);	
-		
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[0].width,textureData[0].height,0, gl.RGBA, gl.UNSIGNED_BYTE, normalData);
+
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -475,7 +489,7 @@ switch(spectralNb){
 		break;
 	case 1:
 		normalData = new Float32Array(textureData[0].normals1);
-		break;		
+		break;
 	case 2:
 		normalData = new Float32Array(textureData[0].normals2);
 		break;
@@ -485,15 +499,15 @@ switch(spectralNb){
 	case 4:
 		normalData = new Float32Array(textureData[0].normals4);
 		break;
-	default: 	
+	default:
 		normalData = new Float32Array(textureData[0].normals);
 		break;
 
-	}		
+	}
 	gl.bindTexture(gl.TEXTURE_2D, normalTex[0]);
 	//if floatingpointtexturesupport
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[0].width,textureData[0].height,0, gl.RGB, gl.FLOAT, normalData);	
-	
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[0].width,textureData[0].height,0, gl.RGB, gl.FLOAT, normalData);
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -506,13 +520,13 @@ if(boolRti && !boolGLTF){
 
 
 	normalData = new Float32Array(textureData[0].hshNormals);
-	
 
-		
+
+
 	gl.bindTexture(gl.TEXTURE_2D, normalTex[0]);
 	//if floatingpointtexturesupport
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[0].width,textureData[0].height,0, gl.RGB, gl.FLOAT, normalData);	
-	
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[0].width,textureData[0].height,0, gl.RGB, gl.FLOAT, normalData);
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -524,12 +538,12 @@ else if(boolPtm && !boolGLTF){
 	var normalData;
 
 	normalData = new Float32Array(textureData[0].ptmNormals);
-	
-		
+
+
 	gl.bindTexture(gl.TEXTURE_2D, normalTex[0]);
 	//if floatingpointtexturesupport
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[0].width,textureData[0].height,0, gl.RGB, gl.FLOAT, normalData);	
-	
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[0].width,textureData[0].height,0, gl.RGB, gl.FLOAT, normalData);
+
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -581,7 +595,7 @@ function loadTexture(gl, url) {
 
 	const texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-  
+
 	// Because images have to be download over the internet
 	// they might take a moment until they are ready.
 	// Until then put a single pixel in the texture so we can
@@ -605,7 +619,7 @@ function loadTexture(gl, url) {
 	  gl.bindTexture(gl.TEXTURE_2D, texture);
 	  gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
 					srcFormat, srcType, image);
-  
+
 	  // WebGL1 has different requirements for power of 2 images
 	  // vs non power of 2 images so check if the image is a
 	  // power of 2 in both dimensions.
@@ -622,7 +636,7 @@ function loadTexture(gl, url) {
 	  render(0);
 	};
 	image.src = url;
-  
+
 	return texture;
 
 }
@@ -636,7 +650,7 @@ function loadImage(url) {
 	  image.src = url;
 	});
 }
-  
+
 function Image2Uint8Array(image) {
   var tmpCanvas = document.createElement('canvas'),
 	tmpCtx = tmpCanvas.getContext('2d');
@@ -647,7 +661,7 @@ function Image2Uint8Array(image) {
 	var buf = imageData.data.buffer;
 	return buf;
 }
-  
+
 function isPowerOf2(value) {
 	return (value & (value - 1)) == 0;
 }
@@ -666,7 +680,7 @@ $("#errorMessages").css("display","block");
 	}
 
 
-	if(boolGLTF){
+	if(boolGLTF || boolRbf ){
 
 		scaleFactor[0] = 1;
 		var xOff,yOff=0;
@@ -685,30 +699,31 @@ $("#errorMessages").css("display","block");
 			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(50*textureData[0].height/textureData[0].width+heightBottom+heightTop)];
 		}
 		else{
-			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(1/canvasWidth*canvasHeight*(widthBack+50+widthRight+widthLeft))];	
+			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(1/canvasWidth*canvasHeight*(widthBack+50+widthRight+widthLeft))];
 		}
 		position = HOME.slice(0);
 		offscreenRenderHeight = Math.round(((textureData[0]!== undefined)?textureData[0].height:0)+0*((textureData[1]!== undefined)?textureData[1].height:0)+((textureData[2]!== undefined)?textureData[2].height*scaleFactor[2]:0)+((textureData[3]!== undefined)?textureData[3].height*scaleFactor[3]:0));
 		offscreenRenderWidth = Math.round(((textureData[4]!== undefined)?textureData[4].height*scaleFactor[4]:0)+((textureData[0]!== undefined)?textureData[0].width:0)+((textureData[5]!== undefined)?textureData[5].height*scaleFactor[5]:0)+((textureData[1]!== undefined)?textureData[1].width*scaleFactor[1]:0));
 		offscreenRenderWidth = textureData[0].width*(1+((textureData[4]!== undefined)?1*scaleFactor[4]/*textureData[4].width/textureData[4].height*/:0)+((textureData[5]!== undefined)?1*scaleFactor[5]/*textureData[4].width/textureData[4].height*/:0)+((textureData[1]!== undefined)?1*scaleFactor[1]/*textureData[4].width/textureData[4].height*/:0));
-	
+
 		sidePlane[sideNr] = null;
 	sidePlane[sideNr] = new ObjectPlane(sideNr,1000,1000,scaleFactor[sideNr],textureData[sideNr].height/textureData[sideNr].width,xOff,yOff,textureData[sideNr].height,textureData[sideNr].width);
 	Scene.addObject(sidePlane[sideNr]);
 	console.log("added side "+sideNr);
 	changeSide(10);
+  if(!boolRbf){
 	normalTex[0] = loadTexture(gl, glTFObj.filename + glTFObj.pld[0].normalTex);
 	albedoTex[0] = loadTexture(gl, glTFObj.filename + glTFObj.pld[0].albTex);
-	
+
 	loadImage(glTFObj.filename + glTFObj.pld[0].normalTex).then(normalImage => {
 		textureData[0].normals0 = Image2Uint8Array(normalImage);
-	  });	
-	  
+	  });
+
 	  if(glTFObj.pld[0].depthTex){
 		  boolDepthMap = true;
 		loadImage(glTFObj.filename + glTFObj.pld[0].depthTex).then(depthImage => {
 			textureData[0].depth = Image2Uint8Array(depthImage);
-		  });	
+		  });
 		  disTex[0] = loadTexture(gl, glTFObj.filename + glTFObj.pld[0].depthTex);
 
 	  }
@@ -729,9 +744,20 @@ $("#errorMessages").css("display","block");
 			textureData[0].ptmNormals = Image2Uint8Array(normalImage);
 		});
 	}
+  }
+  else{//boolRbf
+		var url = relightObj.filename;
+    rbfTex[0] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_0.jpg");
+    rbfTex[1] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_1.jpg");
+    rbfTex[2] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_2.jpg");
+    rbfTex[3] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_3.jpg");
+    rbfTex[4] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_4.jpg");
+    rbfTex[5] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_5.jpg");
+
+  }
 }
 else{
-	
+
 	var normalData;
 	//floatingPointTextureSupport =0;
 	if(!floatingPointTextureSupport){ //takes some time, luckily only for small percentage of visits
@@ -785,10 +811,10 @@ else{
 			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(50*textureData[0].height/textureData[0].width+heightBottom+heightTop)];
 		}
 		else{
-			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(1/canvasWidth*canvasHeight*(widthBack+50+widthRight+widthLeft))];	
+			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(1/canvasWidth*canvasHeight*(widthBack+50+widthRight+widthLeft))];
 		}
 		position = HOME.slice(0);
-		
+
 		offscreenRenderHeight = Math.round(((textureData[0]!== undefined)?textureData[0].height:0)+0*((textureData[1]!== undefined)?textureData[1].height:0)+((textureData[2]!== undefined)?textureData[2].height*scaleFactor[2]:0)+((textureData[3]!== undefined)?textureData[3].height*scaleFactor[3]:0));
 		offscreenRenderWidth = Math.round(((textureData[4]!== undefined)?textureData[4].height*scaleFactor[4]:0)+((textureData[0]!== undefined)?textureData[0].width:0)+((textureData[5]!== undefined)?textureData[5].height*scaleFactor[5]:0)+((textureData[1]!== undefined)?textureData[1].width*scaleFactor[1]:0));
 		offscreenRenderWidth = textureData[0].width*(1+((textureData[4]!== undefined)?1*scaleFactor[4]/*textureData[4].width/textureData[4].height*/:0)+((textureData[5]!== undefined)?1*scaleFactor[5]/*textureData[4].width/textureData[4].height*/:0)+((textureData[1]!== undefined)?1*scaleFactor[1]/*textureData[4].width/textureData[4].height*/:0));
@@ -799,10 +825,10 @@ else{
 	Scene.addObject(sidePlane[sideNr]);
    	console.log("added side "+sideNr);
 	changeSide(10);
-	
+
 	albedoTex[sideNr] = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, albedoTex[sideNr]);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, albedoData);	
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, albedoData);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);	//to overcome not a power of 2 problem.
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); //to overcome not a power of 2 problem.
@@ -811,16 +837,16 @@ else{
 
 
 	//create normal texture
-	
+
 	normalTex[sideNr] = gl.createTexture();
 
 	gl.bindTexture(gl.TEXTURE_2D, normalTex[sideNr]);
 	if(!floatingPointTextureSupport){
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, normalData);			
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, normalData);
 	}
 	else{
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGB, gl.FLOAT, normalData);	
-	}	
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGB, gl.FLOAT, normalData);
+	}
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -853,7 +879,7 @@ else{
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-	
+
 	if(textureData[sideNr].ambient){
 	  //create specular texture
 	  ambientTex[sideNr] = gl.createTexture();
@@ -905,7 +931,7 @@ else{
 
 		gl.bindTexture(gl.TEXTURE_2D, hshTex[i]);
 		if(!floatingPointTextureSupport){
-			//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, hshData);			
+			//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, hshData);
 		}
 		else{
 			var hshData;
@@ -916,8 +942,8 @@ else{
 				case 3: hshData = new Float32Array(textureData[0].hshCoef3);	break;
 			}
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGB, gl.FLOAT, hshData);
-			
-		}	
+
+		}
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -933,7 +959,7 @@ else{
 
 		gl.bindTexture(gl.TEXTURE_2D, ptmTex[i]);
 		if(!floatingPointTextureSupport){
-			//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, hshData);			
+			//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, hshData);
 		}
 		else{
 			var ptmData;
@@ -943,8 +969,8 @@ else{
 				case 2: ptmData = new Float32Array(textureData[0].ptmRgbCoeff);	break;
 			}
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGB, gl.FLOAT, ptmData);
-			
-		}	
+
+		}
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -956,16 +982,16 @@ else{
 	delete textureData[sideNr].ambient; //check with chrome memory management: huge difference
 	delete textureData[sideNr].normals;
 	delete textureData[sideNr].albedo;
-	
+
 	//texture to store offscreen framebuffer color info
 	var offscreenTex = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, offscreenTex);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, offscreenRenderWidth, offscreenRenderHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-	
+
 	var renderbuffer = gl.createRenderbuffer();
 	gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
 	gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, offscreenRenderWidth, offscreenRenderHeight);
-	
+
 	framebuffer = gl.createFramebuffer();
 	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D, offscreenTex, 0);
@@ -974,7 +1000,7 @@ else{
 	gl.bindRenderbuffer(gl.RENDERBUFFER, null);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	render(0); //temp: is this necessary
-	
+
  }
 }
 /*
@@ -1030,11 +1056,11 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var object = Scene.objects[i];
 				var distance;
 				switch(object.id){
-					case 0: 
+					case 0:
 						object.isMiddle = true;
 						object.xOff = 0;
 						object.yOff = 0;
-						object.zRotation = 0; 
+						object.zRotation = 0;
 						msWidth=textureData[0].width;
 						msHeight=textureData[0].height;
 						break;
@@ -1045,28 +1071,28 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 180;
 						break;
-					case 2: 
+					case 2:
 						object.isMiddle = false;
 						distance = -(50*textureData[0].height/textureData[0].width+50*scaleFactor[2]*textureData[2].height/textureData[2].width);
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 3: 
+					case 3:
 						object.isMiddle = false;
 						distance = 50*textureData[0].height/textureData[0].width+50*scaleFactor[3]*textureData[3].height/textureData[3].width;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 4: 
+					case 4:
 						object.isMiddle = false;
 						distance = -(50+50*scaleFactor[4]);
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 5: 
+					case 5:
 						object.isMiddle = false;
 						distance = (50+50*scaleFactor[5]);
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
@@ -1081,14 +1107,14 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var object = Scene.objects[i];
 				var distance;
 				switch(object.id){
-					case 0: 
+					case 0:
 						distance = (50*textureData[1].height/textureData[1].width*scaleFactor[1]+100*textureData[2].height/textureData[2].width*scaleFactor[2]+50*textureData[0].height/textureData[0].width);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 1: 
+					case 1:
 						object.isMiddle = true;
 						object.xOff =0;
 						object.yOff = 0;
@@ -1096,28 +1122,28 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 						msWidth=textureData[1].width;
 						msHeight=textureData[1].height;
 						break;
-					case 2: 
+					case 2:
 						distance = (50*textureData[1].height/textureData[1].width*scaleFactor[1]+50*textureData[2].height/textureData[2].width*scaleFactor[2]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 3: 
+					case 3:
 						distance = -(50*textureData[1].height/textureData[1].width*scaleFactor[1]+50*textureData[3].height/textureData[3].width*scaleFactor[3]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 4: 
+					case 4:
 						distance = -(50*scaleFactor[1]+50*scaleFactor[4]);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 180;
 						break;
-					case 5: 
+					case 5:
 						distance = (50*scaleFactor[1]+50*scaleFactor[5]);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
@@ -1132,21 +1158,21 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var object = Scene.objects[i];
 				var distance;
 				switch(object.id){
-					case 0: 
+					case 0:
 						distance = (50*textureData[2].height/textureData[0].width*scaleFactor[2]+50*textureData[0].height/textureData[0].width);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 1: 
+					case 1:
 						distance = -(50*textureData[2].height/textureData[0].width*scaleFactor[2]+50*textureData[1].height/textureData[1].width*scaleFactor[1]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 2: 
+					case 2:
 						object.isMiddle = true;
 						object.xOff =0;
 						object.yOff = 0;
@@ -1154,21 +1180,21 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 						msWidth=textureData[2].width;
 						msHeight=textureData[2].height;
 						break;
-					case 3: 
+					case 3:
 						distance = (50*textureData[2].height/textureData[0].width*scaleFactor[2]+100*textureData[0].height/textureData[0].width+50*textureData[3].height/textureData[3].width*scaleFactor[3]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 4: 
+					case 4:
 						distance = -(50*scaleFactor[2]+50*scaleFactor[4]*textureData[4].height/textureData[4].width);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 90;
 						break;
-					case 5: 
+					case 5:
 						distance = (50*scaleFactor[2]+50*scaleFactor[5]*textureData[5].height/textureData[5].width);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
@@ -1183,21 +1209,21 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var object = Scene.objects[i];
 				var distance;
 				switch(object.id){
-					case 0: 
+					case 0:
 						distance = -(50*textureData[3].height/textureData[3].width*scaleFactor[3]+50*textureData[0].height/textureData[0].width);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 1: 
+					case 1:
 						distance = (50*textureData[3].height/textureData[3].width*scaleFactor[3]+50*textureData[1].height/textureData[1].width*scaleFactor[1]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 2: 
+					case 2:
 						distance = (50*textureData[3].height/textureData[3].width*scaleFactor[3]+100*textureData[1].height/textureData[1].width*scaleFactor[1]+50*textureData[2].height/textureData[2].width*scaleFactor[2]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
@@ -1205,7 +1231,7 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 
 						object.zRotation = 0;
 						break;
-					case 3: 
+					case 3:
 						object.isMiddle = true;
 						object.xOff =0;
 						object.yOff = 0;
@@ -1213,14 +1239,14 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 						msWidth=textureData[3].width;
 						msHeight=textureData[3].height;
 						break;
-					case 4: 
+					case 4:
 						distance = -(50*scaleFactor[2]+50*scaleFactor[4]*textureData[4].height/textureData[4].width);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = -90;
 						break;
-					case 5: 
+					case 5:
 						distance = (50*scaleFactor[2]+50*scaleFactor[5]*textureData[5].height/textureData[5].width);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
@@ -1235,35 +1261,35 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var object = Scene.objects[i];
 				var distance;
 				switch(object.id){
-					case 0: 
+					case 0:
 						distance = (50*scaleFactor[4]+50);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 1: 
+					case 1:
 						distance = -(50*scaleFactor[4]+50*scaleFactor[1]);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 180;
 						break;
-					case 2: 
+					case 2:
 						distance = -(50*textureData[4].height/textureData[4].width*scaleFactor[4]+50*scaleFactor[2]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = -90;
 						break;
-					case 3: 
+					case 3:
 						distance = (50*textureData[4].height/textureData[4].width*scaleFactor[4]+50*scaleFactor[3]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 90;
 						break;
-					case 4: 
+					case 4:
 						object.isMiddle = true;
 						object.xOff = 0;
 						object.yOff = 0;
@@ -1271,7 +1297,7 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 						msWidth=textureData[4].width;
 						msHeight=textureData[4].height;
 						break;
-					case 5: 
+					case 5:
 						distance = -(50*textureData[4].height/textureData[4].width*scaleFactor[4]+100*scaleFactor[2]+50*textureData[5].height/textureData[5].width*scaleFactor[5]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
@@ -1286,42 +1312,42 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var object = Scene.objects[i];
 				var distance;
 				switch(object.id){
-					case 0: 
+					case 0:
 						distance = -(50*scaleFactor[5]+50);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 0;
 						break;
-					case 1: 
+					case 1:
 						distance = (50*scaleFactor[5]+50*scaleFactor[1]);
 						object.isMiddle = false;
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 180;
 						break;
-					case 2: 
+					case 2:
 						distance = -(50*textureData[5].height/textureData[5].width*scaleFactor[5]+50*scaleFactor[2]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = -90;
 						break;
-					case 3: 
+					case 3:
 						distance = (50*textureData[5].height/textureData[5].width*scaleFactor[5]+50*scaleFactor[3]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 90;
 						break;
-					case 4: 
+					case 4:
 						distance = -(50*textureData[5].height/textureData[5].width*scaleFactor[5]+100*scaleFactor[2]+50*textureData[4].height/textureData[4].width*scaleFactor[4]);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.zRotation = 180;
 						break;
-					case 5: 
+					case 5:
 						object.isMiddle = true;
 						object.xOff = 0;
 						object.yOff = 0;
@@ -1362,6 +1388,8 @@ function updateProgram(number){
 		case 21: mainPrg = prg21; mainProgram = program21; break;
 		case 22: mainPrg = prg22; mainProgram = program22; break;
 		case 23: mainPrg = prg23; mainProgram = program23; break;
+		case 31: mainPrg = prg31; mainProgram = program31; break;
+		case 32: mainPrg = prg32; mainProgram = program32; break;
 	}
 	render(0);
 	console.log("program: "+number);
@@ -1377,16 +1405,16 @@ var ddd1 = new Date().getTime();
 
 	var offscreenView = new Uint8Array(offscreenRenderWidth*offscreenRenderHeight*4);
 var ddd2 = new Date().getTime();
-console.log((ddd2-ddd1));	
+console.log((ddd2-ddd1));
 	gl.readPixels(0,0,offscreenRenderWidth,offscreenRenderHeight,gl.RGBA,gl.UNSIGNED_BYTE,offscreenView);
 var ddd3 = new Date().getTime();
-console.log("readpixels: "+(ddd3-ddd2));	
+console.log("readpixels: "+(ddd3-ddd2));
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	render(0);
 var ddd4 = new Date().getTime();
 console.log((ddd4-ddd3));
 	//omzetten naar bmp
-var cnvs=document.getElementById("canvasOffscreenHelper");	
+var cnvs=document.getElementById("canvasOffscreenHelper");
 	$('#canvasOffscreenHelper').attr('width',offscreenRenderWidth);
 	$('#canvasOffscreenHelper').attr('height',offscreenRenderHeight);
 	var ctxt=cnvs.getContext("2d");
@@ -1405,14 +1433,14 @@ console.log((ddd6-ddd5));
 	document.getElementById("imgOffscreenHelper").src=img;
 	document.getElementById("aOffscreenHelper").href = img;
 	document.getElementById("aOffscreenHelper").download=document.getElementById("inputOffscreenName").value+".jpeg";
-  
+
 	var clickEvent = document.createEvent("MouseEvent");
-	clickEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
+	clickEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 	document.getElementById("aOffscreenHelper").dispatchEvent(clickEvent);
 
 	console.log("done taking screenshot");
-	
-	
+
+
 		var ddd7 = new Date().getTime();
 
 console.log((ddd7-ddd6));
@@ -1481,18 +1509,18 @@ function render(s) {
 		gl.viewport(0, 0, canvasWidth, canvasHeight);
 	}
 	else if(s==1){
-		gl.viewport(0, 0,offscreenRenderWidth, offscreenRenderHeight);	
+		gl.viewport(0, 0,offscreenRenderWidth, offscreenRenderHeight);
 	}
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	var curPrg = null;
 	var curProgram = null;
-	
-	try{	    
+
+	try{
 		for(var i=0; i<Scene.objects.length; i++){
 			var object = Scene.objects[i];
-			
-			
-			if(object.type=="sidePlane"){	
+
+
+			if(object.type=="sidePlane"){
 				gl.useProgram(mainPrg);
 				curProgram = mainProgram;
 				curPrg = mainPrg;
@@ -1503,9 +1531,9 @@ function render(s) {
 			else{
 				gl.useProgram(prg1);
 				curProgram = program1;
-				curPrg = prg1;			
+				curPrg = prg1;
 			}
-			
+
 			var renderPosition = position.slice(0);
 			renderPosition[0]+=object.xOff;
 			renderPosition[1]+=object.yOff;
@@ -1521,18 +1549,18 @@ function render(s) {
 				object.lightIntensity0 = lightIntensity0;
 				object.lightIntensity1 = lightIntensity1;
 			}
-			
+
 			gl.uniform1fv(curProgram.gkernels, kerneltest);
-			
+
 			if(s==1){
-				mat4.perspective(30*piDev180, offscreenRenderWidth/offscreenRenderHeight, 1, 10000.0, pMatrix);		
-			}	
+				mat4.perspective(30*piDev180, offscreenRenderWidth/offscreenRenderHeight, 1, 10000.0, pMatrix);
+			}
 			else{
 				mat4.perspective(30*piDev180, canvasWidth / canvasHeight, 1, 10000.0, pMatrix);  // We can resize the screen at any point so the perspective matrix should be updated always.
 			}
 			mat4.identity(mvMatrix);
 			mat4.set(mvMatrix,mvMatrixCopy);
-		
+
 			if(object.type=="sidePlane"){
 
 				if(s==1){
@@ -1547,7 +1575,7 @@ function render(s) {
 				mat4.rotateZ(mvMatrix,renderRotation[2]*piDev180);
 				mat4.rotateX(nMatrix,renderRotation[0]*piDev180);
 				mat4.rotateY(nMatrix,renderRotation[1]*piDev180);
-				mat4.rotateZ(nMatrix,renderRotation[2]*piDev180);	
+				mat4.rotateZ(nMatrix,renderRotation[2]*piDev180);
 			}
 
 
@@ -1566,11 +1594,11 @@ function render(s) {
 			}
 
 			gl.uniformMatrix4fv(curProgram.uMVMatrix, false, mvMatrix);
-			gl.uniformMatrix4fv(curProgram.uPMatrix, false, pMatrix);    	
-			mat4.inverse(mvMatrix,mvMatrix);     				
-			mat4.transpose(mvMatrix, nMatrix);                     	
-			gl.uniformMatrix4fv(curProgram.uNMatrix, false, nMatrix);    	
-			
+			gl.uniformMatrix4fv(curProgram.uPMatrix, false, pMatrix);
+			mat4.inverse(mvMatrix,mvMatrix);
+			mat4.transpose(mvMatrix, nMatrix);
+			gl.uniformMatrix4fv(curProgram.uNMatrix, false, nMatrix);
+
 			gl.uniform3fv(curProgram.uLightDirection0, object.lightDirection0);
 			gl.uniform3fv(curProgram.uLightDirection1, object.lightDirection1);
 			gl.uniform3fv(curProgram.uSplit, split);
@@ -1584,7 +1612,8 @@ function render(s) {
 			gl.uniform3fv(curProgram.uBiasPTM1, vec3BiasPTM1);
 			gl.uniform4fv(curProgram.uScaleHSH, vec4ScaleHSH);
 			gl.uniform4fv(curProgram.uBiasHSH, vec4BiasHSH);
-			//if(moving){		
+
+			//if(moving){
 			//	gl.uniform1f(curProgram.uParam0, 0.1);
 			//	gl.uniform1f(curProgram.uParam1, 0);
 			//}
@@ -1594,9 +1623,9 @@ function render(s) {
 				gl.uniform1f(curProgram.uParam2, object.param2);
 				gl.uniform1f(curProgram.uParam3, object.param3);
 			//}
-			
+
 			mat4.set(mvMatrixCopy,mvMatrix); //switch back to old mvMatrix
-	
+
 			gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
 			gl.enableVertexAttribArray(0);
 			gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
@@ -1607,9 +1636,9 @@ function render(s) {
 			//else if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [1.0, 1.0, 0, 1.0]);}
 			if(object.type!="lightCone"){gl.uniform4fv(curProgram.uMaterialAmbient, [0, 0, 0, 0]);}
 			gl.bindBuffer(gl.ARRAY_BUFFER, object.tbo);
-			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);		
+			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
 			gl.enableVertexAttribArray(1);
-			
+
 			if (object.id!="objectLight0" && object.id!="objectLight1"){
 				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				gl.uniform2fv(curProgram.uImgDim, [textureData[object.id].width,textureData[object.id].height]);
@@ -1635,7 +1664,7 @@ function render(s) {
 					gl.bindTexture(gl.TEXTURE_2D, albedoTex[object.id]);
 					gl.uniform1i(curProgram.uAlbedoSampler, 2);
 				}
-			
+
 				if (boolMultiSpectral){
 					gl.activeTexture(gl.TEXTURE3);
 					gl.bindTexture(gl.TEXTURE_2D, albedo2Tex[object.id]);
@@ -1664,6 +1693,39 @@ function render(s) {
 					gl.bindTexture(gl.TEXTURE_2D, hshTex[3]);
 					gl.uniform1i(curProgram.hshCoeff3Tex, 14);
 				}
+				if(boolRbf){
+					relightObj.computeLightWeightsRbf(lightDirection0);
+
+					gl.uniform3fv(curProgram.base, relightObj.lweights);
+					gl.uniform1fv(curProgram.bias, relightObj.bias);
+					gl.uniform1fv(curProgram.scale, relightObj.factor);
+
+          gl.activeTexture(gl.TEXTURE11);
+          gl.bindTexture(gl.TEXTURE_2D, rbfTex[0]);
+          gl.uniform1i(curProgram.rbfCoeff0Tex, 11);
+
+          gl.activeTexture(gl.TEXTURE12);
+          gl.bindTexture(gl.TEXTURE_2D, rbfTex[1]);
+          gl.uniform1i(curProgram.rbfCoeff1Tex, 12);
+
+          gl.activeTexture(gl.TEXTURE13);
+          gl.bindTexture(gl.TEXTURE_2D, rbfTex[2]);
+          gl.uniform1i(curProgram.rbfCoeff2Tex, 13);
+
+          gl.activeTexture(gl.TEXTURE14);
+          gl.bindTexture(gl.TEXTURE_2D, rbfTex[3]);
+          gl.uniform1i(curProgram.rbfCoeff3Tex, 14);
+
+          gl.activeTexture(gl.TEXTURE8);
+          gl.bindTexture(gl.TEXTURE_2D, rbfTex[4]);
+          gl.uniform1i(curProgram.rbfCoeff4Tex, 8);
+
+          gl.activeTexture(gl.TEXTURE9);
+          gl.bindTexture(gl.TEXTURE_2D, rbfTex[5]);
+          gl.uniform1i(curProgram.rbfCoeff5Tex, 9);
+
+
+				}
 			    if(boolPtm){
 					gl.activeTexture(gl.TEXTURE8);
 					gl.bindTexture(gl.TEXTURE_2D, ptmTex[0]);
@@ -1678,20 +1740,20 @@ function render(s) {
 					gl.uniform1i(curProgram.ptmRgbCoeffTex, 10);
 				}
 			}
-			
+
 			else{
 				gl.uniform1f(curProgram.uBoolDepthMap, false);
 			}
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
 			if((object.type=="lightCone")&& boolLightToggle() && s==0 &&(mainPrg != prg2 || mainPrg != prg2 )){
-              
+
 				if(object.id=="objectLight0"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity0/10+0.1, lightIntensity0/10+0.1,lightIntensity0/20, 1.0]);}
 				if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity1/10+0.1, lightIntensity1/10+0.1,lightIntensity1/20, 1.0]);}
-				
+
 				gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);
 				gl.uniform4fv(curProgram.uMaterialAmbient, [1.0,1.0,1.0, 1.0]);
 				gl.drawElements(gl.LINE_STRIP, object.indices.length, gl.UNSIGNED_INT,0);
-            }    
+            }
             if(object.type=="sidePlane"){gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);}
 			gl.bindBuffer(gl.ARRAY_BUFFER, null);
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);

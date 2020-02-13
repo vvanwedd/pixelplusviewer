@@ -1,7 +1,7 @@
 // for information on the parser, see the technical paper
 // main idea: this file parses a ZUN or CUN file: it extracts the metadata and spawns a worker that will decompress and calculate the different textures. each time the worker is ready with a texture, it is sent to the main execution thread.
 // global variables
-var bytePointer = 0; //cfr pointer in c
+var bytePointer = 0;
 // metadata
 var timePeriodId = 0;
 var genreId = 0;
@@ -29,10 +29,8 @@ var copyright = "";
 var mMmPerPixel;
 
 var glTFObj;
+var relightObj;
 
-//var boolTemp = true;
-
-//loadblockcompresseddiffuse
 var mData = 0;
 var minValue = 0;
 var maxValue = 0;
@@ -62,6 +60,7 @@ var boolPhotometric = false;
 var boolMultiSpectral = false;
 var boolPtm = false;
 var boolGLTF = false;
+var boolRbf = false;
 var boolDepthMap = false;
 
 var boolZRotation = false;
@@ -191,9 +190,14 @@ function loadFileWrapper(arrayBuffer, filename){
 	loadFilePTM(arrayBuffer);
  }
  else if (fileType == 'ltf'){
-	console.log('Loading GTLF file... ');
+	console.log('Loading glTF file... ');
 	loadFileGLTF(arrayBuffer, filename);
- } else{
+ }
+ else if (fileType == 'son'){
+	console.log('Loading RELIGHT RTI file... ');
+	loadFileRelight(arrayBuffer, filename);
+ }
+ else{
 	         $("#loader").css("display","none");
                 $("#errorMessages").css("display","block");
                 document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The requested file type is not supported. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>.</h3>";
@@ -270,10 +274,51 @@ function updateShaderList(){
 		$('#lshader12').button( "disable");
 		$('#lshader14').button( "disable");
 	}
+	if(boolRbf){       $('#lshader31').button( "enable");
+                $('#lshader32').button( "enable");
+
+                $('#lshader31').button( "enable");
+                $('#lshader32').button( "enable");
+	}
+	else{
+                $('#lshader31').button( "disable");
+                $('#lshader32').button( "disable");
+
+	}
 
 }
 function ab2str(buf){
 return String.fromCharCode.apply(null, new Uint8Array(buf));
+
+}
+function loadFileRelight(arrayBuffer,filename){
+  $("#progressIndicator").css("display","none");
+  $("#loader").css("display","block");
+  $("#radiosetIntro").css("display","none");
+
+  boolRti = false;
+  boolPhotometric = false;
+  boolMultiSpectral = false;
+  boolPtm = false;
+  boolGLTF = false;
+  boolRbf = true;
+
+  relightObj = new Relight();
+  relightObj.parseJSON(ab2str(arrayBuffer));
+  relightObj.loadFactorAndBias();
+  relightObj.loadBasis(relightObj.infobasis);
+  relightObj.computeLightWeights(lightDirection0);
+
+  relightObj.filename = filename;
+  textureData.length = 0;
+  var sideData = new Object();
+  sideData.width = relightObj.width;
+  sideData.height = relightObj.height;
+
+  textureData.push(sideData);
+  runWebGL();
+  updateShaderList();
+  updateProgram(31);
 
 }
 
@@ -294,7 +339,7 @@ $("#errorMessages").css("display","block");
 	boolGLTF = true;
 	boolPtm = false;
 	boolRti = false;
-
+	boolRbf = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -346,7 +391,7 @@ function loadFilePTM(arrayBuffer){
 	boolMultiSpectral = false;
 	boolPtm = true;
 	boolGLTF = false;
-
+	boolRbf = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -421,7 +466,7 @@ function loadFileRTI(arrayBuffer){
 	boolMultiSpectral = false;
 	boolPtm = false;
 	boolGLTF = false;
-
+	boolRbf = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -612,7 +657,7 @@ function loadFile(arrayBuffer){
 	boolMultiSpectral = false;
 	boolPtm = false;
 	boolGLTF = false;
-
+	boolRbf = false;
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
