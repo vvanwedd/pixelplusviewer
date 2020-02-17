@@ -327,6 +327,7 @@ function loadFileRelight(arrayBuffer,filename){
   runWebGL();
   updateShaderList();
   updateProgram(31);
+  $('#lshader31').trigger("click");
 
 }
 
@@ -448,6 +449,7 @@ function loadFilePTM(arrayBuffer){
 		runWebGL();
 		updateProgram(21);
 		updateShaderList();
+    $('#lshader12').trigger("click");
 
 		workerPtmNorm = new Worker('data/js/parser/workerCalculateNormals.js');
 		workerPtmNorm.onerror = function(e){
@@ -554,6 +556,8 @@ $("#progressIndicator").css("display","none");
 runWebGL();
 updateShaderList();
 updateProgram(20);
+$('#lshader11').trigger("click");
+
 
 workerHshNorm = new Worker('data/js/parser/workerCalculateNormals.js');
 workerHshNorm.onerror = function(e){

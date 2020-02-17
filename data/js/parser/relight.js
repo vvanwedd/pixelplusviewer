@@ -84,8 +84,9 @@ loadBasis(data) {
 
 computeLightWeights(lpos) {
 	var t = this;
-	var l = t.rot(lpos[0], lpos[1], -t.pos.a);
-	l[2] = lpos[2];
+  var rotatedLight = [lpos[0]*Math.cos(rotation[2]/180*Math.PI)-lpos[1]*Math.sin(rotation[2]/180*Math.PI), lpos[0]*Math.sin(rotation[2]/180*Math.PI)+lpos[1]*Math.cos(rotation[2]/180*Math.PI), lpos[2] ];
+	var l = t.rot(rotatedLight[0], rotatedLight[1], -t.pos.a);
+	l[2] = rotatedLight[2];
 
 	if(t.waiting) return;
 
@@ -101,8 +102,10 @@ computeLightWeights(lpos) {
 	lightFun.call(this, l);
 }
 
-computeLightWeightsRbf(lpos) {
+computeLightWeightsRbf(lp) {
 	var t = this;
+  var lpos = [lp[0]*Math.cos(rotation[2]/180*Math.PI)-lp[1]*Math.sin(rotation[2]/180*Math.PI), lp[0]*Math.sin(rotation[2]/180*Math.PI)+lp[1]*Math.cos(rotation[2]/180*Math.PI), lp[2] ];
+
 	var nm = t.nmaterials;
 	var np = t.nplanes;
 	var radius = 1/(t.sigma*t.sigma);
