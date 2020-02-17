@@ -5,7 +5,7 @@
 function Programm(vss,fss,prg){
 	var fs = loadShaders(gl, fss);
 	//var vs = loadShaders(gl, vss);
-	
+
 
 	gl.bindAttribLocation(prg, 0, "aVertexPosition");
 	gl.bindAttribLocation(prg, 1, "aVertexTextureCoords");
@@ -34,7 +34,7 @@ function Programm(vss,fss,prg){
 	this.uParam3 = gl.getUniformLocation(prg, "uParam3");
 	this.uFloatTex = gl.getUniformLocation(prg, "uFloatTex");
     this.uBoolDepthMap = gl.getUniformLocation(prg, "uBoolDepthMap");
-    this.uBoolGLTF = gl.getUniformLocation(prg, "uBoolGLTF");
+    this.uBoolFloatTexture = gl.getUniformLocation(prg, "uBoolFloatTexture");
 	this.uUseAmbient = gl.getUniformLocation(prg, "uUseAmbient");
 	this.uLightDirection0 = gl.getUniformLocation(prg, "uLightDirection0");
 	this.uLightDirection1 = gl.getUniformLocation(prg, "uLightDirection1");
@@ -63,7 +63,7 @@ function Programm(vss,fss,prg){
     if(boolRbf){
         //relightObj.baseLocation = gl.getUniformLocation(prg, "base");
 	//gl.uniform1fv(gl.getUniformLocation(prg, "scale"), relightObj.factor);
-         // gl.uniform1fv(gl.getUniformLocation(prg, "bias"), relightObj.bias);    
+         // gl.uniform1fv(gl.getUniformLocation(prg, "bias"), relightObj.bias);
    this.scale = gl.getUniformLocation(prg, "scale");
 	  this.base = gl.getUniformLocation(prg, "base");
 	    this.bias = gl.getUniformLocation(prg, "bias");
@@ -123,6 +123,3 @@ function loadShaders(gl, shaders, callback) {
     }
     return shaders[0];
 }
-
-
-

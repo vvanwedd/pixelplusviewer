@@ -9,14 +9,13 @@ uniform mat4 uNMatrix;
 uniform vec4 uLightAmbient;
 uniform float uLightIntensity0;
 uniform float uLightIntensity1;
-uniform float uFloatTex;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
 
 uniform vec3 base[19];
 uniform float bias[19];
 uniform float scale[19];
-uniform float uBoolGLTF;
+uniform float uBoolFloatTexture;
 
 
 //samplers
@@ -50,5 +49,12 @@ void main(void)
 		color += base[j*3+2]*(rbf[j].y - bias[j*3+2])*scale[j*3+2];
 		color += base[j*3+3]*(rbf[j].z - bias[j*3+3])*scale[j*3+3];
    }
-   gl_FragColor = vec4(color*uLightIntensity0*0.7,1.0);
+
+  vec4 total = vec4(color*uLightIntensity0*0.7,1.0);
+  if(uMaterialAmbient.x != 66666666.0){
+		gl_FragColor = uMaterialAmbient;
+	}
+	else{
+	 gl_FragColor =  total;
+  }
 }

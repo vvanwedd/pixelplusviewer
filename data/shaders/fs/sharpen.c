@@ -16,7 +16,7 @@ uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
 uniform vec2 uImgDim;
 
-uniform float uBoolGLTF;
+uniform float uBoolFloatTexture;
 
 
 uniform vec3 uSplit;
@@ -34,7 +34,7 @@ varying vec3 vTangentEyeDir;
 uniform float param3;
 uniform float param4;
 //const int s = 2; // PROBLEM: sum/float(...) return 0 if s>1!
- //lightIntensity2.r); 
+ //lightIntensity2.r);
 
 // approximated discrete gaussian kernels
 // note: these values are generated in constructor of RelighterCanvas, uncomment source if necessary
@@ -48,10 +48,10 @@ void main(void) {
 int s = int(1.0 + 10.0*uParam1);
   //int i = s;
   for (int i=0; i<21; i++){ //21: MAXVALUE of int s = int(1.0 + 10.0*uLightDiffuse1.r);
-	  for (int y=-1; y<=1; y+=1){ 
+	  for (int y=-1; y<=1; y+=1){
 		  for(int x=-1; x<=1; x+=1){
 		    vec3 neighbourN = vec3(texture2D(uAlbedoSampler, vTextureCoord+vec2(float(x*i)/float(uImgDim[0]),float(y*i)/float(uImgDim[1]))) ).rgb;
-		    
+
 		    g = float(s-i);
 
 		    sum = sum + neighbourN * g;
@@ -65,18 +65,18 @@ int s = int(1.0 + 10.0*uParam1);
   sumg = sumg + 0.0001;
 
   vec3 normal = vec3( texture2D(uNormalSampler, vTextureCoord) ).rgb;
-  if(uBoolGLTF==1.0){normal = 2.0*(normal - 0.5);}
+  if(uBoolFloatTexture!=1.0){normal = 2.0*(normal - 0.5);}
   vec3 albedo = vec3( texture2D(uAlbedoSampler, vTextureCoord) ).rgb;
   albedo = albedo + (2.0*uParam0-1.0)*(albedo-sum/sumg);
-  
+
   vec3 light0 = normalize(uLightDirection0.xyz);
   vec3 light1 = normalize(uLightDirection1.xyz);
-  
-  float diffuseTerm0 = max(0.0, dot(normal, light0) ); 
+
+  float diffuseTerm0 = max(0.0, dot(normal, light0) );
   vec3 diffspec0 = albedo*diffuseTerm0;
-  float diffuseTerm1 = max(0.0, dot(normal, light1) ); 
+  float diffuseTerm1 = max(0.0, dot(normal, light1) );
   vec3 diffspec1 = albedo*diffuseTerm1;
-  
+
   vec4 total = vec4(uLightIntensity0*diffspec0 + uLightIntensity1*diffspec1,1.0);
   if(uMaterialAmbient.x != 66666666.0){
 		gl_FragColor = uMaterialAmbient;
@@ -85,4 +85,3 @@ int s = int(1.0 + 10.0*uParam1);
 	 gl_FragColor =  total;
   }
 }
-

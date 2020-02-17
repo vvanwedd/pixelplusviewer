@@ -131,6 +131,7 @@ var timeoutid;
 
 var vs;
 var floatingPointTextureSupport = 1;
+var boolFloatTexture = 1.0;
 
 var offscreenRenderHeight;
 var offscreenRenderWidth;
@@ -423,7 +424,7 @@ function updateCanvasSize(){
 }
 
 function updateNormal(spectralNb){
-	if(boolGLTF){
+	if(boolGLTF || boolRbf){
 		var normalData;
 	switch(spectralNb){
 	/*	case 0:
@@ -447,6 +448,9 @@ function updateNormal(spectralNb){
 			break;
 		case 6:
 			normalData = new Uint8Array(textureData[0].ptmNormals);
+			break;
+		case 7:
+			normalData = new Uint8Array(textureData[0].rbfNormals);
 			break;
 		default:
 			normalData = new Uint8Array(textureData[0].normals0);
@@ -754,6 +758,15 @@ $("#errorMessages").css("display","block");
     rbfTex[4] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_4.jpg");
     rbfTex[5] =  loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"plane_5.jpg");
 
+  //to do: check whether maps exist
+	normalTex[0] = loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"normals.png");
+	loadImage(url.substring(0,url.lastIndexOf('/')+1)+"normals.png").then(normalImage => {
+		textureData[0].rbfNormals = Image2Uint8Array(normalImage);
+	});
+  ambientTex[0] = loadTexture(gl, url.substring(0,url.lastIndexOf('/')+1)+"means.png");
+	loadImage(url.substring(0,url.lastIndexOf('/')+1)+"means.png").then(ambientImage => {
+		textureData[0].rbfAmbient = Image2Uint8Array(ambientImage);
+	});
   }
 }
 else{
@@ -1605,7 +1618,7 @@ function render(s) {
 			gl.uniform1f(curProgram.uLightIntensity0, object.lightIntensity0);
 			gl.uniform1f(curProgram.uLightIntensity1, object.lightIntensity1);
 			gl.uniform1f(curProgram.uFloatTex, floatingPointTextureSupport);
-			gl.uniform1f(curProgram.uBoolGLTF, boolGLTF);
+			gl.uniform1f(curProgram.uBoolFloatTexture, boolFloatTexture);
 			gl.uniform3fv(curProgram.uScalePTM0, vec3ScalePTM0);
 			gl.uniform3fv(curProgram.uBiasPTM0, vec3BiasPTM0);
 			gl.uniform3fv(curProgram.uScalePTM1, vec3ScalePTM1);

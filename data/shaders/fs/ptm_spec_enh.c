@@ -12,7 +12,6 @@ uniform float uLightIntensity1;
 uniform float uParam0;
 uniform float uParam1;
 uniform float uParam2;
-uniform float uFloatTex;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
 
@@ -25,7 +24,7 @@ uniform sampler2D ptmCoeff0Tex;
 uniform sampler2D ptmCoeff1Tex;
 uniform sampler2D ptmRgbCoeffTex;
 
-uniform float uBoolGLTF;
+uniform float uBoolFloatTexture;
 uniform vec3 uScalePTM0;
 uniform vec3 uBiasPTM0;
 uniform vec3 uScalePTM1;
@@ -38,14 +37,14 @@ varying vec3 vTangentLightDir;
 varying vec3 vTangentEyeDir;
 
 void main(void)
-{    
+{
   vec3 ptmCoeff0 = vec3( texture2D(ptmCoeff0Tex, vTextureCoord) ).rgb;
   vec3 ptmCoeff1 = vec3( texture2D(ptmCoeff1Tex, vTextureCoord) ).rgb;
-  if(uBoolGLTF==1.0){
+  if(uBoolFloatTexture!=1.0){
     ptmCoeff0 *= 255.0;
-ptmCoeff1 *= 255.0;
-ptmCoeff0 = ptmCoeff0.bgr;
-ptmCoeff1 = ptmCoeff1.bgr;
+    ptmCoeff1 *= 255.0;
+    ptmCoeff0 = ptmCoeff0.bgr;
+    ptmCoeff1 = ptmCoeff1.bgr;
     ptmCoeff0.x = uScalePTM0.x*(ptmCoeff0.x - uBiasPTM0.x);
     ptmCoeff0.y = uScalePTM0.y*(ptmCoeff0.y - uBiasPTM0.y);
     ptmCoeff0.z = uScalePTM0.z*(ptmCoeff0.z - uBiasPTM0.z);
@@ -61,15 +60,15 @@ ptmCoeff1 = ptmCoeff1.bgr;
   vec3 lm0 = vec3(lightDirection.x*lightDirection.x, lightDirection.y*lightDirection.y, lightDirection.x*lightDirection.y);
   vec3 lm1 = vec3(lightDirection.x, lightDirection.y, 1.0);
 
-  vec3 tmp0 = ptmCoeff0*lm0;  
+  vec3 tmp0 = ptmCoeff0*lm0;
   vec3 tmp1 = ptmCoeff1*lm1;
 
   float lum = (tmp0.x + tmp0.y + tmp0.z + tmp1.x + tmp1.y + tmp1.z)*uLightIntensity0/255.0/255.0/2.3;///255.0/5.0;
-  if(uBoolGLTF==1.0){ lum *= 255.0;}
+  if(uBoolFloatTexture!=1.0){ lum *= 255.0;}
 
   // Unpack tangent-space normal from texture
   vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
-  if(uBoolGLTF==1.0){normal = 2.0*(normal - 0.5);}
+  if(uBoolFloatTexture!=1.0){normal = 2.0*(normal - 0.5);}
   //normal.x = -normal.x;
   normal = (uNMatrix * vec4(normal, 0.0)).xyz;
   vec3 h0 = vec3(0.0, 0.0, 1.0);

@@ -67,7 +67,7 @@ function initInteraction(){
 	rotAngle=0;
 
 	$("#sliderLight0").slider({value: 3});
-	$("#sliderLight1").slider({value: 0});
+	$("#sliderLight1").slider({value: 2});
 	$("#sliderParam0").slider({value: 0});
 	$("#sliderParam1").slider({value: 0});
 	$("#sliderParam2").slider({value: 0});
@@ -378,9 +378,12 @@ $(document).ready(function(){
 				}
 		if($("#normalPTM")[0].checked==true){
 			updateNormal(6);
-						 if(gl){render(0);}
-
-				}
+			if(gl){render(0);}
+		}
+		if($("#normalRBF")[0].checked==true){
+			updateNormal(7);
+			if(gl){render(0);}
+		}
 
 	});
 	$("#reflectanceset" ).buttonset();
@@ -572,7 +575,7 @@ $(document).ready(function(){
 			updateProgram(31);
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
-			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
 			document.getElementById("param2wrapper").style.display="none";
 			document.getElementById("param0").innerHTML = "rel Amount";
@@ -588,9 +591,9 @@ $(document).ready(function(){
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="none";
-			document.getElementById("param2wrapper").style.display="none";
-			document.getElementById("param0").innerHTML = "Amount";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "exp";
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
@@ -669,7 +672,7 @@ $(document).ready(function(){
 		min:0,
       max: 10,
 		step:0.01,
-      value: 0,
+      value: 2,
       slide: updateLight1,
       change: updateLight1,
 	});

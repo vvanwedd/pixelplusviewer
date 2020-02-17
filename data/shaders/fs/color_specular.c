@@ -14,7 +14,7 @@ uniform float uParam1;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
 
-uniform float uBoolGLTF;
+uniform float uBoolFloatTexture;
 
 
 //samplers
@@ -34,15 +34,14 @@ vec3 rhoSpecular = vec3(1.0,1.0,1.0)*uParam1;
 const float sigma = 0.09;
 
 void main(void)
-{   
-    // Unpack tangent-space normal from texture
-    vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
-	if(uBoolGLTF==1.0){normal = 2.0*(normal - 0.5);}
-    //normal.x = -normal.x;
-    normal = (uNMatrix * vec4(normal, 0.0)).xyz;
-    vec3 albedo = texture2D(uAlbedoSampler, vTextureCoord).rgb;
+{
+  // Unpack tangent-space normal from texture
+  vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
+	if(uBoolFloatTexture!=1.0){normal = 2.0*(normal - 0.5);}
+  normal = (uNMatrix * vec4(normal, 0.0)).xyz;
+  vec3 albedo = texture2D(uAlbedoSampler, vTextureCoord).rgb;
 
-   // Normalize light direction
+  // Normalize light direction
 	vec3 light0 = normalize(uLightDirection0.xyz);
 	vec3 light1 = normalize(uLightDirection1.xyz);
 
@@ -51,12 +50,12 @@ void main(void)
 	float cosGamma = dot(normal,halfDirection);
 	float gamma = acos(cosGamma);
 	float specularTerm = exp(-gamma*gamma/(2.0*sigma*sigma))/cosThetaE;
-	
+
 	float diffuseTerm0 = max(0.0,dot(normal,light0)); //lamberterm would be max of this and predescribed value, eg 0.2
 	vec3 diffspec0 = albedo*diffuseTerm0 + rhoSpecular*specularTerm;
 
 	vec4 total = vec4(uLightIntensity0  * uParam0 * diffspec0, 1.0); //uParam0: textureintensityfactor
- 
+
   if(uMaterialAmbient.x != 66666666.0){
 		gl_FragColor = uMaterialAmbient;
 	}

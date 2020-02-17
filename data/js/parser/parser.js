@@ -28,6 +28,7 @@ var creationDate = "";
 var copyright = "";
 var mMmPerPixel;
 
+var metadataObj;
 var glTFObj;
 var relightObj;
 
@@ -274,11 +275,17 @@ function updateShaderList(){
 		$('#lshader12').button( "disable");
 		$('#lshader14').button( "disable");
 	}
-	if(boolRbf){       $('#lshader31').button( "enable");
-                $('#lshader32').button( "enable");
+	if(boolRbf){
+    $('#lshader31').button( "enable");
+    $('#lshader32').button( "enable");
 
-                $('#lshader31').button( "enable");
-                $('#lshader32').button( "enable");
+    $('#lshader31').button( "enable");
+    $('#lshader32').button( "enable");
+    $("#color1").button({enabled:true});
+    $('#color1').button( "enable");
+    $('#color0').button( "disable");
+    $("#color0").button({disabled:true});
+    useAmbient = true;
 	}
 	else{
                 $('#lshader31').button( "disable");
@@ -296,8 +303,9 @@ function loadFileRelight(arrayBuffer,filename){
   $("#loader").css("display","block");
   $("#radiosetIntro").css("display","none");
 
+  boolFloatTexture = false;
   boolRti = false;
-  boolPhotometric = false;
+  boolPhotometric = true; // only when normal map is available, should check
   boolMultiSpectral = false;
   boolPtm = false;
   boolGLTF = false;
@@ -331,10 +339,20 @@ function loadFileGLTF(arrayBuffer,filename){
 	  glTFObj = JSON.parse(ab2str(arrayBuffer));
 	}
 	catch(e){
-$("#errorMessages").css("display","block");
-                                document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The glTF file could not be parsed.</h3><h3>" + e.name + " "+ e.message + ". Redirecting to <a href=\"http://www.heritage-visualisation.org\">heritage-visualisation.org</a> ... ";
-                        abortExecution();
+    $("#errorMessages").css("display","block");
+    document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The glTF file could not be parsed.</h3><h3>" + e.name + " "+ e.message + ". Redirecting to <a href=\"http://www.heritage-visualisation.org\">heritage-visualisation.org</a> ... ";
+    abortExecution();
 	}
+  try{
+  metadataObj = new Metadata();
+  metadataObj.Filename = glTFObj.Metadata[0]["Original Filename"];
+  metadataObj.Type = "glTF 2.0";
+  metadataObj.Dimensions = glTFObj.width + 'x' + glTFObj.height;
+  metadataObj.Publication = glTFObj.Metadata[0]["Publication"];
+  metadataObj.Description = glTFObj.Metadata[0]["Description"];
+  metadataObj.Notes = glTFObj.Metadata[0]["Notes"];
+  metadataObj.updateMetaDataFields();
+} catch(e){console.log("Metadata fields not filled.");}
 	glTFObj.filename = filename.substr(0,filename.lastIndexOf('/')+1);
 	boolGLTF = true;
 	boolPtm = false;
@@ -368,6 +386,7 @@ $("#errorMessages").css("display","block");
 	textureData.push(sideData);
 
 	runWebGL();
+  boolFloatTexture = false;
 	//buildSidePlane(0);
 	var t = glTFObj.shaderConfig[0].lightDirection0.split(" ", 3);
 	lightDirection0 = [parseFloat(t[0]), parseFloat(t[1]), parseFloat(t[2]) ];
@@ -386,6 +405,7 @@ function loadFilePTM(arrayBuffer){
 	$("#progressIndicator").css("display","block");
 	$("#progressText").text("Parsing PTM file");
 	$("#content").css("display","none");
+  boolFloatTexture = true;
 	boolRti = false;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
@@ -461,6 +481,7 @@ function loadFileRTI(arrayBuffer){
 	//$("#progressIndicator").css("display","none");
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
+  boolFloatTexture = true;
 	boolRti = true;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
@@ -652,6 +673,7 @@ runWebGL();
 
 
 function loadFile(arrayBuffer){
+  boolFloatTexture = true;
 	boolRti = false;
 	boolPhotometric = true;
 	boolMultiSpectral = false;
