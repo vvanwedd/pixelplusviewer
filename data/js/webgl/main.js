@@ -286,7 +286,7 @@ function runWebGL() {
 * Basic gl configuration, tests whether floating textures are supported and creates the different shader programs
 */
 function configure(){
-	gl.clearColor(0.0,0.0,0.0, 0.0);
+	gl.clearColor(1.0,1.0,1.0, 0.0);
 	gl.clearDepth(1);
 	gl.enable(gl.DEPTH_TEST);
 	//see http://www.khronos.org/registry/webgl/extensions/OES_texture_float/
@@ -768,6 +768,22 @@ $("#errorMessages").css("display","block");
 		textureData[0].rbfAmbient = Image2Uint8Array(ambientImage);
 	});
   }
+	//texture to store offscreen framebuffer color info
+        var offscreenTex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, offscreenTex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, offscreenRenderWidth, offscreenRenderHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+	
+        var renderbuffer = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, offscreenRenderWidth, offscreenRenderHeight);
+
+        framebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D, offscreenTex, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER, renderbuffer);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 else{
 
@@ -1414,33 +1430,22 @@ function takeScreenshot(){
 	if(!gl){return;}
 	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 	render(1);
-var ddd1 = new Date().getTime();
 
 	var offscreenView = new Uint8Array(offscreenRenderWidth*offscreenRenderHeight*4);
-var ddd2 = new Date().getTime();
-console.log((ddd2-ddd1));
 	gl.readPixels(0,0,offscreenRenderWidth,offscreenRenderHeight,gl.RGBA,gl.UNSIGNED_BYTE,offscreenView);
-var ddd3 = new Date().getTime();
-console.log("readpixels: "+(ddd3-ddd2));
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	render(0);
-var ddd4 = new Date().getTime();
-console.log((ddd4-ddd3));
 	//omzetten naar bmp
-var cnvs=document.getElementById("canvasOffscreenHelper");
+        var cnvs=document.getElementById("canvasOffscreenHelper");
 	$('#canvasOffscreenHelper').attr('width',offscreenRenderWidth);
 	$('#canvasOffscreenHelper').attr('height',offscreenRenderHeight);
 	var ctxt=cnvs.getContext("2d");
 	var imgData=ctxt.createImageData(offscreenRenderWidth,offscreenRenderHeight);
-var ddd5 = new Date().getTime();
-console.log((ddd5-ddd4));
 	for(var i=0;i<offscreenRenderHeight;i+=1){							//put arraybuffer content in canvas, flipped vertically
-		for(var j=0;j<=4*offscreenRenderWidth-4;j=j+1){
-			imgData.data[j+i*4*offscreenRenderWidth]=offscreenView[j-i*4*offscreenRenderWidth+4*offscreenRenderWidth*offscreenRenderHeight];
+		for(var j=0;j<=offscreenRenderWidth*4-4;j=j+1){
+			imgData.data[j+i*offscreenRenderWidth*4]=offscreenView[j-i*4*offscreenRenderWidth+4*offscreenRenderWidth*offscreenRenderHeight];
 		}
   	}
-var ddd6 = new Date().getTime();
-console.log((ddd6-ddd5));
 	ctxt.putImageData(imgData,0,0);
 	var img = cnvs.toDataURL("image/jpeg");;
 	document.getElementById("imgOffscreenHelper").src=img;
@@ -1453,10 +1458,6 @@ console.log((ddd6-ddd5));
 
 	console.log("done taking screenshot");
 
-
-		var ddd7 = new Date().getTime();
-
-console.log((ddd7-ddd6));
 return img;
 }
 var renderNew;

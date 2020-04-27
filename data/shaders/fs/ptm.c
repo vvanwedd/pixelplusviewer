@@ -38,7 +38,7 @@ void main(void)
 {
   vec3 ptmCoeff0 = vec3( texture2D(ptmCoeff0Tex, vTextureCoord) ).rgb;
   vec3 ptmCoeff1 = vec3( texture2D(ptmCoeff1Tex, vTextureCoord) ).rgb;
-  if(uBoolFloatTexture==1.0){
+  if(uBoolFloatTexture!=1.0){
     ptmCoeff0 *= 255.0;
     ptmCoeff1 *= 255.0;
     ptmCoeff0 = ptmCoeff0.bgr;
@@ -76,7 +76,7 @@ void main(void)
   lum += lum1;
 
   ///255.0/5.0;
-  if(uBoolFloatTexture==1.0){ lum *= 255.0;}
+  if(uBoolFloatTexture!=1.0){ lum *= 255.0;}
   //hsh = 0.000005*hweights0*hsh0 + 10000.0*hweights1*hsh1;//+hsh0;
   //float nDotH = max(min(dot(normal, lightDirection), 0.0f), 1.0f);
   //gl_FragColor = vec4(hsh0.x,1.0,1.0,1.0);
