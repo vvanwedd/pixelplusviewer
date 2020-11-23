@@ -109,6 +109,7 @@ function initInteraction(){
 	$('#lshader15').button();
 	$('#lshader31').button();
 	$('#lshader32').button();
+	$('#lshader33').button();
 
 	$("#colorI").button();
 	$("#colorR").button();
@@ -566,6 +567,21 @@ $(document).ready(function(){
 			document.getElementById("param0").innerHTML = "Percentage";
 			document.getElementById("param1").innerHTML = "Size";
 			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#shader33")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram(33);
+			document.getElementById("light0wrapper").style.display="none";
+			document.getElementById("light1wrapper").style.display="none";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "Rel. %";
+			document.getElementById("param2").innerHTML = "Intensity";
+
 			document.getElementById("param3wrapper").style.display="none";
 
 			document.getElementById("content").style.background="black";

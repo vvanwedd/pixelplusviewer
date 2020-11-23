@@ -96,6 +96,7 @@ function loadShaders(gl, shaders, callback) {
                     gl.FRAGMENT_SHADER :
                     gl.VERTEX_SHADER
             );
+           
             gl.shaderSource(shaders[i], xhr.responseText);
             gl.compileShader(shaders[i]);
             if (!gl.getShaderParameter(shaders[i], gl.COMPILE_STATUS) && !gl.isContextLost())

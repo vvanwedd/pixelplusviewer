@@ -33,6 +33,7 @@ var program24 = null;
 var program25 = null;
 var program31 = null;
 var program32 = null;
+var program33 = null;
 
 var prg1 = null;
 var prg2 = null;
@@ -61,6 +62,7 @@ var prg24 = null;
 var prg25 = null;
 var prg31 = null;
 var prg32 = null;
+var prg33 = null;
 
 var tan15 = Math.tan(15/180*Math.PI);
 var tan30 = Math.tan(30/180*Math.PI);
@@ -170,6 +172,7 @@ function initWebGL(){
 	program25 = null;
 	program31 = null;
 	program32 = null;
+	program33 = null;
 
 	prg1 = null;
 	prg2 = null;
@@ -198,6 +201,7 @@ function initWebGL(){
 	prg25 = null;
 	prg31 = null;
 	prg32 = null;
+	prg33 = null;
 
 	mainPrg = null;
 	mainProgram = null;
@@ -258,8 +262,7 @@ function initWebGL(){
 * Main starting anchor for the WebGL part, invoked after first textureplane is parsed
 */
 function runWebGL() {
-	var dd2 = new Date().getTime();
-	console.log("total parsing time: " +(dd2-dd1));
+
 	$("#loader").css("display","none");
 	$("#content").css("display","block");
 	$("#mainButtonsWrapper").css("border-left","1px solid #aaa");
@@ -267,6 +270,7 @@ function runWebGL() {
 	$('#rightAside').accordion({active:1});
 	Utils.deleteContext();
 	gl = null;
+
 	updateCanvasSize();
 	initInteraction();
 	initWebGL();
@@ -276,8 +280,9 @@ function runWebGL() {
 	configure();
 
 	load();
+
 	updateCanvasSize();
-	$(document).ready(function(){updateProgram(1);});
+	$(document).ready(function(){updateProgram(10);});
 
 }
 
@@ -286,7 +291,7 @@ function runWebGL() {
 * Basic gl configuration, tests whether floating textures are supported and creates the different shader programs
 */
 function configure(){
-	gl.clearColor(1.0,1.0,1.0, 0.0);
+	gl.clearColor(0.0,0.0,0.0, 0.0);
 	gl.clearDepth(1);
 	gl.enable(gl.DEPTH_TEST);
 	//see http://www.khronos.org/registry/webgl/extensions/OES_texture_float/
@@ -304,16 +309,19 @@ function configure(){
 	if(!ext){floatingPointTextureSupport=0;
  	console.log("OES_element_index_uint not supported");}
 
-
 	gl.depthFunc(gl.LEQUAL);
 	//gl.enable(gl.BLEND);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	initTransforms();
+
 	vs = loadShaders(gl,"vs/mainVertexShader"); //since every program uses the same vertex shader, we only need to load it once
+
 	prg1 = gl.createProgram();
+	
 	program1 = new Programm("vs/color","fs/color_rgb",prg1);
 	mainPrg = prg1;
 	mainProgram = program1;
+	
 	prg2 = gl.createProgram();
 	program2 = new Programm("vs/color_specular","fs/color_specular",prg2); //specular
 	prg3 = gl.createProgram();
@@ -366,6 +374,9 @@ function configure(){
 	program31 = new Programm("vs/hsh_spec_enh","fs/rbf_default_color",prg31);
 	prg32 = gl.createProgram();
 	program32 = new Programm("vs/hsh_spec_enh","fs/rbf_spec_enh",prg32);
+	prg33 = gl.createProgram();
+	program33 = new Programm("vs/hsh_spec_enh","fs/pld_vs_hsh",prg33);
+
 	/*
 	prg21 = gl.createProgram();
 	program21 = new Programm("vs/ptm","fs/ptm",prg21);
@@ -424,7 +435,10 @@ function updateCanvasSize(){
 }
 
 function updateNormal(spectralNb){
-	if(boolGLTF || boolRbf){
+	if(boolSCML){
+	singleFile.normalSource = spectralNb;
+	}
+	else if(boolGLTF || boolRbf){
 		var normalData;
 	switch(spectralNb){
 	/*	case 0:
@@ -676,15 +690,29 @@ function isPowerOf2(value) {
 function buildSidePlane(sideNr){
 
 	var maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-	if(textureData[sideNr].height > maxTextureSize || textureData[sideNr].width > maxTextureSize){
+	if((textureData[sideNr].height > maxTextureSize || textureData[sideNr].width > maxTextureSize) && !boolSCML){
 
 $("#errorMessages").css("display","block");
 				document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The dimensions of the file are too big.</h3><h3> Maximum texture dimension supported by this hardware: " +maxTextureSize + ". Texture dimensions: " +  textureData[sideNr].height + "x" + textureData[sideNr].width;
 			abortExecution();
 	}
 
+	if(boolSCML){
 
-	if(boolGLTF || boolRbf ){
+		console.log("BuildSidePlane: bool SCML");
+		sidePlane[0] = null;
+		sidePlane[0] = new ObjectPlane(0,200,200,1,singleFile.height/singleFile.width,0,0,singleFile.height,singleFile.width);
+		Scene.addObject(sidePlane[0]);
+		var canvasWidthMinSidebar = canvasWidth - $('#rightAside').width();
+		if(singleFile.height/canvasHeight > singleFile.width/canvasWidthMinSidebar){
+		  position = [0,0,-1/Math.tan(15/180*Math.PI)*(50*singleFile.height/singleFile.width)];
+	    }else{
+			position = [0,0,-1/Math.tan(15/180*Math.PI)*(50)/canvasWidthMinSidebar*canvasHeight];
+		}
+		changeSide(10);
+	}
+
+	else if(boolGLTF || boolRbf ){
 
 		scaleFactor[0] = 1;
 		var xOff,yOff=0;
@@ -768,22 +796,6 @@ $("#errorMessages").css("display","block");
 		textureData[0].rbfAmbient = Image2Uint8Array(ambientImage);
 	});
   }
-	//texture to store offscreen framebuffer color info
-        var offscreenTex = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, offscreenTex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, offscreenRenderWidth, offscreenRenderHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-	
-        var renderbuffer = gl.createRenderbuffer();
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, offscreenRenderWidth, offscreenRenderHeight);
-
-        framebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D, offscreenTex, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER, renderbuffer);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 else{
 
@@ -1011,7 +1023,6 @@ else{
 	delete textureData[sideNr].ambient; //check with chrome memory management: huge difference
 	delete textureData[sideNr].normals;
 	delete textureData[sideNr].albedo;
-
 	//texture to store offscreen framebuffer color info
 	var offscreenTex = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, offscreenTex);
@@ -1419,6 +1430,7 @@ function updateProgram(number){
 		case 23: mainPrg = prg23; mainProgram = program23; break;
 		case 31: mainPrg = prg31; mainProgram = program31; break;
 		case 32: mainPrg = prg32; mainProgram = program32; break;
+		case 33: mainPrg = prg33; mainProgram = program33; break;
 	}
 	render(0);
 	console.log("program: "+number);
@@ -1430,22 +1442,33 @@ function takeScreenshot(){
 	if(!gl){return;}
 	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 	render(1);
+var ddd1 = new Date().getTime();
 
 	var offscreenView = new Uint8Array(offscreenRenderWidth*offscreenRenderHeight*4);
+var ddd2 = new Date().getTime();
+console.log((ddd2-ddd1));
 	gl.readPixels(0,0,offscreenRenderWidth,offscreenRenderHeight,gl.RGBA,gl.UNSIGNED_BYTE,offscreenView);
+var ddd3 = new Date().getTime();
+console.log("readpixels: "+(ddd3-ddd2));
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	render(0);
+var ddd4 = new Date().getTime();
+console.log((ddd4-ddd3));
 	//omzetten naar bmp
-        var cnvs=document.getElementById("canvasOffscreenHelper");
+var cnvs=document.getElementById("canvasOffscreenHelper");
 	$('#canvasOffscreenHelper').attr('width',offscreenRenderWidth);
 	$('#canvasOffscreenHelper').attr('height',offscreenRenderHeight);
 	var ctxt=cnvs.getContext("2d");
 	var imgData=ctxt.createImageData(offscreenRenderWidth,offscreenRenderHeight);
+var ddd5 = new Date().getTime();
+console.log((ddd5-ddd4));
 	for(var i=0;i<offscreenRenderHeight;i+=1){							//put arraybuffer content in canvas, flipped vertically
-		for(var j=0;j<=offscreenRenderWidth*4-4;j=j+1){
-			imgData.data[j+i*offscreenRenderWidth*4]=offscreenView[j-i*4*offscreenRenderWidth+4*offscreenRenderWidth*offscreenRenderHeight];
+		for(var j=0;j<=4*offscreenRenderWidth-4;j=j+1){
+			imgData.data[j+i*4*offscreenRenderWidth]=offscreenView[j-i*4*offscreenRenderWidth+4*offscreenRenderWidth*offscreenRenderHeight];
 		}
   	}
+var ddd6 = new Date().getTime();
+console.log((ddd6-ddd5));
 	ctxt.putImageData(imgData,0,0);
 	var img = cnvs.toDataURL("image/jpeg");;
 	document.getElementById("imgOffscreenHelper").src=img;
@@ -1458,6 +1481,10 @@ function takeScreenshot(){
 
 	console.log("done taking screenshot");
 
+
+		var ddd7 = new Date().getTime();
+
+console.log((ddd7-ddd6));
 return img;
 }
 var renderNew;
@@ -1551,6 +1578,7 @@ function render(s) {
 			var renderPosition = position.slice(0);
 			renderPosition[0]+=object.xOff;
 			renderPosition[1]+=object.yOff;
+			object.position = renderPosition;
 			var renderRotation = rotation.slice(0);
 			renderRotation[2]+=object.zRotation;
 			if(object.isMiddle==true){
@@ -1649,14 +1677,20 @@ function render(s) {
 			//if(object.id=="objectLight0" && boolLightToggle()){gl.uniform4fv(curProgram.uMaterialAmbient, [1.0, 1.0, 0, 1.0]);}
 			//else if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [1.0, 1.0, 0, 1.0]);}
 			if(object.type!="lightCone"){gl.uniform4fv(curProgram.uMaterialAmbient, [0, 0, 0, 0]);}
+			
 			gl.bindBuffer(gl.ARRAY_BUFFER, object.tbo);
-			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
 			gl.enableVertexAttribArray(1);
+			gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
 			if (object.id!="objectLight0" && object.id!="objectLight1"){
+
+	
+			if(!boolSCML){
 				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				gl.uniform2fv(curProgram.uImgDim, [textureData[object.id].width,textureData[object.id].height]);
 				gl.uniform1f(curProgram.uBoolDepthMap, boolDepthMap);
+
 				if(boolDepthMap){
 					gl.activeTexture(gl.TEXTURE0);
 					gl.bindTexture(gl.TEXTURE_2D, disTex[object.id]);
@@ -1714,30 +1748,29 @@ function render(s) {
 					gl.uniform1fv(curProgram.bias, relightObj.bias);
 					gl.uniform1fv(curProgram.scale, relightObj.factor);
 
-          gl.activeTexture(gl.TEXTURE11);
-          gl.bindTexture(gl.TEXTURE_2D, rbfTex[0]);
-          gl.uniform1i(curProgram.rbfCoeff0Tex, 11);
+          			gl.activeTexture(gl.TEXTURE11);
+          			gl.bindTexture(gl.TEXTURE_2D, rbfTex[0]);
+          			gl.uniform1i(curProgram.rbfCoeff0Tex, 11);
 
-          gl.activeTexture(gl.TEXTURE12);
-          gl.bindTexture(gl.TEXTURE_2D, rbfTex[1]);
-          gl.uniform1i(curProgram.rbfCoeff1Tex, 12);
+          			gl.activeTexture(gl.TEXTURE12);
+          			gl.bindTexture(gl.TEXTURE_2D, rbfTex[1]);
+          			gl.uniform1i(curProgram.rbfCoeff1Tex, 12);
 
-          gl.activeTexture(gl.TEXTURE13);
-          gl.bindTexture(gl.TEXTURE_2D, rbfTex[2]);
-          gl.uniform1i(curProgram.rbfCoeff2Tex, 13);
+          			gl.activeTexture(gl.TEXTURE13);
+          			gl.bindTexture(gl.TEXTURE_2D, rbfTex[2]);
+          			gl.uniform1i(curProgram.rbfCoeff2Tex, 13);
 
-          gl.activeTexture(gl.TEXTURE14);
-          gl.bindTexture(gl.TEXTURE_2D, rbfTex[3]);
-          gl.uniform1i(curProgram.rbfCoeff3Tex, 14);
+          			gl.activeTexture(gl.TEXTURE14);
+          			gl.bindTexture(gl.TEXTURE_2D, rbfTex[3]);
+         			gl.uniform1i(curProgram.rbfCoeff3Tex, 14);
 
-          gl.activeTexture(gl.TEXTURE8);
-          gl.bindTexture(gl.TEXTURE_2D, rbfTex[4]);
-          gl.uniform1i(curProgram.rbfCoeff4Tex, 8);
+       				gl.activeTexture(gl.TEXTURE8);
+          			gl.bindTexture(gl.TEXTURE_2D, rbfTex[4]);
+          			gl.uniform1i(curProgram.rbfCoeff4Tex, 8);
 
-          gl.activeTexture(gl.TEXTURE9);
-          gl.bindTexture(gl.TEXTURE_2D, rbfTex[5]);
-          gl.uniform1i(curProgram.rbfCoeff5Tex, 9);
-
+          			gl.activeTexture(gl.TEXTURE9);
+          			gl.bindTexture(gl.TEXTURE_2D, rbfTex[5]);
+          			gl.uniform1i(curProgram.rbfCoeff5Tex, 9);
 
 				}
 			    if(boolPtm){
@@ -1754,6 +1787,20 @@ function render(s) {
 					gl.uniform1i(curProgram.ptmRgbCoeffTex, 10);
 				}
 			}
+			else if(boolSCML && singleFile.object){
+				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
+				if(singleFile.layout=="image"){
+				gl.uniform2fv(curProgram.uImgDim, [singleFile.width, singleFile.height]);
+				}
+				else{
+					gl.uniform2fv(curProgram.uImgDim, [singleFile.tilesize, singleFile.tilesize]);
+				}
+				//console.log(singleFile.width + " "+ singleFile.height);
+				singleFile.prefetch();
+				singleFile.draw(position, object, curProgram, canvasHeight, canvasWidth);
+
+			}
+		}
 
 			else{
 				gl.uniform1f(curProgram.uBoolDepthMap, false);
@@ -1768,7 +1815,7 @@ function render(s) {
 				gl.uniform4fv(curProgram.uMaterialAmbient, [1.0,1.0,1.0, 1.0]);
 				gl.drawElements(gl.LINE_STRIP, object.indices.length, gl.UNSIGNED_INT,0);
             }
-            if(object.type=="sidePlane"){gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);}
+            if(object.type=="sidePlane" && !boolSCML){gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);}
 			gl.bindBuffer(gl.ARRAY_BUFFER, null);
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         }

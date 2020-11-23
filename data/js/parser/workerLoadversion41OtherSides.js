@@ -86,8 +86,8 @@ function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 	var stringHeader = { s: "" };
 	charCodeArrayToString(uintHeader,stringHeader);
 	bytePointer+=5;
-console.log(stringHeader.s);
-	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0 && stringHeader.s.localeCompare("CSP13") != 0){
+
+	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0){
 		alert('    loadVersion41 Invalid header: ' + stringHeader.s);
 		bytePointer-=5;
 		return;
@@ -108,7 +108,7 @@ console.log(stringHeader.s);
 	var offsetY = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
 	bytePointer +=4;
 
-	if(stringHeader.s.localeCompare("CSP41")==0 || stringHeader.s.localeCompare("CSP13") == 0){
+	if(stringHeader.s.localeCompare("CSP41")==0){
 		mMmPerPixel = dataView.getFloat32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
 		bytePointer +=4;
 	}

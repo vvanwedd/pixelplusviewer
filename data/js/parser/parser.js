@@ -65,18 +65,19 @@ var boolRbf = false;
 var boolDepthMap = false;
 
 var boolZRotation = false;
+var singleFile;
 
 function initViewerParameters(){
   boolZRotation = false;
 }
 
 
-function loadDataSource(zurl){
+function loadDataSource(datasource, dataType){
   $("#mainIntro").css("display","none");
   $("#progressIndicator").css("display","block");
   var xhr = new XMLHttpRequest();
   xhr.withCredentials = true;
-  xhr.open('GET', decodeURIComponent(zurl), true);
+  xhr.open('GET', decodeURIComponent(datasource), true);
   xhr.responseType = 'arraybuffer';
   xhr.onloadstart = function(e) {
     document.getElementById('progressbar').className = 'loading';
@@ -85,7 +86,7 @@ function loadDataSource(zurl){
     progress.style.width = '100%';
     progress.textContent = '100%';
     //loadFile(this.response);
-    loadFileWrapper(this.response, this.responseURL);
+    loadFileWrapper(this.response, dataType);
   };
   xhr.onerror = errorHandler;
   xhr.onprogress = updateProgress;
@@ -98,8 +99,17 @@ function parseURL(){
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   if(urlParams.has('ds')){
-    const dataSource = urlParams.get('ds');
-    loadDataSource(dataSource);
+	var dsType = "dsType";
+	const dataSource = urlParams.get('ds');
+	if(urlParams.has('type')){dsType = urlParams.get('type').toLowerCase(); 
+		if(dsType  === 'scml' || dsType === 'zip'){loadSingleFileScml(dataSource);}
+	}
+	if(dataSource.toLowerCase().endsWith('.zip') || dataSource.toLowerCase().endsWith('.scml')){ 
+		loadSingleFileScml(dataSource);
+	}
+	else{
+	loadDataSource(dataSource, dsType);
+	}
   }
   if(urlParams.has('zrotation')){
     boolZRotation = true;
@@ -175,28 +185,36 @@ window.history.pushState("object or string", "Title", "/viewer/");
 
 document.getElementById('fileinput').addEventListener('change', handleFileSelect, false);
 
-function loadFileWrapper(arrayBuffer, filename){
-	inputFilename = filename;
-	fileType = filename.substr(-3);
- if(fileType == 'cun' || fileType == 'zun' ){
+function loadFileWrapper(arrayBuffer, dataType){
+//	inputFilename = filename;
+ if(dataType == 'cun' || dataType == 'zun' ){
 	 console.log('Loading PLD file... ');
 	 loadFile(arrayBuffer);
  }
- else if (fileType == 'rti'){
+ else if (dataType == 'rti'){
 	console.log('Loading RTI file... ');
 	loadFileRTI(arrayBuffer);
  }
- else if (fileType == 'ptm'){
+ else if (dataType == 'ptm'){
 	console.log('Loading PTM file... ');
 	loadFilePTM(arrayBuffer);
  }
- else if (fileType == 'ltf'){
+ else if (dataType == 'gltf'){
 	console.log('Loading glTF file... ');
 	loadFileGLTF(arrayBuffer, filename);
  }
- else if (fileType == 'son'){
+ else if (dataType == 'son'){
 	console.log('Loading RELIGHT RTI file... ');
 	loadFileRelight(arrayBuffer, filename);
+ }
+ else if (dataType == 'scml'){
+	console.log('Loading SCML file... ');
+	loadFileSCML(arrayBuffer, filename);
+ }
+ else if (dataType == 'zip'){
+	console.log('Loading single SCML file...');
+	loadFileSingleSCML
+
  }
  else{
 	         $("#loader").css("display","none");
@@ -231,11 +249,14 @@ function updateShaderList(){
 		$('#lshader11').button( "enable");
 		$('#lshader13').button( "enable");
 		$('#lshader15').button( "enable");
+		if(boolPhotometric){$('#lshader33').button( "enable");}
+		else{$('#lshader33').button( "disable");}
 	}
 	else{
 		$('#lshader11').button( "disable");
 		$('#lshader13').button( "disable");
 		$('#lshader15').button( "disable");
+		$('#lshader33').button( "disable");
 	}
 	if(boolHasAmbient[0]){
 		$('#color1').button( "enable");
@@ -310,6 +331,7 @@ function loadFileRelight(arrayBuffer,filename){
   boolPtm = false;
   boolGLTF = false;
   boolRbf = true;
+  boolSCML = false;
 
   relightObj = new Relight();
   relightObj.parseJSON(ab2str(arrayBuffer));
@@ -331,11 +353,115 @@ function loadFileRelight(arrayBuffer,filename){
 
 }
 
+function loadFileSCML(arrayBuffer,filename){
+	$("#progressIndicator").css("display","none");
+	$("#loader").css("display","block");
+	$("#radiosetIntro").css("display","none");
+  
+	boolFloatTexture = false;
+	boolRti = false;
+	boolPhotometric = true; // only when normal map is available, should check
+	boolMultiSpectral = false;
+	boolPtm = false;
+	boolGLTF = false;
+	boolRbf = false;
+    boolSCML = true;
+
+	scmlObj = new SCML();
+	scmlObj.parseJSON(ab2str(arrayBuffer));
+	//relightObj.loadFactorAndBias();
+	//relightObj.loadBasis(relightObj.infobasis);
+	//relightObj.computeLightWeights(lightDirection0);
+  
+	scmlObj.filename = filename;
+	scmlObj.url = filename.substr(0,filename.lastIndexOf('/')+1);
+	textureData.length = 0;
+	var sideData = new Object();
+	sideData.width = scmlObj.width;
+	sideData.height = scmlObj.height;
+	sideData.isMiddle = true;
+	updateCanvasSize();
+	scmlObj.canvas.width = canvasWidth;
+	scmlObj.canvas.height = canvasHeight;
+	
+	if(scmlObj.boolRbf){
+		scmlObj.loadFactorAndBias();
+		scmlObj.loadBasis(scmlObj.infobasis);
+		scmlObj.computeLightWeights(lightDirection0);
+	}
+
+	textureData.push(sideData);
+	runWebGL();
+
+	scmlObj.object = sideData;
+    
+	scmlObj.initTree();
+	updateShaderList();
+	updateProgram(1);
+	$('#lshader1').trigger("click");
+ 
+  }
+
+  function loadSingleFileScml(dataSource){
+	$("#mainIntro").css("display","none");
+	$("#progressIndicator").css("display","block");
+	$("#progressIndicator").css("display","none");
+	$("#loader").css("display","block");
+	$("#radiosetIntro").css("display","none");
+  
+	boolFloatTexture = false;
+	boolRti = false;
+	boolPhotometric = true; // only when normal map is available, should check
+	boolMultiSpectral = false;
+	boolPtm = false;
+	boolGLTF = false;
+	boolRbf = false;
+	boolSCML = true;
+	
+	singleFile = new SingleFileSCML(dataSource );
+
+	singleFile.init().then(function() {
+
+	//scmlObj = new SCML();
+	//scmlObj.parseJSON(ab2str(arrayBuffer));
+	//relightObj.loadFactorAndBias();
+	//relightObj.loadBasis(relightObj.infobasis);
+	//relightObj.computeLightWeights(lightDirection0);
+  
+	//scmlObj.filename = filename;
+	//scmlObj.url = filename.substr(0,filename.lastIndexOf('/')+1);
+	//console.log("hier");
+	textureData.length = 0;
+	var sideData = new Object();
+	sideData.width = singleFile.width;
+	sideData.height = singleFile.height;
+	sideData.isMiddle = true;
+	updateCanvasSize();
+	singleFile.canvas.width = canvasWidth;
+	singleFile.canvas.height = canvasHeight;
+	
+	if(singleFile.boolRbf){
+		singleFile.loadFactorAndBias();
+		singleFile.loadBasis(singleFile.infobasis);
+		singleFile.computeLightWeights(lightDirection0);
+	}
+
+	textureData.push(sideData);
+	runWebGL();
+
+	singleFile.object = sideData;
+    
+	singleFile.initTree();
+	updateShaderList();
+	updateProgram(1);
+	$('#lshader1').trigger("click");
+    });
+  }
+
 function loadFileGLTF(arrayBuffer,filename){
 	$("#progressIndicator").css("display","none");
 	$("#loader").css("display","block");
 	$("#radiosetIntro").css("display","none");
-        dd1 = new Date().getTime();
 
 	try {
 	  glTFObj = JSON.parse(ab2str(arrayBuffer));
@@ -360,6 +486,7 @@ function loadFileGLTF(arrayBuffer,filename){
 	boolPtm = false;
 	boolRti = false;
 	boolRbf = false;
+	boolSCML = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -414,9 +541,9 @@ function loadFilePTM(arrayBuffer){
 	boolPtm = true;
 	boolGLTF = false;
 	boolRbf = false;
+	boolSCML = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
-        dd1 = new Date().getTime();
 
 
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
@@ -485,16 +612,17 @@ function loadFileRTI(arrayBuffer){
 	//$("#progressIndicator").css("display","none");
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
-        boolFloatTexture = true;
+  boolFloatTexture = true;
 	boolRti = true;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = false;
 	boolGLTF = false;
 	boolRbf = false;
+	boolSCML = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
-        dd1 = new Date().getTime();
+
 
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
 	var str = '';
@@ -686,6 +814,7 @@ function loadFile(arrayBuffer){
 	boolPtm = false;
 	boolGLTF = false;
 	boolRbf = false;
+	boolSCML = false;
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
@@ -711,7 +840,6 @@ function loadFile(arrayBuffer){
 	}
 
 	var i = 0;
-	var j = 0;
 	while (true) {
 		//read tag
 		var uintTag = new Uint8Array(arrayBuffer,bytePointer,3);
@@ -770,100 +898,6 @@ function loadFile(arrayBuffer){
 			workerOtherSides.postMessage({buffer: arrayBuffer, startPtr: beginPointer,},[arrayBuffer]);
 }
 
-function loadVersion13(ArrayBuffer, dataView, endpos, SideNr){
-
-console.log("loadVersion13");
-var sideData = new Object();
-//dimension/offsets
-var offsetX, offsetY;
-
-mWidth = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
-console.log("mWidth: "+mWidth);
-bytePointer +=4;
-
-mHeight = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
-console.log("mHeight: "+mHeight);
-bytePointer +=4;
-
-var offsetX = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
-console.log("offsetX: "+offsetX);
-bytePointer +=4;
-
-var offsetY = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
-console.log("offsetY: "+offsetY);
-bytePointer +=4;
-
-mMmPerPixel = 0;
-	mMmPerPixel = dataView.getFloat32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
-	console.log("mMmPerPixel: "+mMmPerPixel);
-	bytePointer +=4;
-
-
-console.log("bytepointer: " +bytePointer);
-
-var pos = bytePointer;
-  	var blocksize; // NOTE: we do not use long as it is not necessary yet and #bytes differs on 32-and 64-bit
-	var i = 0;
-
-	while(((endPos[SideNr]==0) || (bytePointer<endPos[SideNr]) /*&& i<4*/ ) /*&& (fread(tag, 1, 4, fd) == 4)*/ ) {
-		var uintTag = new Uint8Array(ArrayBuffer,bytePointer,4);
-		var stringTag = { s: "" };
-		charCodeArrayToString(uintTag,stringTag);
-		bytePointer+=4;
-
-		var blocksize = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
-		bytePointer +=4;
-
-		console.log("TAG: " + stringTag.s + " (" + blocksize + " bytes)");
-
-		if(stringTag.s.localeCompare("INFO")==0){
-			loadBlockInfo(ArrayBuffer,dataView,SideNr);
-		}
-		else if(stringTag.s.localeCompare("NORC")==0){
-			loadBlockCompressedNormal(ArrayBuffer,dataView,SideNr);
-		}
-		else if(stringTag.s.localeCompare("NORZ")==0 || stringTag.s.localeCompare("NOZ2")==0 || stringTag.s.localeCompare("NOZ3")==0 || stringTag.s.localeCompare("NOZ4")==0 || stringTag.s.localeCompare("NOZ5")==0){
-			if(stringTag.s.localeCompare("NOZ2")==0){boolMultiSpectral = true;initInteraction();updateShaderList();}
-			loadBlockZippedNormal(ArrayBuffer,dataView,SideNr);
-		}
-		else if(stringTag.s.localeCompare("ALBC")==0){
-			loadBlockCompressedDiffuse(ArrayBuffer,dataView,0,SideNr);
-		}
-		else if(stringTag.s.localeCompare("ALBZ")==0 || stringTag.s.localeCompare("ALZ2")==0 ){
-			//console.log("before loadBlockZippedDiffuse : " + stringTag.s);
-			loadBlockZippedDiffuse(ArrayBuffer,dataView,0,SideNr);
-		}
-		else if(stringTag.s.localeCompare("AMBC")==0){
-			boolHasAmbient[SideNr] = true;
-			loadBlockCompressedDiffuse(ArrayBuffer,dataView,1,SideNr);
-		}
-		else if(stringTag.s.localeCompare("AMBZ")==0 || stringTag.s.localeCompare("AMZ2")==0){
-			boolHasAmbient[SideNr] = true;
-			loadBlockZippedDiffuse(ArrayBuffer,dataView,1,SideNr);
-		}
-		else{
-			$("#loader").css("display","none");
-			$("#errorMessages").css("display","block");
-			document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  Invalid compression tag: " + stringTag.s + " </h3>";
-			bytePointer-=5;
-			//abortExecution();
-		}
-
-		console.log("Loaded " + stringTag.s);
-		sideData.width = mWidth;
-		sideData.height = mHeight;
-		sideData.mmPerPixel = mMmPerPixel;
-	i++;
-
-	}
-
-	textureData.push(sideData);
-
-	console.log("---------------------------------------------------Done with this side");
-	return;
-        
-
-}
 function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 
 	startPointer[SideNr] = bytePointer;
@@ -880,19 +914,14 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 	charCodeArrayToString(uintHeader,stringHeader);
 	console.log("header: "+stringHeader.s);
 	bytePointer+=5;
-	
 
-	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0 && stringHeader.s.localeCompare("CSP13")!=0){
+	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0){
 		$("#progressIndicator").css("display","none");
 		$("#errorMessages").css("display","block");
-		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader.s + " </h3>";
+		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader1.s + " </h3>";
 		bytePointer-=5;
 		abortExecution();
 	}
-        if(stringHeader.s.localeCompare("CSP13") == 0 ){
-        loadVersion13(ArrayBuffer, dataView, endpos, SideNr);
-        }
-	else{
 	var sideData = new Object();
 	//dimension/offsets
 	var offsetX, offsetY;
@@ -977,12 +1006,10 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 	i++;
 
 	}
-
 	textureData.push(sideData);
 
 	console.log("---------------------------------------------------Done with this side");
 	return;
-        }
 }
 //following functions are only used to jump over the compressed blocks.
 function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
