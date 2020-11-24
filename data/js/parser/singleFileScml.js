@@ -162,7 +162,7 @@ return new Promise( function (resolve, reject){
 			//if (boundary) console.log('PARTS', parseMultipartBody(client.resposeText, boundary))
 			console.log("loaded last chunk");
 			_this.endOfFile = xhr.response;
-			console.log(_this.endOfFile);
+			//console.log(_this.endOfFile);
 			var dataView = new DataView(_this.endOfFile);
 			_this.dataView = dataView;
 			//_this.arrayBuffer = new ArrayBuffer()
@@ -451,7 +451,7 @@ findEntry(filename){
 }
 
 parseSCML(index){
-console.log(this.scmlFiles[0]);
+//console.log(this.scmlFiles[0]);
   
 	this.width = parseFloat(this.scmlFiles[index].scmlFile.width);
 	this.height = parseFloat(this.scmlFiles[index].scmlFile.height);
@@ -511,7 +511,7 @@ console.log(this.scmlFiles[0]);
 	  }
 	}
 	//if(glTFObj.pld[0].depthTex){boolDepthMap = true;}
-	if(this.scmlFiles[index].scmlFile.ptm&& 0){
+	if(this.scmlFiles[index].scmlFile.ptm){
 	  this.boolPtm = true;
 	  boolPtm = true;
 		var lst = this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].bias.split(",", 3);
@@ -605,7 +605,7 @@ console.log(this.scmlFiles[0]);
 	return new Promise(function (resolve, reject) {
 		console.log(url);
 		var entry = _this.findEntry(url);
-		console.log(entry);
+		//console.log(entry);
 		if(entry){
 		  _this.loadEntry(entry)
 			.then(function(e) {
