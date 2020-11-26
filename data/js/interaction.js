@@ -1084,6 +1084,33 @@ function toggleFullScreen() {
   }
 }
 
+function displayRightAside(boolAside){
+	if(boolAside){
+		rightAside=true;
+		$("#rightAside").css("right","15px");
+		$("#contentwrapper").css("right","390px");
+		$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-e");
+	} else {
+		rightAside=false;
+		$("#rightAside").css("right","-390px");
+		$("#contentwrapper").css("right","15px");
+		$("#rightAsideButtonIcon").attr("class","sidebarIcon ui-icon ui-icon-triangle-1-w");
+	}
+return;
+}
+
+function setProgressText(boolClear, text, boolIsError){
+	if(boolClear){
+		if(!boolIsError){ $("#progressText").html("<p>" + text + "</p>");} 
+		else{        	  $("#progressText").html("<h2 id='error'>Error: " + text + "</h2>");}
+	}
+	else{
+		if(!boolIsError){ $("#progressText").append("<p>" + text + "</p>");} 
+		else{        	  $("#progressText").append("<h2 id='error'>Error: " + text + "</h2>");}
+	}
+
+
+}
 
 var introID =0;
 function animateIntroSlider(){

@@ -51,6 +51,18 @@ function getDataHelper(byteLength, bytes) {
 	};
 }
 
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 class Entry{}
 
 class SingleFileSCML{
@@ -80,14 +92,13 @@ return new Promise(function (resolve, reject) {
 	var index = 0;
 _this.getFileSize(_this.url)
         .then(response => {
-			//console.log(response);
+                        setProgressText(false, "Returned filesize: " + _this.fileSize + " bytes (" + formatBytes(_this.fileSize,2) +")", false );
             _this.loadLastChunk(_this.url).then(function() {
-				//console.log(_this.dataView);
 				_this.zipBrowse(_this.dataView);
-				//_this.findEntry('singleimage.scml');
-				//console.log(_this.scmlFileEntry);
+				setProgressText(false, "Number of entries: " + _this.entries.length, false );
 				_this.loadEntry(_this.scmlFiles[index]).then(function() {
 					_this.parseSCML(index);
+					setProgressText(false, "Loaded settings file " + _this.scmlFiles[index].filename, false );
 					resolve();
 					//console.log(" ---- done ----");
 				}).catch(e => {
@@ -99,10 +110,13 @@ _this.getFileSize(_this.url)
 			}).catch(e => {
 				reject({status: e});
 				console.log("Error loadLastChunk: " + e);
-			});;
+	                        setProgressText(false, "Load last part of SCML failed: " + e.status + " " + e.statusText, true );
+
+			});
         }).catch(e => {
 			reject({status: e});
-			console.log("Error getFileSize: " + e);
+			console.log("Error getFileSize: " + e.statusText);
+			setProgressText(false, "Get filesize failed: " + e.status + " " + e.statusText, true );
 		});
 		
 	//this.loadSingleDataFile();
@@ -112,6 +126,8 @@ _this.getFileSize(_this.url)
 	//console.log(scmlEntry);
 	//this.loadEntry(scmlEntry);
 
+}).catch(e => {
+	console.log("Error: " + e);
 });
 
 }
@@ -123,8 +139,13 @@ getFileSize(url) {
     	var xhr = new XMLHttpRequest();
     	xhr.open("HEAD", url, true); 
     	xhr.onreadystatechange = function() {
+			if(this.status == 404){
+				reject({status: this.status, statusText: xhr.statusText});
+			}
         	if (this.readyState == this.DONE || this.readyState == 2) { //2 == HEADERS_RECEIVED
 				_this.fileSize = parseInt(xhr.getResponseHeader("Content-Length"));
+
+				if(_this.fileSize <= 500*1024*1024){_this.lastChunkSize == 1024*1024*2;}
 				console.log("FileSize: "+ String(_this.fileSize));
 				resolve(parseInt(xhr.getResponseHeader("Content-Length")));
       		} else {
@@ -283,6 +304,8 @@ return new Promise( function (resolve, reject){
 			index += 46 + entry.filenameLength + entry.extraFieldLength + entry.commentLength;
 			if(i==0){_this.rootname = _this.entries[0].filename;}
 		}
+                
+
 	//	callback(entries);
 	//}, function() {
 	//	onerror(ERR_READ);
@@ -1168,6 +1191,7 @@ t.loadEntry(t.findEntry(t.getTileURL(name, x, y, level))).then(function(e){
 	} else {
 		blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
 	}
+	$("#progressFooter").html("Loaded texture " + name + " (" + x + "," + y + "," + level+")");
 	var urlCreator = window.URL || window.webkitURL;
 	var imageUrl = urlCreator.createObjectURL( blob );
 	//console.log(imageUrl);

@@ -300,6 +300,7 @@ float: left;
 	position: absolute;
 	left:0px;
 	right:15px;
+	top:60px;
 	height: 100%;
 	z-index:1000;
 	background-color: #7F7F7F;
@@ -422,12 +423,19 @@ float: left;
 	display:none;
 	text-align:center;
 }
+/*
 #progressIndicator h2{
 	color:#222;
 	position:absolute;
 	left:50%;
 	top: 50%;
 	margin: -70px 0 0 -250px;
+}
+*/
+#progressIndicator #error{
+	color:#ff0033;
+	background-color: #222;
+	/*font-weight: 500;*/
 }
 #progressbar {
 
@@ -498,7 +506,7 @@ float: left;
 #rightAside{
 	position: absolute;
 	right: -375px;
-	top: 0px;
+	top: 60px;
 	overflow:hidden;
 	margin-right:0;
 	width:375px;
@@ -541,7 +549,16 @@ footer{
 	bottom:1px;
 	height:15px;
 	z-index:1010;
+	overflow: hidden;
 }
+#copyright{
+	float:left;
+}
+#progressFooter{
+	margin-right: 400px;
+	float: right;
+}
+
 
 input, input:focus,textarea:focus{
 	border:0;

@@ -94,6 +94,8 @@ function loadDataSource(datasource, dataType){
 }
 
 function parseURL(){
+  
+  displayRightAside(true);
   initViewerParameters();
 
   const queryString = window.location.search;
@@ -142,7 +144,9 @@ function errorHandler(evt) {
         break;
     };
   }
+
 var progress = document.querySelector('.percent');
+
 function updateProgress(evt) {
     // evt is an ProgressEvent.
     if (evt.lengthComputable) {
@@ -154,6 +158,7 @@ function updateProgress(evt) {
       }
     }
   }
+
 function handleFileSelect(evt) {
     // Reset progress indicator on new file selection.
 	$("#mainIntro").css("display","none");
@@ -404,11 +409,12 @@ function loadFileSCML(arrayBuffer,filename){
 
   function loadSingleFileScml(dataSource){
 	$("#mainIntro").css("display","none");
+	setProgressText(true, "Loading " + dataSource + " ...", false);
+	//$("#progressText").html("<p>Loading " + dataSource + " ...</p>");
 	$("#progressIndicator").css("display","block");
-	$("#progressIndicator").css("display","none");
 	$("#loader").css("display","block");
 	$("#radiosetIntro").css("display","none");
-  
+
 	boolFloatTexture = false;
 	boolRti = false;
 	boolPhotometric = true; // only when normal map is available, should check
@@ -422,15 +428,6 @@ function loadFileSCML(arrayBuffer,filename){
 
 	singleFile.init().then(function() {
 
-	//scmlObj = new SCML();
-	//scmlObj.parseJSON(ab2str(arrayBuffer));
-	//relightObj.loadFactorAndBias();
-	//relightObj.loadBasis(relightObj.infobasis);
-	//relightObj.computeLightWeights(lightDirection0);
-  
-	//scmlObj.filename = filename;
-	//scmlObj.url = filename.substr(0,filename.lastIndexOf('/')+1);
-	//console.log("hier");
 	textureData.length = 0;
 	var sideData = new Object();
 	sideData.width = singleFile.width;

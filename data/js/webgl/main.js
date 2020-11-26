@@ -264,6 +264,7 @@ function initWebGL(){
 function runWebGL() {
 
 	$("#loader").css("display","none");
+	$("#progressIndicator").css("display","none");
 	$("#content").css("display","block");
 	$("#mainButtonsWrapper").css("border-left","1px solid #aaa");
 	$("#radioset").css("display","block");
@@ -1051,16 +1052,16 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 	//check which side is new main side
 	switch(mainSide){
 		case 0:
-			if(direction==0){if(textureData[3]!== undefined){mainSide=3;}}
-			else if(direction==1){if(textureData[2]!== undefined){mainSide=2;}}
-			else if(direction==2){if(textureData[4]!== undefined){mainSide=4;}}
-			else if(direction==3){if(textureData[5]!== undefined){mainSide=5;}}
+			if(direction==0){if(textureData[3]!== undefined){mainSide=3;}else if(textureData[1]!== undefined){mainSide=1;}}
+			else if(direction==1){if(textureData[2]!== undefined){mainSide=2;}else if(textureData[1]!== undefined){mainSide=1;}}
+			else if(direction==2){if(textureData[4]!== undefined){mainSide=4;}else if(textureData[1]!== undefined){mainSide=1;}}
+			else if(direction==3){if(textureData[5]!== undefined){mainSide=5;}else if(textureData[1]!== undefined){mainSide=1;}}
 			break;
 		case 1:
-			if(direction==0){if(textureData[2]!== undefined){mainSide=2;}}
-			else if(direction==1){if(textureData[3]!== undefined){mainSide=3;}}
-			else if(direction==2){if(textureData[5]!== undefined){mainSide=5;}}
-			else if(direction==3){if(textureData[4]!== undefined){mainSide=4;}}
+			if(direction==0){if(textureData[2]!== undefined){mainSide=2;}else if(textureData[1]!== undefined){mainSide=0;}}
+			else if(direction==1){if(textureData[3]!== undefined){mainSide=3;}else if(textureData[1]!== undefined){mainSide=0;}}
+			else if(direction==2){if(textureData[5]!== undefined){mainSide=5;}else if(textureData[1]!== undefined){mainSide=0;}}
+			else if(direction==3){if(textureData[4]!== undefined){mainSide=4;}else if(textureData[1]!== undefined){mainSide=0;}}
 			break;
 		case 2:
 			if(direction==0){if(textureData[0]!== undefined){mainSide=0;}}
@@ -1109,7 +1110,7 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 						distance = (50+((textureData[5]!== undefined)?100*scaleFactor[5]:0)+50*scaleFactor[1]);
 						object.xOff = Math.cos(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.sin(rotation[2]/180*Math.PI)*distance;
-						object.zRotation = 180;
+						if(textureData[2]!=undefined){object.zRotation = 180;}
 						break;
 					case 2:
 						object.isMiddle = false;
@@ -1148,7 +1149,7 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 				var distance;
 				switch(object.id){
 					case 0:
-						distance = (50*textureData[1].height/textureData[1].width*scaleFactor[1]+100*textureData[2].height/textureData[2].width*scaleFactor[2]+50*textureData[0].height/textureData[0].width);
+						distance = (50*textureData[1].height/textureData[1].width*scaleFactor[1]+((textureData[2]!== undefined)?100*textureData[2].height/textureData[2].width*scaleFactor[2]:1)+50*textureData[0].height/textureData[0].width);
 						object.isMiddle = false;
 						object.xOff = -Math.sin(rotation[2]/180*Math.PI)*distance;
 						object.yOff = Math.cos(rotation[2]/180*Math.PI)*distance;
