@@ -246,15 +246,19 @@
 				<a id="aOffscreenHelper" download="a.jpg" href="" style="display:none;">link</a>
 				<canvas id="canvasOffscreenHelper" style="display:none;"></canvas>
 			<img id="imgOffscreenHelper" style="display:none;">
-		<!-- used to load ZUNs directly into the website. Note that the URL has to be encoded/decoded
-		<?php
-			if(isset($_GET["file"])){
-				echo "<script> $(document).ready(function() {xhrTest( encodeURIComponent('" . $_GET["file"] . "'))});</script>";
-			}
-			?>-->
+		
 			</div>
 		  </div>
-
+		  <h3 style="border-top:0; margin-bottom:-1px;">Technical data</h3>
+		  <div>
+			  <ul class="aside metadata">
+				<li>Filesize: <input disabled id="inputFilesize"></li>
+				<li>HTTP 206 Partial Content: <input disabled id="inputHttp206"></li>
+				<li>Number of items: <input disabled id="inputType"></li>
+				<pre id="scmlConfig"></pre>
+				<li>Log: <textarea disabled id="inputNotes"></textarea></li>
+			  </ul>
+			</div>
         </div>
 		<div id="rightAsideButton"><span id="rightAsideButtonIcon" class="sidebarIcon ui-icon ui-icon-triangle-1-w"></span></div>
     </div>

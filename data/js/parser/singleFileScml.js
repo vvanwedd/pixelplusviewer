@@ -51,6 +51,18 @@ function getDataHelper(byteLength, bytes) {
 	};
 }
 
+var timer = function(name) {
+    var start = new Date();
+    return {
+        stop: function() {
+            var end  = new Date();
+            var time = end.getTime() - start.getTime();
+            console.log('Timer:', name, 'finished in', time, 'ms');
+        }
+    }
+};
+
+
 function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
 
@@ -73,6 +85,7 @@ class SingleFileSCML{
 	this.lastChunkSize = 1024*1024*10;
 	this.entries = [];
 	this.scmlFiles = [];
+	this.http206 = false;
 }
 
 
@@ -100,32 +113,19 @@ _this.getFileSize(_this.url)
 					_this.parseSCML(index);
 					setProgressText(false, "Loaded settings file " + _this.scmlFiles[index].filename, false );
 					resolve();
-					//console.log(" ---- done ----");
 				}).catch(e => {
 					reject({status: e});
-				//		console.log("Error loadEntry: " + e);
 				});
-				//_this.parseSCML();
-				
 			}).catch(e => {
 				reject({status: e});
 				console.log("Error loadLastChunk: " + e);
 	                        setProgressText(false, "Load last part of SCML failed: " + e.status + " " + e.statusText, true );
-
 			});
         }).catch(e => {
 			reject({status: e});
 			console.log("Error getFileSize: " + e.statusText);
 			setProgressText(false, "Get filesize failed: " + e.status + " " + e.statusText, true );
 		});
-		
-	//this.loadSingleDataFile();
-	//todo: add support for several scml config files
-	//var scmlEntry = new Entry();
-	//scmlEntry = this.findEntry('scml2/singleimage.scml');
-	//console.log(scmlEntry);
-	//this.loadEntry(scmlEntry);
-
 }).catch(e => {
 	console.log("Error: " + e);
 });
@@ -145,7 +145,7 @@ getFileSize(url) {
         	if (this.readyState == this.DONE || this.readyState == 2) { //2 == HEADERS_RECEIVED
 				_this.fileSize = parseInt(xhr.getResponseHeader("Content-Length"));
 
-				if(_this.fileSize <= 500*1024*1024){_this.lastChunkSize == 1024*1024*2;}
+				if(_this.fileSize <= 500*1024*1024){_this.lastChunkSize = 1024*1024*2;}
 				console.log("FileSize: "+ String(_this.fileSize));
 				resolve(parseInt(xhr.getResponseHeader("Content-Length")));
       		} else {
@@ -182,6 +182,7 @@ return new Promise( function (resolve, reject){
 			//const boundary = client.getResponseHeader('Content-Type').match(/boundary=(.+)$/i)[1];
 			//if (boundary) console.log('PARTS', parseMultipartBody(client.resposeText, boundary))
 			console.log("loaded last chunk");
+			_this.http206 = true;
 			_this.endOfFile = xhr.response;
 			//console.log(_this.endOfFile);
 			var dataView = new DataView(_this.endOfFile);
@@ -191,9 +192,9 @@ return new Promise( function (resolve, reject){
 			resolve(xhr.response);
 		} else {
 			if (xhr.readyState == 2)
-			{ console.log("headers received ... ");}
+			{ /*console.log("headers received ... ");*/}
 			else if (xhr.readyState == 3)
-			{ console.log("downloading ... ");}
+			{/* console.log("downloading ... ");*/}
 			else {
 				console.log("shouldnt come here " + xhr.readyState);
 	  		    reject({
@@ -475,7 +476,8 @@ findEntry(filename){
 
 parseSCML(index){
 //console.log(this.scmlFiles[0]);
-  
+var t = timer('parseSCML');
+
 	this.width = parseFloat(this.scmlFiles[index].scmlFile.width);
 	this.height = parseFloat(this.scmlFiles[index].scmlFile.height);
 	this.layout = this.scmlFiles[index].scmlFile.layout;
@@ -619,8 +621,55 @@ parseSCML(index){
   
 	//change
 	this.pos = {x: this.width/2, y: this.height/2, z:1, a:100};
-  
+	this.populateFields(index);
+	t.stop();
+
   }
+
+populateFields(index){
+var _this = this;
+return new Promise(function (resolve, reject){
+
+//too slow
+/*
+	if (!library)
+   var library = {};
+
+library.json = {
+   replacer: function(match, pIndent, pKey, pVal, pEnd) {
+      var key = '<span class=json-key>';
+      var val = '<span class=json-value>';
+      var str = '<span class=json-string>';
+      var r = pIndent || '';
+      if (pKey)
+         r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+      if (pVal)
+         r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+      return r + (pEnd || '');
+      },
+   prettyPrint: function(obj) {
+      var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+      return JSON.stringify(obj, null, 3)
+         .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+         .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+         .replace(jsonLine, library.json.replacer);
+      }
+   };
+   $('#scmlConfig').html(library.json.prettyPrint(_this.scmlFiles[index].scmlFile));
+   */
+  
+	document.getElementById("inputDimensions").value = _this.height + " px x " + _this.width + " px";
+	document.getElementById("inputFilename").value = _this.url;
+	document.getElementById("inputType").value = "SCML";
+	document.getElementById("scmlConfig").innerHTML = JSON.stringify(_this.scmlFiles[index].scmlFile, undefined, 2); 
+	document.getElementById("inputFilesize").value =formatBytes(_this.fileSize,2);
+	document.getElementById("inputHttp206").value = (_this.http206) ? "Supported by server": "Not supported by server";
+	document.getElementById("inputNumberOfEntries").value = _this.entries.length;
+
+
+})
+
+}  
 
   get(url, type) {
 	  var _this = this;
@@ -1191,7 +1240,7 @@ t.loadEntry(t.findEntry(t.getTileURL(name, x, y, level))).then(function(e){
 	} else {
 		blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
 	}
-	$("#progressFooter").html("Loaded texture " + name + " (" + x + "," + y + "," + level+")");
+	$("#progressFooter").html("Loaded " + name + " (" + x + "," + y + "," + level+")");
 	var urlCreator = window.URL || window.webkitURL;
 	var imageUrl = urlCreator.createObjectURL( blob );
 	//console.log(imageUrl);

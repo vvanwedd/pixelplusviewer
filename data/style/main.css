@@ -558,7 +558,22 @@ footer{
 	margin-right: 400px;
 	float: right;
 }
-
+pre {
+	background-color: #222222;
+	/*border: 1px solid silver;
+	padding: 10px 20px;
+	margin: 20px; */
+	}
+ .json-key {
+	color: brown;
+	}
+ .json-value {
+	color: navy;
+	}
+ .json-string {
+	color: olive;
+	}
+ 
 
 input, input:focus,textarea:focus{
 	border:0;

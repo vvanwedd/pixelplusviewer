@@ -106,7 +106,7 @@ function parseURL(){
 	if(urlParams.has('type')){dsType = urlParams.get('type').toLowerCase(); 
 		if(dsType  === 'scml' || dsType === 'zip'){loadSingleFileScml(dataSource);}
 	}
-	if(dataSource.toLowerCase().endsWith('.zip') || dataSource.toLowerCase().endsWith('.scml')){ 
+	else if(dataSource.toLowerCase().endsWith('.zip') || dataSource.toLowerCase().endsWith('.scml')){ 
 		loadSingleFileScml(dataSource);
 	}
 	else{
