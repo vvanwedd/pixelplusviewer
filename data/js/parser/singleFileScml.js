@@ -122,13 +122,111 @@ _this.getFileSize(_this.url)
 	                        setProgressText(false, "Load last part of SCML failed: " + e.status + " " + e.statusText, true );
 			});
         }).catch(e => {
-			reject({status: e});
+			//reject({status: e});
 			console.log("Error getFileSize: " + e.statusText);
 			setProgressText(false, "Get filesize failed: " + e.status + " " + e.statusText, true );
+			_this.http206 = false;
+			_this.init2().then(respsonse =>{resolve();}).catch(e=> {console.log("Error: "+ e); reject();});
+			//resolve();
 		});
 }).catch(e => {
 	console.log("Error: " + e);
 });
+
+}
+
+init2(){
+	var _this = this;
+	var index = 0;
+	_this.http206 = false;
+	setProgressText(false, "Dataserver doesn't support fast loading. " , false );
+	return new Promise(function (resolve, reject) {
+	_this.downloadEntireSCML(_this.url).then( function(){
+
+		//var dataView = new DataView(_this.entireSCML);
+		_this.zipBrowse(_this.dataView);
+		setProgressText(false, "Number of entries: " + _this.entries.length, false );
+		_this.loadEntry(_this.scmlFiles[index]).then(function() {
+					_this.parseSCML(index);
+					setProgressText(false, "Loaded settings file " + _this.scmlFiles[index].filename, false );
+					resolve();
+				}).catch(e => {
+					reject({status: e});
+				});
+			}
+	).catch(e =>{
+		setProgressText(false, "Get filesize failed: " + e.status + " " + e.statusText, true );
+	});
+}).catch(e => {
+		console.log("Error: " + e);
+});
+
+}
+
+downloadEntireSCML(url){
+	setProgressText(false, "Downloading entire dataset ... " , false );
+	document.getElementById('progressbar').className = 'loading';
+	var _this = this;
+	
+	return new Promise( function (resolve, reject){
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.responseType = 'arraybuffer';
+		xhr.addEventListener("progress", function (evt) {
+			if (evt.lengthComputable) {
+				var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+				// Increase the progress bar length.
+				if (percentLoaded < 100) {
+				  progress.style.width = percentLoaded + '%';
+				  progress.textContent = percentLoaded + '%';
+				}
+			  }
+		}, false);
+		xhr.onreadystatechange = function() {
+			  if (xhr.readyState == 4 && xhr.status === 200) {
+				console.log("loaded last chunk");
+				_this.http206 = false;
+				_this.entireSCML = xhr.response;
+				//_this.endOfFile = _this.entireSCML;
+				_this.fileSize = _this.entireSCML.byteLength;
+				if(_this.fileSize <= 500*1024*1024){_this.lastChunkSize = 1024*1024*2;} else {_this.lastChunkSize = 1024*1024*10;}
+				//_this.lastChunkSize = _this.fileSize;
+				_this.endOfFile = _this.entireSCML.slice(_this.fileSize - _this.lastChunkSize, _this.fileSize);
+				_this.dataView = new DataView(_this.endOfFile);
+				//_this.zipBrowse(dataView);
+				$("#progressbar").css("display","none");
+				//console.log(_this.endOfFile);
+				//var dataView = new DataView(_this.endOfFile);
+				//_this.dataView = dataView;
+				//_this.arrayBuffer = new ArrayBuffer()
+				//_this.zipBrowse(dataView);
+				resolve();
+			} else {
+				if (xhr.readyState == 2)
+				{ /*console.log("headers received ... ");*/}
+				else if (xhr.readyState == 3)
+				{/* console.log("downloading ... ");*/}
+				else {
+					console.log("shouldnt come here " + xhr.readyState);
+					  reject({
+					  status: this.status,
+					  statusText: xhr.statusText
+					});
+				}
+			}
+		}
+		xhr.on
+		xhr.onerror = function () {
+			//console.log("e2");
+			  reject({
+				status: this.status,
+				statusText: xhr.statusText
+			  });
+		}
+		xhr.send(null);
+	});
+	
+
 
 }
 
@@ -139,12 +237,19 @@ getFileSize(url) {
     	var xhr = new XMLHttpRequest();
     	xhr.open("HEAD", url, true); 
     	xhr.onreadystatechange = function() {
-			if(this.status == 404){
+			if(xhr.status == 404){
 				reject({status: this.status, statusText: xhr.statusText});
 			}
-        	if (this.readyState == this.DONE || this.readyState == 2) { //2 == HEADERS_RECEIVED
+        	if (xhr.readyState == 4 || xhr.readyState == 2) { //2 == HEADERS_RECEIVED 4 == operation done or failed
 				_this.fileSize = parseInt(xhr.getResponseHeader("Content-Length"));
-
+				if (xhr.readyState == 4 && isNaN(_this.fileSize)){reject({
+					status: xhr.getResponseHeader("Content-Length"),
+					statusText: "Has the fileserver containing the dataset enabled CORS for this domain?"});
+				}
+				else if(isNaN(_this.fileSize)){reject({
+					status: xhr.getResponseHeader("Content-Length"),
+					statusText: "Content-Length Header response"});
+				}
 				if(_this.fileSize <= 500*1024*1024){_this.lastChunkSize = 1024*1024*2;}
 				console.log("FileSize: "+ String(_this.fileSize));
 				resolve(parseInt(xhr.getResponseHeader("Content-Length")));
@@ -214,47 +319,6 @@ return new Promise( function (resolve, reject){
 	xhr.send(null);
 });
 }
-
- /*
- loadSingleDataFile(){
-	var _this = this;
-	return new Promise(function (resolve, reject) {
-	
-	this.getFileSize(this.url).then((size)=>{
-		_this.fileSize = parseInt(size);
-		_this.zipBrowse()
-	
-	});
-	});
-
-	this.getFilesize(this.url, function(size) {
-
-		_this.fileSize = parseInt(size);
-		console.log("The new size of " + _this.url + " is : " + _this.fileSize + " bytes.");
-		
-		const client = new XMLHttpRequest();
-        client.open('GET', _this.url, true);
-        client.responseType = 'arraybuffer';
-        var str = 'bytes=' + String(_this.fileSize - _this.lastChunkSize) + '-' + String(_this.fileSize - 0);
-        console.log(str);
-        client.setRequestHeader('Range', str );
-        client.onreadystatechange = function() {
-          if (client.readyState == 4 && client.status === 206) {
-            //const boundary = client.getResponseHeader('Content-Type').match(/boundary=(.+)$/i)[1];
-	        //if (boundary) console.log('PARTS', parseMultipartBody(client.resposeText, boundary))
-			_this.endOfFile = client.response;
-			console.log(_this.endOfFile);
-			var dataView = new DataView(_this.endOfFile);
-			_this.dataView = dataView;
-			//_this.arrayBuffer = new ArrayBuffer()
-			_this.zipBrowse(dataView);
-          }
-        }
-        client.send(null);
-	});
-//});
-}
-*/
 
  zipBrowse(dataView){	
 	console.log("zipBrowse");
@@ -392,6 +456,7 @@ static getDate(timeRaw) {
 loadEntry(entry){
 
 	var _this = this;
+	if(_this.http206){
 	//this.getFilesize(this.url, function(size) {
 	return new Promise(function (resolve, reject) {
 	//_this.fileSize = parseInt(size);
@@ -404,38 +469,13 @@ loadEntry(entry){
     xhr.responseType = 'arraybuffer';
 	var str = 'bytes=' + String(from) + '-' + String(to);
 	var sz = to-from;
-//	console.log("size: " + String(sz));
-//	console.log(str);
 	var extension = entry.filename.substr(entry.filename.lastIndexOf('.') + 1).toLowerCase();
-//console.log(entry);
-//console.log(extension);
     xhr.setRequestHeader('Range', str );
     xhr.onreadystatechange = function() {
     	if (xhr.readyState == 4 && xhr.status === 206) {
 			if(extension === 'png' || extension === 'jpeg' || extension ==='jpg'){
-				/*var arrayBufferView = new Uint8Array( this.response );
-				//console.log(_this.buf2hex(this.response));
-				
-				var blob;
-				if(extension === 'png'){
-					blob = new Blob( [ arrayBufferView ], { type: "image/png" } );
-				} else{
-					blob = new Blob( [ arrayBufferView ], { type: "image/jpg" } );
-				}
-				var urlCreator = window.URL || window.webkitURL;
-				var imageUrl = urlCreator.createObjectURL( blob );
-				var img = new Image();//document.querySelector( "#photo" );
-				img.src = imageUrl;
-				entry.image = img;
-				console.log(entry);
-				*/
 				resolve(this.response);
-			//console.log(img);
 			} else if(extension === 'scml' || extension === 'json' ){
-				//_this.scmlFile = JSON.stringify(Array.from(new Uint8Array(this.response)));
-				//console.log(_this.buf2hex(this.response));
-				//console.log(String.fromCharCode.apply(null, new Uint8Array(this.response)));
-				
 				entry.scmlFile = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(this.response)));
 				resolve();
 			} else if(extension == 'dzi'){
@@ -460,8 +500,27 @@ loadEntry(entry){
 		
 	}
     xhr.send(null);
-	//});
 });
+}
+else {
+	return new Promise(function (resolve, reject){
+		var from = entry.offset + 34 + entry.filenameLength + entry.extraFieldLength; //why 34 instead of 30?
+		//console.log(from);
+		var to = 	entry.offset + 34 + entry.filenameLength + entry.extraFieldLength + entry.compressedSize;
+		var extension = entry.filename.substr(entry.filename.lastIndexOf('.') + 1).toLowerCase();
+		if(extension === 'png' || extension === 'jpeg' || extension ==='jpg'){
+			var arrayb = 
+			resolve(_this.entireSCML.slice(from,to));
+		} else if(extension === 'scml' || extension === 'json' ){
+			entry.scmlFile = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(_this.entireSCML.slice(from,to))));
+			resolve();
+		} else if(extension == 'dzi'){
+			resolve(String.fromCharCode.apply(null, new Uint8Array(_this.entireSCML.slice(from,to))));
+		} else {reject({status: -1, statusText: "Could not find entry " + entry.filename});}
+	});
+
+
+}
 
 }
 
