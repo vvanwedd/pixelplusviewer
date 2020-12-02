@@ -104,8 +104,9 @@ function parseURL(){
 	var dsType = "dsType";
 	const dataSource = urlParams.get('ds');
 	if(urlParams.has('type')){dsType = urlParams.get('type').toLowerCase(); 
-		if(dsType  === 'scml' || dsType === 'zip'){loadSingleFileScml(dataSource);}
-	}
+	} else{dsType = dataSource.substring(dataSource.lastIndexOf('.') + 1).toLowerCase();}
+
+	if(dsType  === 'scml' || dsType === 'zip'){loadSingleFileScml(dataSource);}
 	else if(dataSource.toLowerCase().endsWith('.zip') || dataSource.toLowerCase().endsWith('.scml')){ 
 		loadSingleFileScml(dataSource);
 	}
