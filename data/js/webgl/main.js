@@ -283,7 +283,7 @@ function runWebGL() {
 	load();
 
 	updateCanvasSize();
-	$(document).ready(function(){updateProgram(10);});
+	$(document).ready(function(){updateProgram(1);});
 
 }
 
