@@ -260,6 +260,7 @@ function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
 	return albedoBuffer;
 }
 function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
+	setProgressText(false, "Loading diffuse texture for side " + SideNr + " ..." , false);
   	var nbBits = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
 	var minValue = dataView.getFloat32(bytePointer,true);
@@ -300,6 +301,7 @@ function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
 	
 }
 function loadBlockZippedNormal(arrayBuffer,dataView,SideNr){
+	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
 
@@ -328,15 +330,15 @@ var packedNormals = new Uint16Array(strBuf);
 	return normalBuf;
 }
 function loadBlockCompressedNormal(arrayBuffer,dataView,SideNr){
-var d1 = new Date().getTime();
+	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
 
 	var compressedData = new Uint8Array(arrayBuffer,bytePointer,compressedBufferLen);
-bytePointer += compressedBufferLen;
+	bytePointer += compressedBufferLen;
 	var uncompressedData = bzip2.simple(bzip2.array(compressedData));
 
-var uncompressedView = new Uint8Array(uncompressedData);
+	var uncompressedView = new Uint8Array(uncompressedData);
 
 
 	var strBuf = new ArrayBuffer(uncompressedData.length);

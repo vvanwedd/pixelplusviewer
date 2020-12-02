@@ -1053,7 +1053,6 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 }
 //following functions are only used to jump over the compressed blocks.
 function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
-	setProgressText(false, "Loading diffuse texture for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: bzC texture");
   	var nbBits = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1079,7 +1078,6 @@ function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
 
 }
 function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
-	setProgressText(false, "Loading diffuse texture for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: bzC texture");
   	var nbBits = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1105,7 +1103,6 @@ function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
 
 }
 function loadBlockZippedNormal(arrayBuffer,dataView,SideNr){
-	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: compressed normals");
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1117,7 +1114,6 @@ function loadBlockZippedNormal(arrayBuffer,dataView,SideNr){
 
 }
 function loadBlockCompressedNormal(arrayBuffer,dataView,SideNr){
-	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: compressed normals");
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
