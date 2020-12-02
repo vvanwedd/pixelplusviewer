@@ -62,6 +62,7 @@ var boolMultiSpectral = false;
 var boolPtm = false;
 var boolGLTF = false;
 var boolRbf = false;
+var dsType = "";
 var boolDepthMap = false;
 
 var boolZRotation = false;
@@ -83,10 +84,15 @@ function loadDataSource(datasource, dataType){
     document.getElementById('progressbar').className = 'loading';
   };
   xhr.onload = function(e) {
+	if (xhr.readyState == 4 && xhr.status === 200) {
     progress.style.width = '100%';
     progress.textContent = '100%';
     //loadFile(this.response);
-    loadFileWrapper(this.response, dataType);
+	loadFileWrapper(this.response, dataType);
+	} else if (xhr.status === 404){
+		setProgressText(false, "Error 404: The selected file could not be found. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>." , true);
+		abortExecution();
+	}
   };
   xhr.onerror = errorHandler;
   xhr.onprogress = updateProgress;
@@ -94,7 +100,8 @@ function loadDataSource(datasource, dataType){
 }
 
 function parseURL(){
-  
+  $("#mainIntro").css("display","none");
+  $("#progressIndicator").css("display","block");
   displayRightAside(true);
   initViewerParameters();
 
@@ -103,15 +110,22 @@ function parseURL(){
   if(urlParams.has('ds')){
 	var dsType = "dsType";
 	const dataSource = urlParams.get('ds');
-	if(urlParams.has('type')){dsType = urlParams.get('type').toLowerCase(); 
-	} else{dsType = dataSource.substring(dataSource.lastIndexOf('.') + 1).toLowerCase();}
+	if(urlParams.has('type')){
+		dsType = urlParams.get('type').toLowerCase(); 
+	} else{
+		dsType = dataSource.substring(dataSource.lastIndexOf('.') + 1).toLowerCase();
+	}
 
-	if(dsType  === 'scml' || dsType === 'zip'){loadSingleFileScml(dataSource);}
+	setProgressText(true, "Loading " + dsType + " datasource from URL " + dataSource + " ..." , false);
+
+	if(dsType  === 'scml' || dsType === 'zip'){
+		loadSingleFileScml(dataSource);
+	}
 	else if(dataSource.toLowerCase().endsWith('.zip') || dataSource.toLowerCase().endsWith('.scml')){ 
 		loadSingleFileScml(dataSource);
 	}
 	else{
-	loadDataSource(dataSource, dsType);
+		loadDataSource(dataSource, dsType);
 	}
   }
   if(urlParams.has('zrotation')){
@@ -127,21 +141,25 @@ var reader;
 function errorHandler(evt) {
     switch(evt.target.error.code) {
       case evt.target.error.NOT_FOUND_ERR:
-        $("#loader").css("display","none");
-		$("#errorMessages").css("display","block");
-		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be found. </h3>";
+        //$("#loader").css("display","none");
+		//$("#errorMessages").css("display","block");
+		//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be found. </h3>";
+		setProgressText(false, "Error: The requested file could not be found." , true);
         break;
       case evt.target.error.NOT_READABLE_ERR:
-        $("#loader").css("display","none");
-		$("#errorMessages").css("display","block");
-		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file is not readable. </h3>";
+        //$("#loader").css("display","none");
+		//$("#errorMessages").css("display","block");
+		//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file is not readable. </h3>";
+		setProgressText(false, "Error: The requested file is not readable." , true);
+
         break;
       case evt.target.error.ABORT_ERR:
         break; // noop
       default:
-        $("#loader").css("display","none");
-		$("#errorMessages").css("display","block");
-		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The was an error reading the selected file. </h3>";
+        //$("#loader").css("display","none");
+		//$("#errorMessages").css("display","block");
+		//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The was an error reading the selected file. </h3>";
+		setProgressText(false, "Error reading the selected file." , true);
         break;
     };
   }
@@ -223,10 +241,12 @@ function loadFileWrapper(arrayBuffer, dataType){
 
  }
  else{
-	         $("#loader").css("display","none");
-                $("#errorMessages").css("display","block");
-                document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The requested file type is not supported. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>.</h3>";
-	 abortExecution();
+	// $("#loader").css("display","none");
+    //   $("#errorMessages").css("display","block");
+    //   document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The requested file type is not supported. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>.</h3>";
+	setProgressText(false, "Error: The requested file type is not supported. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>." , true);
+
+	abortExecution();
 
 
  }
@@ -372,6 +392,7 @@ function loadFileSCML(arrayBuffer,filename){
 	boolGLTF = false;
 	boolRbf = false;
     boolSCML = true;
+	dsType = "SCML";
 
 	scmlObj = new SCML();
 	scmlObj.parseJSON(ab2str(arrayBuffer));
@@ -424,6 +445,8 @@ function loadFileSCML(arrayBuffer,filename){
 	boolGLTF = false;
 	boolRbf = false;
 	boolSCML = true;
+
+	dsType = "SCML";
 	
 	singleFile = new SingleFileSCML(dataSource );
 
@@ -485,6 +508,8 @@ function loadFileGLTF(arrayBuffer,filename){
 	boolRti = false;
 	boolRbf = false;
 	boolSCML = false;
+	dsType = "glTF";
+
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -540,6 +565,9 @@ function loadFilePTM(arrayBuffer){
 	boolGLTF = false;
 	boolRbf = false;
 	boolSCML = false;
+
+
+
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -547,6 +575,8 @@ function loadFilePTM(arrayBuffer){
 	let inputBuffer = {buffer:arrayBuffer,  currentIndex:0};
 	var version = readTillNewLine(inputBuffer); console.log("PTM Version: " + version);
 	var type = readTillNewLine(inputBuffer); console.log("PTM Type: " + type);
+
+	dsType = "PTM " + type + " " + version;
 	var w = parseInt(readTillNewLine(inputBuffer));
 	var h = parseInt(readTillNewLine(inputBuffer));
 
@@ -600,6 +630,7 @@ function loadFilePTM(arrayBuffer){
 	  }
 	}
 	workerPtm.postMessage({buffer: inputBuffer.buffer, currentIdx: inputBuffer.currentIndex, w: w, h:h,version:version,},[inputBuffer.buffer]);
+	populateMetaFields();
 
 }
 
@@ -654,12 +685,17 @@ else if (basisTerm == 2)
 	switch(rtiType){
 
 		case 0: //RTI
+		dsType = "RTI";
 		break;
 		case 1: // RTI PTM
+		dsType = "PTM RTI";
 		break;
 		case 2: //RTI SH
+		dsType = "SH RTI";
 		break;
 		case 3: //RTI HSH
+		dsType = "HSH RTI";
+
 		//loadDataHSH(inputBuffer, w, h, basisTerm, true);//RTI HSH
 			workerRti = new Worker('data/js/parser/workerRtiLoader.js');
 			workerRti.onerror = function(e){
@@ -816,7 +852,8 @@ function loadFile(arrayBuffer){
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
-	$("#progressText").text("Parsing PLD file");
+	setProgressText(true, "Parsing PLD file ...", false);
+	//$("#progressText").text("Parsing PLD file");
 	$("#content").css("display","none");
 
 	//setting length to 0 deletes all elements from array in js
@@ -831,9 +868,10 @@ function loadFile(arrayBuffer){
 	console.log("Main header: "+stringHeader1.s);
 
 	if(stringHeader1.s.localeCompare("CUN01")!=0){
-		$("#loader").css("display","none");
-		$("#errorMessages").css("display","block");
-		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  Header should be CUN01 but is: " + stringHeader1.s + " </h3>";
+		//$("#loader").css("display","none");
+		//$("#errorMessages").css("display","block");
+		//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  Header should be CUN01 but is: " + stringHeader1.s + " </h3>";
+		setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file.  Header should be CUN01 but is: " + stringHeader1.s , true);
 		return;
 	}
 
@@ -914,9 +952,10 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 	bytePointer+=5;
 
 	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0){
-		$("#progressIndicator").css("display","none");
-		$("#errorMessages").css("display","block");
-		document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader1.s + " </h3>";
+		//$("#progressIndicator").css("display","none");
+		//$("#errorMessages").css("display","block");
+		//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader1.s + " </h3>";
+		setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file. Invalid header: " + stringHeader1.s , true);
 		bytePointer-=5;
 		abortExecution();
 	}
@@ -990,9 +1029,10 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 			loadBlockZippedDiffuse(ArrayBuffer,dataView,1,SideNr);
 		}
 		else{
-			$("#loader").css("display","none");
-			$("#errorMessages").css("display","block");
-			document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  Invalid compression tag: " + stringTag.s + " </h3>";
+			//$("#loader").css("display","none");
+			//$("#errorMessages").css("display","block");
+			//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  Invalid compression tag: " + stringTag.s + " </h3>";
+			setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file.  Invalid compression tag: " + stringTag.s , true);
 			bytePointer-=5;
 			abortExecution();
 		}
@@ -1011,6 +1051,7 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 }
 //following functions are only used to jump over the compressed blocks.
 function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
+	setProgressText(false, "Loading diffuse texture for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: bzC texture");
   	var nbBits = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1036,6 +1077,7 @@ function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
 
 }
 function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
+	setProgressText(false, "Loading diffuse texture for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: bzC texture");
   	var nbBits = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1061,6 +1103,7 @@ function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
 
 }
 function loadBlockZippedNormal(arrayBuffer,dataView,SideNr){
+	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: compressed normals");
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1072,6 +1115,7 @@ function loadBlockZippedNormal(arrayBuffer,dataView,SideNr){
 
 }
 function loadBlockCompressedNormal(arrayBuffer,dataView,SideNr){
+	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	console.log("  LOADING BLOCK: compressed normals");
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1089,6 +1133,7 @@ function nbPixels(){
 }
 
 function loadBlockInfo(ArrayBuffer,dataView){
+	setProgressText(false, "Loading info ..." , false);
 	console.log("  LOADING BLOCK: info");
 	var mSide = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
@@ -1110,11 +1155,12 @@ function loadInfo(ArrayBuffer,dataView){
 	bytePointer +=4;
 	console.log("  version: "+version);
 	if(version != 1.0){
-$("#loader").css("display","none");
-			$("#errorMessages").css("display","block");
-			document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  loadInfo: invalid version number: " + version + " </h3>";
-			bytePointer-=5;
-			abortExecution();
+			//$("#loader").css("display","none");
+			//$("#errorMessages").css("display","block");
+			//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  loadInfo: invalid version number: " + version + " </h3>";
+		setProgressText(false, "The file could not be read. Please choose a different ZUN or CUN file.  loadInfo: invalid version number: " + version , true);
+		bytePointer-=5;
+		abortExecution();
 	}
 
 	var ID;
@@ -1226,6 +1272,12 @@ function populateMetaFields(){
 	document.getElementById("inputPublication").innerHTML= publicationInfo;
 	document.getElementById("inputDescription").innerHTML= description;
 	document.getElementById("inputNotes").innerHTML= notes;
+
+	document.getElementById("inputType").value = "ZUN (Legacy web PLD)";
+	//document.getElementById("scmlConfig").innerHTML = JSON.stringify(_this.scmlFiles[index].scmlFile, undefined, 2); 
+	document.getElementById("inputFilesize").value =formatBytes(_this.fileSize,2);
+	document.getElementById("inputHttp206").value = (_this.http206) ? "Supported": "Not supported";
+	document.getElementById("inputNumberOfEntries").value = _this.entries.length;
 
 	rightAside=true;
 	$("#rightAside").animate({right:'15px'});

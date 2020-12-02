@@ -105,7 +105,7 @@ return new Promise(function (resolve, reject) {
 	var index = 0;
 _this.getFileSize(_this.url)
         .then(response => {
-                        setProgressText(false, "Returned filesize: " + _this.fileSize + " bytes (" + formatBytes(_this.fileSize,2) +")", false );
+            setProgressText(false, "Returned filesize: " + _this.fileSize + " bytes (" + formatBytes(_this.fileSize,2) +")", false );
             _this.loadLastChunk(_this.url).then(function() {
 				_this.zipBrowse(_this.dataView);
 				setProgressText(false, "Number of entries: " + _this.entries.length, false );
