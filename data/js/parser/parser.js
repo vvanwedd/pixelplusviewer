@@ -67,6 +67,7 @@ var boolDepthMap = false;
 
 var boolZRotation = false;
 var singleFile;
+var fileLength = 0;
 
 function initViewerParameters(){
   boolZRotation = false;
@@ -87,7 +88,7 @@ function loadDataSource(datasource, dataType){
 	if (xhr.readyState == 4 && xhr.status === 200) {
     progress.style.width = '100%';
     progress.textContent = '100%';
-    //loadFile(this.response);
+    fileLength = this.response.byteLength;
 	loadFileWrapper(this.response, dataType);
 	} else if (xhr.status === 404){
 		setProgressText(false, "Error 404: The selected file could not be found. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>." , true);
@@ -286,6 +287,7 @@ function updateShaderList(){
 	}
 	if(boolHasAmbient[0]){
 		$('#color1').button( "enable");
+		useAmbient = true;
 	}
 	else{
 		$('#color1').button( "disable");
@@ -635,9 +637,9 @@ function loadFilePTM(arrayBuffer){
 }
 
 function loadFileRTI(arrayBuffer){
-	$("#progressIndicator").css("display","block");
-	$("#progressText").text("Parsing RTI file");
-	$("#content").css("display","none");
+	//$("#progressIndicator").css("display","block");
+	//$("#progressText").text("Parsing RTI file");
+	//$("#content").css("display","none");
 	//$("#progressIndicator").css("display","none");
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
@@ -1275,9 +1277,9 @@ function populateMetaFields(){
 
 	document.getElementById("inputType").value = "ZUN (Legacy web PLD)";
 	//document.getElementById("scmlConfig").innerHTML = JSON.stringify(_this.scmlFiles[index].scmlFile, undefined, 2); 
-	document.getElementById("inputFilesize").value =formatBytes(_this.fileSize,2);
-	document.getElementById("inputHttp206").value = (_this.http206) ? "Supported": "Not supported";
-	document.getElementById("inputNumberOfEntries").value = _this.entries.length;
+	document.getElementById("inputFilesize").value =formatBytes(fileLength,2);
+	document.getElementById("inputHttp206").value = "Not supported for legacy data type";
+	//document.getElementById("inputNumberOfEntries").value = _this.entries.length;
 
 	rightAside=true;
 	$("#rightAside").animate({right:'15px'});

@@ -722,7 +722,7 @@ library.json = {
 	document.getElementById("inputType").value = "SCML";
 	document.getElementById("scmlConfig").innerHTML = JSON.stringify(_this.scmlFiles[index].scmlFile, undefined, 2); 
 	document.getElementById("inputFilesize").value =formatBytes(_this.fileSize,2);
-	document.getElementById("inputHttp206").value = (_this.http206) ? "Supported by server": "Not supported by server";
+	document.getElementById("inputHttp206").value = (_this.http206) ? "Supported": "Not supported";
 	document.getElementById("inputNumberOfEntries").value = _this.entries.length;
 
 

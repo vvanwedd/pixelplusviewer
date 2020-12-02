@@ -923,6 +923,7 @@ else{
 	}
 
 	if(textureData[sideNr].ambient){
+	  useAmbient = true;
 	  //create specular texture
 	  ambientTex[sideNr] = gl.createTexture();
 	  var ambientData = new Uint8Array(textureData[0].ambient);
@@ -1545,7 +1546,7 @@ function animateM(n){
 * main idea: for each object in scene: update matrices, lightdirection and scene
 */
 function render(s) {
-	//console.log("render");
+	console.log("render" + useAmbient);
 //renderTime0 = new Date().getTime();
 	if(s==0){
 		gl.viewport(0, 0, canvasWidth, canvasHeight);
