@@ -141,8 +141,8 @@ function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 
 	//var MSnormals = new Array(5);
 	while(((endPos[SideNr]==0) || (bytePointer<endPos[SideNr]) /*&& i<4*/ ) /*&& (fread(tag, 1, 4, fd) == 4)*/ ) {
-		percentLoaded = Math.round((bytePointer / endPos[SideNr]) * 100);
-		self.postMessage(percentLoaded);
+		mPercentLoaded = Math.round((bytePointer / endPos[SideNr]) * 100);
+		self.postMessage({percentLoaded:mPercentLoaded});
 		
    	//var tag = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
 		//bytePointer +=4;
@@ -157,48 +157,85 @@ function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 		//fread(&blocksize, sizeof(unsigned int), 1, fd);
 
 		if(stringTag.s.localeCompare("INFO")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading info for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			loadBlockInfo(ArrayBuffer,dataView,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("NORC")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading surface normals for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msNormals0 = loadBlockCompressedNormal(arrayBuffer,dataView,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("NORZ")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading surface normals for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msNormals0 = loadBlockZippedNormal(arrayBuffer,dataView,SideNr);
-			
 		}	
 		else if(stringTag.s.localeCompare("NOZ2")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading R surface normals for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msNormals1 = loadBlockZippedNormal(arrayBuffer,dataView,SideNr);
 		}
 		else if(stringTag.s.localeCompare("NOZ3")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading G surface normals for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msNormals2 = loadBlockZippedNormal(arrayBuffer,dataView,SideNr);
 		}
 		else if(stringTag.s.localeCompare("NOZ4")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading B surface normals for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msNormals3 = loadBlockZippedNormal(arrayBuffer,dataView,SideNr);
 		}
 		else if(stringTag.s.localeCompare("NOZ5")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading N-UV surface normals for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msNormals4 = loadBlockZippedNormal(arrayBuffer,dataView,SideNr);
 		}
 		else if(stringTag.s.localeCompare("ALBC")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading albedo data for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msAlbedo0 = loadBlockCompressedDiffuse(arrayBuffer,dataView,0,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("ALBZ")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading albedo data for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			//sideData.albedo = loadBlockZippedDiffuse(arrayBuffer,dataView,0,SideNr);
 			sideData.msAlbedo0 = loadBlockZippedDiffuse(arrayBuffer,dataView,0,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("ALZ2")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading additional albedo data for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msAlbedo1 = loadBlockZippedDiffuse(arrayBuffer,dataView,0,SideNr);
 		}	
 		else if(stringTag.s.localeCompare("AMBC")==0){
+			var mProgressTextType = false;
+			var mProgressText = "Loading ambient data for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			boolHasAmbient[SideNr]=true;
 			sideData.msAmbient0 = loadBlockCompressedDiffuse(arrayBuffer,dataView,1,SideNr);
 		}
 		else if(stringTag.s.localeCompare("AMBZ")==0){	
+			var mProgressTextType = false;
+			var mProgressText = "Loading ambient data for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			boolHasAmbient[SideNr]=true;
 			//sideData.ambient = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
 			sideData.msAmbient0 = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
 		}
 		else if(stringTag.s.localeCompare("AMZ2")==0){	
-		
+			var mProgressTextType = false;
+			var mProgressText = "Loading additional ambient data for side " + SideNr + " ...";
+			self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
 			sideData.msAmbient1 = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
 		}	
 	
@@ -260,7 +297,6 @@ function loadBlockZippedDiffuse(arrayBuffer,dataView,type,SideNr){
 	return albedoBuffer;
 }
 function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
-	setProgressText(false, "Loading diffuse texture for side " + SideNr + " ..." , false);
   	var nbBits = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
 	var minValue = dataView.getFloat32(bytePointer,true);
@@ -301,7 +337,6 @@ function loadBlockCompressedDiffuse(arrayBuffer,dataView,type,SideNr){
 	
 }
 function loadBlockZippedNormal(arrayBuffer,dataView,SideNr){
-	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
 
@@ -330,7 +365,6 @@ var packedNormals = new Uint16Array(strBuf);
 	return normalBuf;
 }
 function loadBlockCompressedNormal(arrayBuffer,dataView,SideNr){
-	setProgressText(false, "Loading surface normals for side " + SideNr + " ..." , false);
 	var compressedBufferLen = dataView.getUint32(bytePointer,true);
 	bytePointer +=4;
 

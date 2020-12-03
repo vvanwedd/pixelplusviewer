@@ -926,11 +926,14 @@ function loadFile(arrayBuffer){
 				$("#progressIndicator").css("display","none");runWebGL();updateShaderList();}
 				else{buildSidePlane(event.data.sideNr);render(0);}
 			  }
-			  else{
+			  else if(event.data.percentLoaded){
 			    //console.log(event.data);
-				percentLoaded = event.data;
+				percentLoaded = event.data.percentLoaded
 				progress.style.width = percentLoaded + '%';
 				progress.textContent = percentLoaded + '%';
+			  } else if(event.data.progressText){
+				setProgressText(false, event.data.progressText , event.data.progressTextType);
+
 			  }
 			};
 			workerOtherSides.postMessage({buffer: arrayBuffer, startPtr: beginPointer,},[arrayBuffer]);
