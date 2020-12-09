@@ -140,6 +140,7 @@ $(document).ready(function(){
 
 var reader;
 function errorHandler(evt) {
+    if(evt.target.error){
     switch(evt.target.error.code) {
       case evt.target.error.NOT_FOUND_ERR:
         //$("#loader").css("display","none");
@@ -163,6 +164,9 @@ function errorHandler(evt) {
 		setProgressText(false, "Error reading the selected file." , true);
         break;
     };
+    }else{
+                setProgressText(false, "Error reading the selected file. Possible CORS issue, see web console (ctrl+shift+k or ctrl+shift+i)" , true);
+    }
   }
 
 var progress = document.querySelector('.percent');
