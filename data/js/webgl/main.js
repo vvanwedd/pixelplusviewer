@@ -436,7 +436,7 @@ function updateCanvasSize(){
 }
 
 function updateNormal(spectralNb){
-	if(boolSCML){
+	if(boolScml){
 	singleFile.normalSource = spectralNb;
 	}
 	else if(boolGLTF || boolRbf){
@@ -691,14 +691,14 @@ function isPowerOf2(value) {
 function buildSidePlane(sideNr){
 
 	var maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-	if((textureData[sideNr].height > maxTextureSize || textureData[sideNr].width > maxTextureSize) && !boolSCML){
+	if((textureData[sideNr].height > maxTextureSize || textureData[sideNr].width > maxTextureSize) && !boolScml){
 
 $("#errorMessages").css("display","block");
 				document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The dimensions of the file are too big.</h3><h3> Maximum texture dimension supported by this hardware: " +maxTextureSize + ". Texture dimensions: " +  textureData[sideNr].height + "x" + textureData[sideNr].width;
 			abortExecution();
 	}
 
-	if(boolSCML){
+	if(boolScml){
 
 		console.log("BuildSidePlane: bool SCML");
 		sidePlane[0] = null;
@@ -924,9 +924,8 @@ else{
 
 	if(textureData[sideNr].ambient){
 	  useAmbient = true;
-	  //create specular texture
 	  ambientTex[sideNr] = gl.createTexture();
-	  var ambientData = new Uint8Array(textureData[0].ambient);
+	  var ambientData = new Uint8Array(textureData[sideNr].ambient);
 	  gl.bindTexture(gl.TEXTURE_2D, ambientTex[sideNr]);
 	  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, ambientData);
 	  //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, textureIMG);
@@ -940,7 +939,7 @@ else{
 
 	if(boolMultiSpectral){
 		albedo2Tex[sideNr] = gl.createTexture();
-		var albedo2Data = new Uint8Array(textureData[0].albedo1);
+		var albedo2Data = new Uint8Array(textureData[sideNr].albedo1);
 		gl.bindTexture(gl.TEXTURE_2D, albedo2Tex[sideNr]);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, albedo2Data);
 		//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, textureIMG);
@@ -953,7 +952,7 @@ else{
 
 		if(textureData[sideNr].ambient1){
 		ambient2Tex[sideNr] = gl.createTexture();
-		var ambient2Data = new Uint8Array(textureData[0].ambient1);
+		var ambient2Data = new Uint8Array(textureData[sideNr].ambient1);
 		gl.bindTexture(gl.TEXTURE_2D, ambient2Tex[sideNr]);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureData[sideNr].width,textureData[sideNr].height,0, gl.RGBA, gl.UNSIGNED_BYTE, ambient2Data);
 		//gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, textureIMG);
@@ -1650,6 +1649,7 @@ function render(s) {
 			gl.uniform1f(curProgram.uLightIntensity1, object.lightIntensity1);
 			gl.uniform1f(curProgram.uFloatTex, floatingPointTextureSupport);
 			gl.uniform1f(curProgram.uBoolFloatTexture, boolFloatTexture);
+			gl.uniform1f(curProgram.uBoolScml, boolScml);
 			gl.uniform3fv(curProgram.uScalePTM0, vec3ScalePTM0);
 			gl.uniform3fv(curProgram.uBiasPTM0, vec3BiasPTM0);
 			gl.uniform3fv(curProgram.uScalePTM1, vec3ScalePTM1);
@@ -1688,7 +1688,7 @@ function render(s) {
 			if (object.id!="objectLight0" && object.id!="objectLight1"){
 
 	
-			if(!boolSCML){
+			if(!boolScml){
 				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				gl.uniform2fv(curProgram.uImgDim, [textureData[object.id].width,textureData[object.id].height]);
 				gl.uniform1f(curProgram.uBoolDepthMap, boolDepthMap);
@@ -1705,6 +1705,7 @@ function render(s) {
 					gl.uniform1i(curProgram.uNormalSampler, 1);
 				}
 				if(useAmbient && boolPhotometric){
+					console.log(object.id);
 					gl.activeTexture(gl.TEXTURE2);
 					gl.bindTexture(gl.TEXTURE_2D, ambientTex[object.id]);
 					gl.uniform1i(curProgram.uAlbedoSampler, 2);
@@ -1746,9 +1747,9 @@ function render(s) {
 				if(boolRbf){
 					relightObj.computeLightWeightsRbf(lightDirection0);
 
-					gl.uniform3fv(curProgram.base, relightObj.lweights);
-					gl.uniform1fv(curProgram.bias, relightObj.bias);
-					gl.uniform1fv(curProgram.scale, relightObj.factor);
+					gl.uniform3fv(curProgram.rbfBase, relightObj.lweights);
+					gl.uniform1fv(curProgram.rbfBias, relightObj.bias);
+					gl.uniform1fv(curProgram.rbfScale, relightObj.factor);
 
           			gl.activeTexture(gl.TEXTURE11);
           			gl.bindTexture(gl.TEXTURE_2D, rbfTex[0]);
@@ -1789,13 +1790,20 @@ function render(s) {
 					gl.uniform1i(curProgram.ptmRgbCoeffTex, 10);
 				}
 			}
-			else if(boolSCML && singleFile.object){
+			else if(boolScml && singleFile.object){
+
+				gl.uniform1fv(curProgram.scmlPldBias, singleFile.pld_wl_nor.bias.concat(singleFile.pld_wl_alb.bias));
+				gl.uniform1fv(curProgram.scmlPldScale, singleFile.pld_wl_nor.scale.concat(singleFile.pld_wl_alb.scale));
+
 				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				if(singleFile.layout=="image"){
 				gl.uniform2fv(curProgram.uImgDim, [singleFile.width, singleFile.height]);
 				}
 				else{
 					gl.uniform2fv(curProgram.uImgDim, [singleFile.tilesize, singleFile.tilesize]);
+				}
+				if(boolDepthMap){
+					gl.uniform1f(curProgram.uBoolDepthMap, boolDepthMap);
 				}
 				//console.log(singleFile.width + " "+ singleFile.height);
 				singleFile.prefetch();
@@ -1817,7 +1825,7 @@ function render(s) {
 				gl.uniform4fv(curProgram.uMaterialAmbient, [1.0,1.0,1.0, 1.0]);
 				gl.drawElements(gl.LINE_STRIP, object.indices.length, gl.UNSIGNED_INT,0);
             }
-            if(object.type=="sidePlane" && !boolSCML){gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);}
+            if(object.type=="sidePlane" && !boolScml){gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);}
 			gl.bindBuffer(gl.ARRAY_BUFFER, null);
          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         }
