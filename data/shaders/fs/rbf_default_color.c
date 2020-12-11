@@ -12,9 +12,9 @@ uniform float uLightIntensity1;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
 
-uniform vec3 base[19];
-uniform float bias[19];
-uniform float scale[19];
+uniform vec3 rbfBase[19];
+uniform float rbfBias[19];
+uniform float rbfScale[19];
 uniform float uBoolFloatTexture;
 
 
@@ -43,11 +43,11 @@ void main(void)
   rbf[4] = vec3( texture2D(rbfCoeff4Tex, vTextureCoord) ).rgb;
   rbf[5] = vec3( texture2D(rbfCoeff5Tex, vTextureCoord) ).rgb;
 
-  vec3 color = base[0];
+  vec3 color = rbfBase[0];
   for(int j = 0; j < 6; j++) {
-		color += base[j*3+1]*(rbf[j].x - bias[j*3+1])*scale[j*3+1];
-		color += base[j*3+2]*(rbf[j].y - bias[j*3+2])*scale[j*3+2];
-		color += base[j*3+3]*(rbf[j].z - bias[j*3+3])*scale[j*3+3];
+		color += rbfBase[j*3+1]*(rbf[j].x - rbfBias[j*3+1])*rbfScale[j*3+1];
+		color += rbfBase[j*3+2]*(rbf[j].y - rbfBias[j*3+2])*rbfScale[j*3+2];
+		color += rbfBase[j*3+3]*(rbf[j].z - rbfBias[j*3+3])*rbfScale[j*3+3];
    }
 
   vec4 total = vec4(color*uLightIntensity0*0.7,1.0);
