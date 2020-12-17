@@ -461,9 +461,9 @@ loadEntry(entry){
 	return new Promise(function (resolve, reject) {
 	//_this.fileSize = parseInt(size);
 	//	console.log("The new size of " + _this.url + " is : " + _this.fileSize + " bytes.");
-	var from = entry.offset + 34 + entry.filenameLength + entry.extraFieldLength; //why 34 instead of 30?
+	var from = entry.offset + 30 + entry.filenameLength ;//+ entry.extraFieldLength; //should be 0, but should check extrafieldlength by reading local header
 	//console.log(from);
-	var to = 	entry.offset + 33 + entry.filenameLength + entry.extraFieldLength + entry.compressedSize;
+	var to = 	entry.offset + 29 + entry.filenameLength + entry.compressedSize; // + entry.extraFieldLength
 	const xhr = new XMLHttpRequest();
     xhr.open('GET', _this.url, true);
     xhr.responseType = 'arraybuffer';
@@ -476,6 +476,8 @@ loadEntry(entry){
 			if(extension === 'png' || extension === 'jpeg' || extension ==='jpg'){
 				resolve(this.response);
 			} else if(extension === 'scml' || extension === 'json' ){
+				//console.log(_this.buf2hex(this.response));
+				//console.log(String.fromCharCode.apply(null, new Uint8Array(this.response)));
 				entry.scmlFile = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(this.response)));
 				resolve();
 			} else if(extension == 'dzi'){
@@ -504,9 +506,10 @@ loadEntry(entry){
 }
 else {
 	return new Promise(function (resolve, reject){
-		var from = entry.offset + 34 + entry.filenameLength + entry.extraFieldLength; //why 34 instead of 30?
+		//readCommonHeader(entry, data, 4, false, onerror);
+		var from = entry.offset + 30 + entry.filenameLength;// + entry.extraFieldLength; 
 		//console.log(from);
-		var to = 	entry.offset + 34 + entry.filenameLength + entry.extraFieldLength + entry.compressedSize;
+		var to = 	entry.offset + 29 + entry.filenameLength + entry.compressedSize; //+ entry.extraFieldLength
 		var extension = entry.filename.substr(entry.filename.lastIndexOf('.') + 1).toLowerCase();
 		if(extension === 'png' || extension === 'jpeg' || extension ==='jpg'){
 			var arrayb = 
@@ -534,9 +537,11 @@ findEntry(filename){
 }
 
 parseSCML(index){
-//console.log(this.scmlFiles[0]);
+console.log(this.scmlFiles[0]);
 var t = timer('parseSCML');
-
+if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scmlFiles[index].scmlFile["SCML Version"] == 0.1)){
+	setProgressText(false, "Parsing SCML file failed.", true );
+} else{
 	this.width = parseFloat(this.scmlFiles[index].scmlFile.width);
 	this.height = parseFloat(this.scmlFiles[index].scmlFile.height);
 	this.layout = this.scmlFiles[index].scmlFile.layout;
@@ -551,44 +556,130 @@ var t = timer('parseSCML');
    
 	if(this.scmlFiles[index].scmlFile.pld){
 	  boolPhotometric = true;
-	  this.pld_wl_nor = {file: this.scmlFiles[index].scmlFile.pld[0].pld_wl_nor[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.pld[0].pld_wl_nor[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.pld[0].pld_wl_nor[0].bias), plane: 0 };
-	  this.pld_wl_alb = {file: this.scmlFiles[index].scmlFile.pld[0].pld_wl_alb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.pld[0].pld_wl_alb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.pld[0].pld_wl_alb[0].bias), plane: 1 };
-	  this.planes[0] = this.pld_wl_nor;
-	  this.planes[1] = this.pld_wl_alb;
-	  if(this.scmlFiles[index].scmlFile.pld[0].pld_wl_amb){
-		  boolHasAmbient[0] = true;
-		  this.pld_wl_amb = {file: this.scmlFiles[index].scmlFile.pld[0].pld_wl_amb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.pld[0].pld_wl_amb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.pld[0].pld_wl_amb[0].bias), plane: 2 };
-		  this.planes[2] = this.pld_wl_amb;
+	  if(this.scmlFiles[index].scmlFile.pld["side_0"].wl_nor){
+	  this.pld_wl_nor = {name: "pld_side_0_wl_nor", file: this.scmlFiles[index].scmlFile.pld["side_0"].wl_nor.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].wl_nor.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].wl_nor.bias, plane: 0 };
+	  this.pld_wl_alb = {name: "pld_side_0_wl_alb", file: this.scmlFiles[index].scmlFile.pld["side_0"].wl_alb.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].wl_alb.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].wl_alb.bias, plane: 1 }; 
+	  for(var id = 0; id<3; id++){
+		  this.pld_wl_nor.scale[i] = parseFloat(this.pld_wl_nor.scale[i]);
+		  this.pld_wl_alb.scale[i] = parseFloat(this.pld_wl_alb.scale[i]);
+		  this.pld_wl_nor.bias[i] = parseFloat(this.pld_wl_nor.bias[i]);
+		  this.pld_wl_alb.bias[i] = parseFloat(this.pld_wl_alb.bias[i]);
 	  }
-	  this.njpegs += 3;
+	  this.planes.push(this.pld_wl_nor);
+	  this.planes.push(this.pld_wl_alb);
+	  if(this.scmlFiles[index].scmlFile.pld["side_0"].wl_amb){
+		  boolHasAmbient[0] = true;
+		  this.pld_wl_amb = {name: "pld_side_0_wl_amb", file: this.scmlFiles[index].scmlFile.pld["side_0"].wl_amb.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].wl_amb.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].wl_amb.bias, plane: 2 };
+		  this.planes.push(this.pld_wl_amb);
+		  for(var id = 0; id<3; id++){
+			this.pld_wl_amb.scale[i] = parseFloat(this.pld_wl_amb.scale[i]);
+			this.pld_wl_amb.bias[i] = parseFloat(this.pld_wl_amb.bias[i]);
+
+		}
+	  }
+	  if(this.scmlFiles[index].scmlFile.pld["side_0"].wl_depth){
+		boolDepthMap = true;
+		this.pld_wl_depth = {name: "pld_side_0_wl_depth", file: this.scmlFiles[index].scmlFile.pld["side_0"].wl_depth.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].wl_depth.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].wl_depth.bias, plane: 3 };
+		  this.planes.push( this.pld_wl_depth );
+	  }
+	  this.njpegs += 4;
+
+	}
+	if(this.scmlFiles[index].scmlFile.pld["side_0"].r_nor){
+		boolMultiSpectral = true;
+		boolHasAmbient[0] = true;
+		this.pld_ir_nor = {name: "pld_side_0_ir_nor", file: this.scmlFiles[index].scmlFile.pld["side_0"].ir_nor.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].ir_nor.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].ir_nor.bias, plane: 0 };
+		this.pld_r_nor = {name: "pld_side_0_r_nor", file: this.scmlFiles[index].scmlFile.pld["side_0"].r_nor.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].r_nor.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].r_nor.bias, plane: 0 };
+		this.pld_g_nor = {name: "pld_side_0_g_nor", file: this.scmlFiles[index].scmlFile.pld["side_0"].g_nor.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].g_nor.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].g_nor.bias, plane: 0 };
+		this.pld_b_nor = {name: "pld_side_0_b_nor", file: this.scmlFiles[index].scmlFile.pld["side_0"].b_nor.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].b_nor.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].b_nor.bias, plane: 0 };
+		this.pld_uv_nor = {name: "pld_side_0_uv_nor", file: this.scmlFiles[index].scmlFile.pld["side_0"].uv_nor.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].uv_nor.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].uv_nor.bias, plane: 0 };
+		this.pld_rgb_alb = {name: "pld_side_0_rgb_alb", file: this.scmlFiles[index].scmlFile.pld["side_0"].rgb_alb.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].rgb_alb.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].rgb_alb.bias, plane: 0 };
+		this.pld_iu_alb = {name: "pld_side_0_iu_alb", file: this.scmlFiles[index].scmlFile.pld["side_0"].iu_alb.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].iu_alb.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].iu_alb.bias, plane: 0 };
+		this.pld_rgb_amb = {name: "pld_side_0_rgb_amb", file: this.scmlFiles[index].scmlFile.pld["side_0"].rgb_amb.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].rgb_amb.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].rgb_amb.bias, plane: 0 };
+		this.pld_iu_amb = {name: "pld_side_0_iu_amb", file: this.scmlFiles[index].scmlFile.pld["side_0"].iu_amb.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].iu_amb.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].iu_amb.bias, plane: 0 };
+		for(var id = 0; id<3; id++){
+			this.pld_ir_nor.scale[i] = parseFloat(this.pld_ir_nor.scale[i]);
+			this.pld_ir_nor.bias[i] = parseFloat(this.pld_ir_nor.bias[i]);
+			this.pld_r_nor.scale[i] = parseFloat(this.pld_r_nor.scale[i]);
+			this.pld_r_nor.bias[i] = parseFloat(this.pld_r_nor.bias[i]);
+			this.pld_g_nor.scale[i] = parseFloat(this.pld_g_nor.scale[i]);
+			this.pld_g_nor.bias[i] = parseFloat(this.pld_g_nor.bias[i]);
+			this.pld_b_nor.scale[i] = parseFloat(this.pld_b_nor.scale[i]);
+			this.pld_b_nor.bias[i] = parseFloat(this.pld_b_nor.bias[i]);
+			this.pld_uv_nor.scale[i] = parseFloat(this.pld_uv_nor.scale[i]);
+			this.pld_uv_nor.bias[i] = parseFloat(this.pld_uv_nor.bias[i]);
+			this.pld_rgb_alb.scale[i] = parseFloat(this.pld_rgb_alb.scale[i]);
+			this.pld_rgb_alb.bias[i] = parseFloat(this.pld_rgb_alb.bias[i]);
+			this.pld_iu_alb.scale[i] = parseFloat(this.pld_iu_alb.scale[i]);
+			this.pld_iu_alb.bias[i] = parseFloat(this.pld_iu_alb.bias[i]);
+			this.pld_rgb_amb.scale[i] = parseFloat(this.pld_rgb_amb.scale[i]);
+			this.pld_rgb_amb.bias[i] = parseFloat(this.pld_rgb_amb.bias[i]);
+			this.pld_iu_amb.scale[i] = parseFloat(this.pld_iu_amb.scale[i]);
+			this.pld_iu_amb.bias[i] = parseFloat(this.pld_iu_amb.bias[i]);
+		}
+		this.planes.push(this.pld_ir_nor);
+		this.planes.push(this.pld_r_nor);
+		this.planes.push(this.pld_g_nor);
+		this.planes.push(this.pld_b_nor);
+		this.planes.push(this.pld_uv_nor);
+		this.planes.push(this.pld_rgb_alb);
+		this.planes.push(this.pld_iu_alb);
+		this.planes.push(this.pld_rgb_amb);
+		this.planes.push(this.pld_iu_amb);
+		if(this.scmlFiles[index].scmlFile.pld["side_0"].r_depth){
+			boolDepthMap = true;
+			this.pld_ir_depth = {name: "pld_side_0_ir_depth", file: this.scmlFiles[index].scmlFile.pld["side_0"].ir_depth.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].ir_depth.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].ir_depth.bias, plane: 0 };
+			this.pld_r_depth = {name: "pld_side_0_r_depth", file: this.scmlFiles[index].scmlFile.pld["side_0"].r_depth.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].r_depth.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].r_depth.bias, plane: 0 };
+			this.pld_g_depth = {name: "pld_side_0_g_depth", file: this.scmlFiles[index].scmlFile.pld["side_0"].g_depth.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].g_depth.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].g_depth.bias, plane: 0 };
+			this.pld_b_depth = {name: "pld_side_0_b_depth", file: this.scmlFiles[index].scmlFile.pld["side_0"].b_depth.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].b_depth.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].b_depth.bias, plane: 0 };
+			this.pld_uv_depth = {name: "pld_side_0_uv_depth", file: this.scmlFiles[index].scmlFile.pld["side_0"].uv_depth.file, scale: this.scmlFiles[index].scmlFile.pld["side_0"].uv_depth.scale, bias: this.scmlFiles[index].scmlFile.pld["side_0"].uv_depth.bias, plane: 0 };
+				for(var id = 0; id<3; id++){
+					this.pld_ir_depth.scale[i] = parseFloat(this.pld_ir_depth.scale[i]);
+					this.pld_ir_depth.bias[i] = parseFloat(this.pld_ir_depth.bias[i]);
+					this.pld_r_depth.scale[i] = parseFloat(this.pld_r_depth.scale[i]);
+					this.pld_r_depth.bias[i] = parseFloat(this.pld_r_depth.bias[i]);
+					this.pld_g_depth.scale[i] = parseFloat(this.pld_g_depth.scale[i]);
+					this.pld_g_depth.bias[i] = parseFloat(this.pld_g_depth.bias[i]);
+					this.pld_b_depth.scale[i] = parseFloat(this.pld_b_depth.scale[i]);
+					this.pld_b_depth.bias[i] = parseFloat(this.pld_b_depth.bias[i]);
+					this.pld_uv_depth.scale[i] = parseFloat(this.pld_uv_depth.scale[i]);
+					this.pld_uv_depth.bias[i] = parseFloat(this.pld_uv_depth.bias[i]);
+			}
+			this.planes.push(this.pld_ir_depth);
+			this.planes.push(this.pld_r_depth);
+			this.planes.push(this.pld_g_depth);
+			this.planes.push(this.pld_b_depth);
+			this.planes.push(this.pld_uv_depth);
+	}
 	  
 	}
+ }
   
 	if(this.scmlFiles[index].scmlFile.hsh ){
 	  this.boolHsh = true;
 	  boolRti = true;
-	  this.hsh_plane_0 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].bias), plane: 3 };
-	  this.hsh_plane_1 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].bias), plane: 4 };
-	  this.hsh_plane_2 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].bias), plane: 5 };
-	  this.hsh_plane_3 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].bias), plane: 6 };
-	  this.planes[3] = this.hsh_plane_0;
-	  this.planes[4] = this.hsh_plane_1;
-	  this.planes[5] = this.hsh_plane_2;
-	  this.planes[6] = this.hsh_plane_3;
+	  this.hsh_plane_0 = {name: "hsh_side_0_plane_0", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].bias), plane: 3 };
+	  this.hsh_plane_1 = {name: "hsh_side_0_plane_1", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].bias), plane: 4 };
+	  this.hsh_plane_2 = {name: "hsh_side_0_plane_2", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].bias), plane: 5 };
+	  this.hsh_plane_3 = {name: "hsh_side_0_plane_3", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].bias), plane: 6 };
+	  this.planes.push( this.hsh_plane_0);
+	  this.planes.push( this.hsh_plane_1);
+	  this.planes.push( this.hsh_plane_2);
+	  this.planes.push( this.hsh_plane_3);
   
 	  vec4ScaleHSH = [this.planes[3].scale, this.planes[4].scale, this.planes[5].scale, this.planes[6].scale];
 	  vec4BiasHSH = [this.planes[3].bias, this.planes[4].bias, this.planes[5].bias, this.planes[6].bias];
 	  this.njpegs +=4;
 	  if(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor){
-		  this.hsh_nor = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].bias), plane: 7  };
-		  this.planes[7] = this.hsh_nor;
+		  this.hsh_nor = {name: "hsh_side_0_nor", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].bias), plane: 7  };
+		  this.planes.push( this.hsh_nor );
 		  this.njpegs +=1;
 	  } else { 
 		  this.hsh_nor = {file: null, scale: 1, bias: 0};
 	  }
 	  if(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb){
-		  this.hsh_amb = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].bias), plane: 8 };
-		  this.planes[8] = this.hsh_amb;
+		  this.hsh_amb = {name: "hsh_side_0_amb", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].bias), plane: 8 };
+		  this.planes.push( this.hsh_amb);
 		  this.njpegs +=1;
 	  } else { 
 		  this.hsh_amb = {file: null, scale: 1, bias: 0};
@@ -607,22 +698,22 @@ var t = timer('parseSCML');
 		lst = this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].scale.split(",", 3);
 		vec3ScalePTM1 = [parseFloat(lst[0]),parseFloat(lst[1]),parseFloat(lst[2])];
   
-		this.hsh_plane_0 = {file: this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].bias), plane: 9 };
-		this.hsh_plane_1 = {file: this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].bias), plane: 10 };
-		this.hsh_plane_rgb = {file: this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_rgb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_rgb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_rgb[0].bias), plane: 11 };
-		this.planes[9] = this.hsh_plane_0;
-		this.planes[10] = this.hsh_plane_1;
-		this.planes[11] = this.hsh_plane_rgb;
+		this.ptm_plane_0 = {name: "ptm_side_0_plane_0", file: this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_0[0].bias), plane: 9 };
+		this.ptm_plane_1 = {name: "ptm_side_0_plane_1", file: this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_1[0].bias), plane: 10 };
+		this.ptm_plane_rgb = {name: "ptm_side_0_plane_rgb", file: this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_rgb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_rgb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_plane_rgb[0].bias), plane: 11 };
+		this.planes.push( this.ptm_plane_0);
+		this.planes.push( this.ptm_plane_1);
+		this.planes.push( this.ptm_plane_rgb);
 		this.njpegs+=3;
   
 		if(this.scmlFiles[index].scmlFile.ptm[0].ptm_nor){
 		  this.ptm_nor = {file: this.scmlFiles[index].scmlFile.ptm[0].ptm_nor[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_nor[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_nor[0].bias), plane: 12 };
-		  this.planes[12] = this.ptm_nor;
+		  this.planes.push( this.ptm_nor);
 		  this.njpegs+=1;
 		}
 		if(this.scmlFiles[index].scmlFile.ptm[0].ptm_amb){
 		  this.ptm_nor = {file: this.scmlFiles[index].scmlFile.ptm[0].ptm_amb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_amb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.ptm[0].ptm_amb[0].bias), plane: 13 };
-		  this.planes[13] = this.ptm_amb;
+		  this.planes.push( this.ptm_amb);
 		  this.njpegs+=1;
 		}
 	  }
@@ -637,14 +728,14 @@ var t = timer('parseSCML');
 			  this.planes[i + 14] = plane;
 			  this.njpegs +=1;
 		  }
-		  this.rbf_plane_0 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].bias), plane: 3 };
-		  this.rbf_plane_1 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].bias), plane: 4 };
-		  this.rbf_plane_2 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].bias), plane: 5 };
-		  this.rbf_plane_3 = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].bias), plane: 6 };
-		  this.planes[3] = this.hsh_plane_0;
-		  this.planes[4] = this.hsh_plane_1;
-		  this.planes[5] = this.hsh_plane_2;
-		  this.planes[6] = this.hsh_plane_3;
+		  this.rbf_plane_0 = {name: "rbf_side_0_plane_0", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].bias), plane: 3 };
+		  this.rbf_plane_1 = {name: "rbf_side_0_plane_1", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].bias), plane: 4 };
+		  this.rbf_plane_2 = {name: "rbf_side_0_plane_2", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].bias), plane: 5 };
+		  this.rbf_plane_3 = {name: "rbf_side_0_plane_3", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].bias), plane: 6 };
+		  this.planes.push( this.hsh_plane_0);
+		  this.planes.push( this.hsh_plane_1);
+		  this.planes.push( this.hsh_plane_2);
+		  this.planes.push( this.hsh_plane_3);
 	  
 		  vec4ScaleHSH = [this.planes[3].scale, this.planes[4].scale, this.planes[5].scale, this.planes[6].scale];
 		  vec4BiasHSH = [this.planes[3].bias, this.planes[4].bias, this.planes[5].bias, this.planes[6].bias];
@@ -681,8 +772,8 @@ var t = timer('parseSCML');
 	//change
 	this.pos = {x: this.width/2, y: this.height/2, z:1, a:100};
 	this.populateFields(index);
+}
 	t.stop();
-
   }
 
 populateFields(index){
@@ -859,9 +950,9 @@ initTree() {
 			t.metaDataURL = /*t.url + */t.planes[0].file;
 			//console.log(t.planes[0].file);
 			t.getTileURL = function (image, x, y, level) {
-				//console.log(image);
+				console.log(image);
 				var prefix = image.substr(0, image.lastIndexOf("."));
-				var base = /*t.url +  '/' +*/ prefix + '_files/';
+				var base = /*t.url +  '/' +*/ prefix + '/';// + '_files/';
 				var ilevel = parseInt(t.nlevels - 1 - level);
 				//console.log( base + ilevel + '/' + x + '_' + y + t.suffix);
 				return base + ilevel + '/' + x + '_' + y + t.suffix;
@@ -1479,9 +1570,9 @@ drawNode(pos, minlevel, level, x, y) {
 //0.0 is in the center of the screen, 
 	//var gl = t.gl;
 	//TODO join buffers, and just make one call per draw! (except the bufferData, which is per node)
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.object.vbo);
-	gl.enableVertexAttribArray(0);
-	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+	//gl.bindBuffer(gl.ARRAY_BUFFER, this.object.vbo);
+	//gl.enableVertexAttribArray(0);
+	//gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 	
 	gl.bufferData(gl.ARRAY_BUFFER, coords, gl.STATIC_DRAW);
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -1495,25 +1586,32 @@ drawNode(pos, minlevel, level, x, y) {
 	
 	//gl.vertexAttribPointer(t.texattrib, 2, gl.FLOAT, false, 0, 0);
 	//gl.enableVertexAttribArray(t.texattrib);
-
+	//console.log(this.findPlaneIndex("pld_side_0_b_nor"));
+	//console.log(this.planes);
+	gl.activeTexture(gl.TEXTURE1);
 	switch(this.normalSource){
-		case 2: 			
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[0]);
-			gl.uniform1i(this.curPrg.uNormalSampler, 1);
-			break;
-		case 5: 			
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[7]);
-			gl.uniform1i(this.curPrg.uNormalSampler, 1);
-			break;
-		case 6: 			
-			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[12]);
-			gl.uniform1i(this.curPrg.uNormalSampler, 1);
-			break;
-
+		case 0:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
+		case 1:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+		case 2:
+			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
+			}
+		case 3:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
+		case 4:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
+		case 5:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_hsh_nor")]); break;
+		case 6:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ptm_nor")]); break;
+		
 	}
+	gl.uniform1i(this.curPrg.uNormalSampler, 1);
+
 	// Only the next shaders use HSH coeffs
 if(this.curPrg == program20 || this.curPrg == program22 || this.curPrg == program24 || this.curPrg == program25){ 
 	gl.activeTexture(gl.TEXTURE2);
@@ -1566,23 +1664,59 @@ else if(this.curPrg == program33){
 	gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[6]);
 	gl.uniform1i(this.curPrg.hshCoeff3Tex, 5);
 }
-else{
+else{ //pld
+	if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
 
-			gl.activeTexture(gl.TEXTURE2);
+			
 			if(useAmbient){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[2]);
+				gl.activeTexture(gl.TEXTURE2);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_amb")]);
+				gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
+				gl.activeTexture(gl.TEXTURE3);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_bu_amb")]);
+				gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3);
 			}
 			else{
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[1]);
-			}
-			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
+				gl.activeTexture(gl.TEXTURE2);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_alb")]);
+				gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
+				gl.activeTexture(gl.TEXTURE3);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_bu_alb")]);
+				gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3);
+				//console.log(this.findPlaneIndex("pld_side_0_bu_alb"));
 
+			}
+} else{ //wl
+	if(useAmbient){
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_amb")]);
+		gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
+	}
+	else{
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_alb")]);
+		gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
+	}
+}
+			
+if(boolDepthMap){
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_depth")]);
+	gl.uniform1i(this.curPrg.uDispSampler, 0);
+}
 	
 }
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.object.ibo);
 	gl.drawElements(gl.TRIANGLES, this.object.indices.length, gl.UNSIGNED_INT,0);
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+}
+
+findPlaneIndex( name){
+	for(var i =0; i< this.planes.length; i++){
+		if(this.planes[i].name === name){ return i};
+	}
+	return -1;
 }
 
 draw(pos,obj,curProgram,canvasHeight,canvasWidth){

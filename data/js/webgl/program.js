@@ -61,13 +61,16 @@ function Programm(vss,fss,prg){
     this.rbfCoeff4Tex = gl.getUniformLocation(prg, "rbfCoeff4Tex");
     this.rbfCoeff5Tex = gl.getUniformLocation(prg, "rbfCoeff5Tex");
     if(boolRbf){
-        //relightObj.baseLocation = gl.getUniformLocation(prg, "base");
-	//gl.uniform1fv(gl.getUniformLocation(prg, "scale"), relightObj.factor);
-         // gl.uniform1fv(gl.getUniformLocation(prg, "bias"), relightObj.bias);
-   this.scale = gl.getUniformLocation(prg, "scale");
-	  this.base = gl.getUniformLocation(prg, "base");
-	    this.bias = gl.getUniformLocation(prg, "bias");
+     this.rbfScale = gl.getUniformLocation(prg, "rbfScale");
+     this.rbfBase = gl.getUniformLocation(prg, "rbfBase");
+	 this.rbfBias = gl.getUniformLocation(prg, "rbfBias");
     }
+    this.uBoolScml = gl.getUniformLocation(prg, "uBoolScml");
+    if(boolScml){
+      this.scmlPldScale = gl.getUniformLocation(prg, "scmlPldScale");
+      this.scmlPldBias = gl.getUniformLocation(prg, "scmlPldBias");
+    }
+
     this.uScaleHSH = gl.getUniformLocation(prg, "uScaleHSH");
     this.uBiasHSH = gl.getUniformLocation(prg, "uBiasHSH");
     this.uScalePTM0 = gl.getUniformLocation(prg, "uScalePTM0");
@@ -115,7 +118,7 @@ function loadShaders(gl, shaders, callback) {
     ) {
         (xhr = new XMLHttpRequest).i = i;
         xhr.open("get", loadShaders.base + shaders[i] + ".c", asynchronous);
-        //console.log(shaders[i]);
+        console.log(shaders[i]);
         if (asynchronous) {
             xhr.onreadystatechange = onreadystatechange;
         }

@@ -62,6 +62,7 @@ var boolMultiSpectral = false;
 var boolPtm = false;
 var boolGLTF = false;
 var boolRbf = false;
+var boolScml = false;
 var dsType = "";
 var boolDepthMap = false;
 
@@ -140,6 +141,7 @@ $(document).ready(function(){
 
 var reader;
 function errorHandler(evt) {
+    if(evt.target.error){
     switch(evt.target.error.code) {
       case evt.target.error.NOT_FOUND_ERR:
         //$("#loader").css("display","none");
@@ -163,6 +165,9 @@ function errorHandler(evt) {
 		setProgressText(false, "Error reading the selected file." , true);
         break;
     };
+    }else{
+                setProgressText(false, "Error reading the selected file. Possible CORS issue, see web console (ctrl+shift+k or ctrl+shift+i)" , true);
+    }
   }
 
 var progress = document.querySelector('.percent');
@@ -359,7 +364,7 @@ function loadFileRelight(arrayBuffer,filename){
   boolPtm = false;
   boolGLTF = false;
   boolRbf = true;
-  boolSCML = false;
+  boolScml = false;
 
   relightObj = new Relight();
   relightObj.parseJSON(ab2str(arrayBuffer));
@@ -393,7 +398,7 @@ function loadFileSCML(arrayBuffer,filename){
 	boolPtm = false;
 	boolGLTF = false;
 	boolRbf = false;
-    boolSCML = true;
+    boolScml = true;
 	dsType = "SCML";
 
 	scmlObj = new SCML();
@@ -446,7 +451,7 @@ function loadFileSCML(arrayBuffer,filename){
 	boolPtm = false;
 	boolGLTF = false;
 	boolRbf = false;
-	boolSCML = true;
+	boolScml = true;
 
 	dsType = "SCML";
 	
@@ -509,7 +514,7 @@ function loadFileGLTF(arrayBuffer,filename){
 	boolPtm = false;
 	boolRti = false;
 	boolRbf = false;
-	boolSCML = false;
+	boolScml = false;
 	dsType = "glTF";
 
 	//setting length to 0 deletes all elements from array in js
@@ -566,7 +571,7 @@ function loadFilePTM(arrayBuffer){
 	boolPtm = true;
 	boolGLTF = false;
 	boolRbf = false;
-	boolSCML = false;
+	boolScml = false;
 
 
 
@@ -650,7 +655,7 @@ function loadFileRTI(arrayBuffer){
 	boolPtm = false;
 	boolGLTF = false;
 	boolRbf = false;
-	boolSCML = false;
+	boolScml = false;
 	//setting length to 0 deletes all elements from array in js
 	textureData.length = 0;
 
@@ -850,7 +855,7 @@ function loadFile(arrayBuffer){
 	boolPtm = false;
 	boolGLTF = false;
 	boolRbf = false;
-	boolSCML = false;
+	boolScml = false;
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
@@ -921,7 +926,11 @@ function loadFile(arrayBuffer){
 				textureData[event.data.sideNr].albedo0 = event.data.msAlbedo0;
 				textureData[event.data.sideNr].albedo1 = event.data.msAlbedo1;
 				//textureData[event.data.sideNr].MSnormals = event.data.msnormals0;
-				if(boolHasAmbient[event.data.sideNr]){textureData[event.data.sideNr].ambient = event.data.msAmbient0;textureData[event.data.sideNr].ambient0 = event.data.msAmbient0;textureData[event.data.sideNr].ambient1 = event.data.msAmbient1;}
+				if(boolHasAmbient[event.data.sideNr]){
+					textureData[event.data.sideNr].ambient = event.data.msAmbient0;
+					textureData[event.data.sideNr].ambient0 = event.data.msAmbient0;
+					textureData[event.data.sideNr].ambient1 = event.data.msAmbient1;
+				}
 				if(event.data.sideNr==0){$("content").css("display","block");
 				$("#progressIndicator").css("display","none");runWebGL();updateShaderList();}
 				else{buildSidePlane(event.data.sideNr);render(0);}

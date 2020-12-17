@@ -1545,7 +1545,7 @@ function animateM(n){
 * main idea: for each object in scene: update matrices, lightdirection and scene
 */
 function render(s) {
-	console.log("render" + useAmbient);
+	//console.log("render" + useAmbient);
 //renderTime0 = new Date().getTime();
 	if(s==0){
 		gl.viewport(0, 0, canvasWidth, canvasHeight);
@@ -1792,12 +1792,17 @@ function render(s) {
 			}
 			else if(boolScml && singleFile.object){
 
-				gl.uniform1fv(curProgram.scmlPldBias, singleFile.pld_wl_nor.bias.concat(singleFile.pld_wl_alb.bias));
-				gl.uniform1fv(curProgram.scmlPldScale, singleFile.pld_wl_nor.scale.concat(singleFile.pld_wl_alb.scale));
+				if(boolMultiSpectral){
+					gl.uniform1fv(curProgram.scmlPldBias, singleFile.pld_r_nor.bias.concat(singleFile.pld_rgb_alb.bias).concat(singleFile.pld_iu_alb.bias));
+					gl.uniform1fv(curProgram.scmlPldScale, singleFile.pld_r_nor.scale.concat(singleFile.pld_rgb_alb.scale).concat(singleFile.pld_iu_alb.scale));
 
-				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
+				} else {
+ 					gl.uniform1fv(curProgram.scmlPldBias, singleFile.pld_wl_nor.bias.concat(singleFile.pld_wl_alb.bias));
+                    gl.uniform1fv(curProgram.scmlPldScale, singleFile.pld_wl_nor.scale.concat(singleFile.pld_wl_alb.scale));
+				}
+					gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				if(singleFile.layout=="image"){
-				gl.uniform2fv(curProgram.uImgDim, [singleFile.width, singleFile.height]);
+					gl.uniform2fv(curProgram.uImgDim, [singleFile.width, singleFile.height]);
 				}
 				else{
 					gl.uniform2fv(curProgram.uImgDim, [singleFile.tilesize, singleFile.tilesize]);
@@ -1835,7 +1840,7 @@ function render(s) {
     }
     catch(err){
         alert(err);
-        console.error(err.description);
+        console.error(err);
 	}
 	//renderTime1 = new Date().getTime();
 //console.log((renderTime1-renderTime0));
