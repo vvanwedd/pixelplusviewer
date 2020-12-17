@@ -35,11 +35,14 @@ void main(void)
   // Unpack tangent-space normal from texture
   vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
   vec3 albedo2 = texture2D(uAlbedo2Sampler, vTextureCoord).rgb;
-
+  vec3 albedo = texture2D(uAlbedoSampler, vTextureCoord).rgb;
   if(uBoolScml == 1.0){
     normal.x = scmlPldScale[0]*( normal.x - scmlPldBias[0]);
     normal.y = scmlPldScale[1]*( normal.y - scmlPldBias[1]);
     normal.z = scmlPldScale[2]*( normal.z - scmlPldBias[2]);
+    albedo.x = scmlPldScale[3]*( albedo.x - scmlPldBias[3]);
+    albedo.y = scmlPldScale[4]*( albedo.y - scmlPldBias[4]);
+    albedo.z = scmlPldScale[5]*( albedo.z - scmlPldBias[5]);
     albedo2.x = scmlPldScale[6]*( albedo2.x - scmlPldBias[6]);
     albedo2.y = scmlPldScale[7]*( albedo2.y - scmlPldBias[7]);
     albedo2.z = scmlPldScale[8]*( albedo2.z - scmlPldBias[8]);

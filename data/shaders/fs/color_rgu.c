@@ -1,4 +1,4 @@
-rgprecision highp float;
+precision highp float;
 
 //geometry
 uniform vec4 uMaterialDiffuse;

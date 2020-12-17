@@ -47,7 +47,7 @@ void main(void)
   if(uBoolFloatTexture!=1.0 && uBoolScml != 1.0){normal = 2.0*(normal - 0.5);}
 
   normal = (uNMatrix * vec4(normal, 0.0)).xyz;
-  vec3 albedoMix = vec3(albedo.g, albedo.g, albedo.g;
+  vec3 albedoMix = vec3(albedo.g, albedo.g, albedo.g);
 
   // Normalize light direction
   vec3 light0 = normalize(uLightDirection0.xyz);

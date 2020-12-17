@@ -34,7 +34,7 @@ void main(void) {
 	vec4 finalPosition;
 	if(uBoolDepthMap==1.0){
 		vec3 disp = texture2D(uDispSampler, aVertexTextureCoords).xyz;
-		finalPosition = uPMatrix * uMVMatrix *(vec4(aVertexPosition, 1.0) + 10.0*vec4(0.0,0.0,(disp.x-0.5),0.0));	//hardcoded depthmultiplier should be changed.
+		finalPosition = uPMatrix * uMVMatrix *(vec4(aVertexPosition, 1.0) + 20.0*vec4(0.0,0.0,(disp.x-0.5),0.0));	//hardcoded depthmultiplier should be changed.
 	}
 	else{
 		finalPosition = uPMatrix * uMVMatrix *(vec4(aVertexPosition, 1.0));
