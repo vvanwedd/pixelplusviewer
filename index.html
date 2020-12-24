@@ -127,7 +127,7 @@
 
 		  <div>
 
-		  <div id="shaderset">
+		  <div id="shaderSet">
 				<h4>Visual style</h4>
 				<div class="visualstyle">
 				  <h5>PLD</h5>
@@ -173,7 +173,7 @@
 				<div id="param3wrapper" class="paramwrapper" style="display:none;"><span id="param3">Param 3: </span><div id="sliderParam3"></div></br></div>
 				</div>
 			</div>
-			<div id="reflectanceset">
+			<div id="reflectanceSet">
 					<h4>Reflectance source</h4>
 					<div class="visualstyle">
 
@@ -181,7 +181,7 @@
 					<input type="radio" id="color1" name="radio3" checked="checked"><label for="color1">Ambient</label>
 				</div>
 				</div>
-				<div id="colorset">
+				<div id="colorSet">
 					<h4>Color source</h4>
 					<div class="visualstyle">
                                                 <input type="radio" id="colorI" name="radioColorSet"><label for="colorI">IR</label>
@@ -196,7 +196,21 @@
 						<input type="radio" id="colorGBU" name="radioColorSet"><label for="colorGBU">GBU</label>
 					</div>
 				</div>
-				<div id="normalset">
+				<div id="depthSet">
+					<h4>3D source</h4>
+					<div class="visualstyle">
+					
+						<input type="radio" name="radioDepth" id="depthNone"><label for="depthNone" checked="checked" title="No 3D mode" id="lDepthNone">None</label>
+						<input type="radio" name="radioDepth" id="depthPldWl"><label for="depthPldWl" title="PLD White Light" id="lDepthPldWl">PLD WL</label>
+						 <input type="radio" name="radioDepth" id="depthPldI"><label for="depthPldI" title="Source: PLD Near Infra-Red" id="lDepthPldI">PLD I</label>
+						 <input type="radio" name="radioDepth" id="depthPldR"><label for="depthPldR" title="Source: PLD Red" id="lDepthPldR">PLD R</label>
+						 <input type="radio" name="radioDepth" id="depthPldG"><label for="depthPldG" title="Source; PLD Green" id="lDepthPldG">PLD G</label>
+						 <input type="radio" name="radioDepth" id="depthPldB"><label for="depthPldUV" title="Source: PLD Blue" id="lDepthPldB">PLD B</label>
+						 <input type="radio" name="radioDepth" id="depthPldUV"><label for="depthPldUV" title="Source: PLD Near UV " id="lDepthPldUV">PLD UV</label>
+		
+					</div>
+					</div>
+				<div id="normalSet">
                 	<h4>Normal source</h4>
 					<div class="normalsource">
 				  		<h5>PLD</h5>

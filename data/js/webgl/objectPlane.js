@@ -21,7 +21,7 @@ function ObjectPlane(name,xres,yres,xScale,ratio,xOffset,yOffset,height,width){
 	var uv = [];
 	var a,c,b = 0;
 	var xwidth = 50*xScale;
-if(boolDepthMap){ //texture plane only needs to be made as a grid when using depth maps
+if(boolDepthMap){ //boolDepthMap texture plane only needs to be made as a grid when using depth maps
 	for(c=0;c<=3*(xres+1)*yres;c=c+3*(xres+1)){
 		for(a=0;a<=3*xres;a=a+3){
 			v[a+c] = -xwidth+a*2*xwidth/(3*xres); 

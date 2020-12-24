@@ -118,7 +118,7 @@ function loadShaders(gl, shaders, callback) {
     ) {
         (xhr = new XMLHttpRequest).i = i;
         xhr.open("get", loadShaders.base + shaders[i] + ".c", asynchronous);
-        console.log(shaders[i]);
+       // console.log(shaders[i]);
         if (asynchronous) {
             xhr.onreadystatechange = onreadystatechange;
         }

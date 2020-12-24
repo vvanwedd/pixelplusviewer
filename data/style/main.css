@@ -128,7 +128,7 @@ header{
 	padding-right:10px;
 }
 
-#shaderset .ui-button-text-only .ui-button-text,#colorset .ui-button-text-only .ui-button-text, #reflectanceset .ui-button-text-only .ui-button-text, #normalset .ui-button-text-only .ui-button-text{
+#shaderSet .ui-button-text-only .ui-button-text, #depthSet .ui-button-text-only .ui-button-text, #colorSet .ui-button-text-only .ui-button-text, #reflectanceSet .ui-button-text-only .ui-button-text, #normalSet .ui-button-text-only .ui-button-text{
 	padding:0px;
 	display: table-cell;
 	vertical-align: middle;
@@ -177,7 +177,7 @@ header{
 #rightAside .ui-state-highlight{
 	background-color: #ff00aa;
 }
-#shaderset .ui-button, #colorset .ui-button, #reflectanceset .ui-button, #positioning .ui-button, #normalset .ui-button{
+#shaderSet .ui-button, #colorSet .ui-button, #reflectanceSet .ui-button, #positioning .ui-button, #normalset .ui-button, #depthSet .ui-button{
 	border: 1px solid #aaa;
 	/*width:110px;
 	height:20px;*/
@@ -193,7 +193,7 @@ header{
 #buttonPrint{
 padding: 5px;
 }
-#shaderset .ui-state-hover {
+#shaderSet .ui-state-hover, #depthSet .ui-state-hover {
 	border: 1px solid #eee;
 }
 .paramwrapper{
@@ -259,12 +259,12 @@ float: left;
 	background-image: url(images/side.png);
 	background-repeat:no-repeat;
 }
-#shaderset, #colorset, #reflectanceset, #positioning, #filterparameters, #printing, #normalset{
+#shaderSet, #colorSet, #reflectanceSet, #depthSet, #positioning, #filterparameters, #printing, #normalSet{
 	width:345px;
 	float: right;
 	text-align:left;
 }
-#colorset h4, #shaderset h4, #reflectanceset h4, #positioning h4, #filterparameters h4, #printing h4, #normalset h4, .visualstyle h5, .normalsource h5{
+#colorSet h4, #shaderSet h4, #reflectanceSet h4, #depthSet h4, #positioning h4, #filterparameters h4, #printing h4, #normalSet h4, .visualstyle h5, .normalsource h5{
 	margin:5px 0 5px -5px;
 	text-align:left;
 

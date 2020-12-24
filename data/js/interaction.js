@@ -82,6 +82,7 @@ function initInteraction(){
 	oldY1=0;
 
 	$("#color0")[0].checked =true;
+	$("#color0").button();
 	$("#color0").button("refresh");
 	//$("#color1").button("widget").css({"display": "none"});
 	//$("#color1").button("refresh");
@@ -122,6 +123,14 @@ function initInteraction(){
 	$("#colorRGB").button();
 	$("#colorRGU").button();
 	$("#colorGBU").button();
+
+	$("#lDephNone").button();
+
+	$("#normalI").button();
+	$("#normalR").button();
+	$("#normalG").button();
+	$("#normalB").button();
+	$("#normalU").button();
 
 	if(!boolMultiSpectral){
 		$("#colorI").button("disable");
@@ -298,8 +307,8 @@ $(document).ready(function(){
 			$("#introLinks").animate({opacity:'1.0'});
 		}
 	});
- $("#colorset" ).buttonset();
- $("#colorset").change(function(){
+ $("#colorSet" ).buttonset();
+ $("#colorSet").change(function(){
 	if($("#colorIRG")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
 		updateProgram(11);
@@ -348,8 +357,8 @@ $(document).ready(function(){
 });
 
 
- $("#normalset" ).buttonset();
-	$("#normalset").change(function(){
+ $("#normalSet" ).buttonset();
+	$("#normalSet").change(function(){
                 if($("#normalI")[0].checked==true){
                         updateNormal(0);
 			if(gl){render(0);}
@@ -387,16 +396,56 @@ $(document).ready(function(){
 		}
 
 	});
-	$("#reflectanceset" ).buttonset();
-	$("#reflectanceset").change(function(){
+
+	$("#depthSet" ).buttonset();
+	$("#depthSet").change(function(){
+                if($("#normalI")[0].checked==true){
+                        updateNormal(0);
+			if(gl){render(0);}
+		}
+		if($("#normalR")[0].checked==true){
+                        updateNormal(1);
+			if(gl){render(0);}
+
+                }
+		if($("#normalG")[0].checked==true){
+                        updateNormal(2);
+			if(gl){render(0);}
+
+                }
+		if($("#normalB")[0].checked==true){
+                        updateNormal(3);
+			if(gl){render(0);}
+
+                }
+		if($("#normalU")[0].checked==true){
+			updateNormal(4);
+                        if(gl){render(0);}
+				}
+		if($("#normalHSH")[0].checked==true){
+			updateNormal(5);
+		 				if(gl){render(0);}
+				}
+		if($("#normalPTM")[0].checked==true){
+			updateNormal(6);
+			if(gl){render(0);}
+		}
+		if($("#normalRBF")[0].checked==true){
+			updateNormal(7);
+			if(gl){render(0);}
+		}
+
+	});
+	$("#reflectanceSet" ).buttonset();
+	$("#reflectanceSet").change(function(){
 		if($("#color0")[0].checked==true){useAmbient = false;}
 		else if($("#color1")[0].checked==true){useAmbient = true;}
 		if(gl){render(0)};
 	});
 	$("#color1").button({disabled:true});
 
-	$("#shaderset" ).buttonset();
-	$("#shaderset").change(function(){
+	$("#shaderSet" ).buttonset();
+	$("#shaderSet").change(function(){
 		if($("#shader1")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
 			updateProgram(1);

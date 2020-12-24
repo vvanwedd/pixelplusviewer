@@ -32,7 +32,7 @@ void main(void) {
 	vLightDirection0 = uLightDirection0;
 	vLightDirection1 = uLightDirection1;
 	vec4 finalPosition;
-	if(uBoolDepthMap==1.0){
+	if(uBoolDepthMap==1.0){//
 		vec3 disp = texture2D(uDispSampler, aVertexTextureCoords).xyz;
 		finalPosition = uPMatrix * uMVMatrix *(vec4(aVertexPosition, 1.0) + 20.0*vec4(0.0,0.0,(disp.x-0.5),0.0));	//hardcoded depthmultiplier should be changed.
 	}

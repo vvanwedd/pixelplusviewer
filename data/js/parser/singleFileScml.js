@@ -86,6 +86,7 @@ class SingleFileSCML{
 	this.entries = [];
 	this.scmlFiles = [];
 	this.http206 = false;
+	this.canvas = {width: 0, height: 0};
 }
 
 
@@ -114,12 +115,16 @@ _this.getFileSize(_this.url)
 					setProgressText(false, "Loaded settings file " + _this.scmlFiles[index].filename, false );
 					resolve();
 				}).catch(e => {
-					reject({status: e});
+					setProgressText(false, "Loading settings file failed: " + e.status + " " + e.statusText, true );
+                        		_this.http206 = false;
+                        		_this.init2().then(respsonse =>{resolve();}).catch(e=> {console.log("Error: "+ e); reject();});
+					//reject({status: e});
 				});
 			}).catch(e => {
-				reject({status: e});
+				setProgressText(false, "Loading last part of SCML file failed: " + e.status + " " + e.statusText, true );
+                        	_this.http206 = false;
+                        	_this.init2().then(respsonse =>{resolve();}).catch(e=> {console.log("Error: "+ e); reject();});
 				console.log("Error loadLastChunk: " + e);
-	                        setProgressText(false, "Load last part of SCML failed: " + e.status + " " + e.statusText, true );
 			});
         }).catch(e => {
 			//reject({status: e});
@@ -509,10 +514,9 @@ else {
 		//readCommonHeader(entry, data, 4, false, onerror);
 		var from = entry.offset + 30 + entry.filenameLength;// + entry.extraFieldLength; 
 		//console.log(from);
-		var to = 	entry.offset + 29 + entry.filenameLength + entry.compressedSize; //+ entry.extraFieldLength
+		var to = 	entry.offset + 30 + entry.filenameLength + entry.compressedSize; //+ entry.extraFieldLength
 		var extension = entry.filename.substr(entry.filename.lastIndexOf('.') + 1).toLowerCase();
 		if(extension === 'png' || extension === 'jpeg' || extension ==='jpg'){
-			var arrayb = 
 			resolve(_this.entireSCML.slice(from,to));
 		} else if(extension === 'scml' || extension === 'json' ){
 			entry.scmlFile = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(_this.entireSCML.slice(from,to))));
@@ -539,11 +543,22 @@ findEntry(filename){
 parseSCML(index){
 console.log(this.scmlFiles[0]);
 var t = timer('parseSCML');
-if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scmlFiles[index].scmlFile["SCML Version"] == 0.1)){
+if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scmlFiles[index].scmlFile["SCML Version"] == 1.0)){
 	setProgressText(false, "Parsing SCML file failed.", true );
 } else{
-	this.width = parseFloat(this.scmlFiles[index].scmlFile.width);
-	this.height = parseFloat(this.scmlFiles[index].scmlFile.height);
+	if(this.scmlFiles[index].scmlFile.viewersettings){
+		if(this.scmlFiles[index].scmlFile.viewersettings.zrotation){
+			boolZRotation = true;
+    		pZRotation = parseFloat(this.scmlFiles[index].scmlFile.viewersettings.zrotation);
+		}
+	}
+	if(this.scmlFiles[index].scmlFile.pld){
+          this.width = parseFloat(this.scmlFiles[index].scmlFile.pld["side_0"].metadata.width);
+          this.height = parseFloat(this.scmlFiles[index].scmlFile.pld["side_0"].metadata.height);
+	}else {
+	  this.width = parseFloat(this.scmlFiles[index].scmlFile.width);
+	  this.height = parseFloat(this.scmlFiles[index].scmlFile.height);
+	}
 	this.layout = this.scmlFiles[index].scmlFile.layout;
   
 	this.boolHsh = false;
@@ -685,7 +700,6 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 		  this.hsh_amb = {file: null, scale: 1, bias: 0};
 	  }
 	}
-	//if(glTFObj.pld[0].depthTex){boolDepthMap = true;}
 	if(this.scmlFiles[index].scmlFile.ptm){
 	  this.boolPtm = true;
 	  boolPtm = true;
@@ -767,7 +781,7 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
   
 	this.border = 1;
 	this.mipmapbias= 0.5;
-	this.canvas = {width: 0, height: 0};
+	
   
 	//change
 	this.pos = {x: this.width/2, y: this.height/2, z:1, a:100};
@@ -1431,38 +1445,6 @@ t.loadEntry(t.findEntry(t.getTileURL(name, x, y, level))).then(function(e){
 });
 
 
-/*
-//removeEventListener
-//	image.addEventListener('load', function() {
-	image.onload = function() {
-		console.log("Loading image " + image.src + " for index " + index + " level: " + level + " x: "+ x + " y: "+y);
-		var tex = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, tex);
-		gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //_MIPMAP_LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
-//		gl.generateMipmap(gl.TEXTURE_2D);
-
-		t.nodes[index].tex[plane] = tex;
-		t.nodes[index].missing--;
-		if(t.nodes[index].missing == 0) {
-			delete t.requested[index];
-			t.requestedCount--;
-			t.preload();
-			//t.redraw();
-		}
-	};
-	image.onerror = function() {
-		console.log("FAILED Loading image " + image.src + " for index " + index);
-
-		t.nodes[index].missing = -1;
-		delete t.requested[index];
-		t.requestedCount--;
-		t.preload();
-	}
-	*/
 }
 
 flush() {
@@ -1570,19 +1552,21 @@ drawNode(pos, minlevel, level, x, y) {
 //0.0 is in the center of the screen, 
 	//var gl = t.gl;
 	//TODO join buffers, and just make one call per draw! (except the bufferData, which is per node)
-	//gl.bindBuffer(gl.ARRAY_BUFFER, this.object.vbo);
-	//gl.enableVertexAttribArray(0);
-	//gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-	
-	gl.bufferData(gl.ARRAY_BUFFER, coords, gl.STATIC_DRAW);
-	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	if(!boolDepthMap){
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.object.vbo);
+		gl.enableVertexAttribArray(0);
+		gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);	
 
+		gl.bufferData(gl.ARRAY_BUFFER, coords, gl.STATIC_DRAW);
+		gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.object.tbo);
 	gl.enableVertexAttribArray(1);
 	gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
 	gl.bufferData(gl.ARRAY_BUFFER, tcoords, gl.STATIC_DRAW);
-	
+	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+}
 	
 	//gl.vertexAttribPointer(t.texattrib, 2, gl.FLOAT, false, 0, 0);
 	//gl.enableVertexAttribArray(t.texattrib);

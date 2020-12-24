@@ -1,5 +1,3 @@
-// for information on the parser, see the technical paper
-// main idea: this file parses a ZUN or CUN file: it extracts the metadata and spawns a worker that will decompress and calculate the different textures. each time the worker is ready with a texture, it is sent to the main execution thread.
 // global variables
 var bytePointer = 0;
 // metadata
@@ -27,6 +25,7 @@ var creator = "";
 var creationDate = "";
 var copyright = "";
 var mMmPerPixel;
+
 
 var metadataObj;
 var glTFObj;
@@ -65,6 +64,7 @@ var boolRbf = false;
 var boolDepthMap = false;
 
 var boolZRotation = false;
+var pZRotation = 0;
 
 function initViewerParameters(){
   boolZRotation = false;
@@ -397,7 +397,7 @@ function loadFileGLTF(arrayBuffer,filename){
 	param1 = parseFloat(glTFObj.shaderConfig[0].param1);
 	updateProgram(style);
 	$('#shader'+style).prop('checked',true);
-	$("#shaderset").change();
+	$("#shaderSet").change();
 	updateShaderList();
 
 }

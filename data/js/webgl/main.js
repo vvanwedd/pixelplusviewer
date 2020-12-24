@@ -909,7 +909,7 @@ else{
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-	if(boolDepthMap){
+	/*if(boolDepthMap){
 		disTex[sideNr] = gl.createTexture();
 
 	gl.bindTexture(gl.TEXTURE_2D, disTex[sideNr]);
@@ -921,7 +921,7 @@ else{
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	}
-
+*/
 	if(textureData[sideNr].ambient){
 	  useAmbient = true;
 	  ambientTex[sideNr] = gl.createTexture();
@@ -1687,12 +1687,10 @@ function render(s) {
 
 			if (object.id!="objectLight0" && object.id!="objectLight1"){
 
-	
 			if(!boolScml){
 				gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				gl.uniform2fv(curProgram.uImgDim, [textureData[object.id].width,textureData[object.id].height]);
 				gl.uniform1f(curProgram.uBoolDepthMap, boolDepthMap);
-
 				if(boolDepthMap){
 					gl.activeTexture(gl.TEXTURE0);
 					gl.bindTexture(gl.TEXTURE_2D, disTex[object.id]);
