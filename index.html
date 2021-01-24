@@ -131,34 +131,37 @@
 				<h4>Visual style</h4>
 				<div class="visualstyle">
 				  <h5>PLD</h5>
-				  <input type="radio" id="shader1" name="radio1" checked="checked"><label for="shader1" title="The ‘Color’ style implements how a diffuse material reflects light and is as such the inverse of the principle of Photometric Stereo (in which the albedo and surface normal get disentangled. This model is sometimes referred to as Lambertian reflectance. The reflected intensity is proportional to the cosine of the angle between the light direction and the normal vector." id="lshader1">Default color</label>
-				  <input type="radio" id="shader8" name="radio1"><label for="shader8" id="lshader8" title="This visual style is the same as the Color style, except that the color map is sharpened. 2 parameters control the sharpening: Percentage and Size.">Sharpen</label>
+				  <input type="radio" id="pld_default_color" name="radio1" checked="checked"><label for="pld_default_color" id="lpld_default_color" title="The ‘Color’ style implements how a diffuse material reflects light and is as such the inverse of the principle of Photometric Stereo (in which the albedo and surface normal get disentangled. This model is sometimes referred to as Lambertian reflectance. The reflected intensity is proportional to the cosine of the angle between the light direction and the normal vector.">Default color</label>
+				  <input type="radio" id="pld_color_specular" name="radio1"><label for="pld_color_specular" id="lpld_color_specular" title="">Specular Enhancement</label>
+				  <input type="radio" id="pld_sharpen_refl" name="radio1"><label for="pld_sharpen_refl" id="lpld_sharpen_refl" title="This visual style is the same as the Color style, except that the color map is sharpened. 2 parameters control the sharpening: Percentage and Size.">Sharpen reflectance</label>
+				  <input type="radio" id="pld_sharpen_nor" name="radio1"><label for="pld_sharpen_nor" id="lpld_sharpen_nor" title="">Exaggerated normals</label>
 				  <!--<input type="radio" id="shader2" name="radio1"><label for="shader2">Specular color</label>-->
-				  <input type="radio" id="shader3" name="radio1"><label for="shader3" id="lshader3" title="This visual style is the same as the Color style, except that the Albedo is set to a uniform value. By removing the local color information from the image, a more careful study of the surface orientation is possible by carefully changing the virtual light direction.">Shaded</label>
-				  <input type="radio" id="shader4" name="radio1"><label for="shader4" id="lshader4" title="This visual style is the same as the Shaded style, except that surface orientation is exaggerated w.r.t. the orientation parallell to the camera direction.">Shaded exaggerated</label>
-				  <input type="radio" id="shader5" name="radio1"><label for="shader5" id="lshader5" title="This visual style is inspired by pencil drawings of objects with local relief like cuneiform tablets. Where the surface direction locally abrubtly changes, a black pixel value is set.">Sketch 1</label>
-				  <input type="radio" id="shader6" name="radio1"><label for="shader6" id="lshader6">Sketch 2</label>
+				  <input type="radio" id="pld_shaded" name="radio1"><label for="pld_shaded" id="lpld_shaded" title="This visual style is the same as the Color style, except that the Albedo is set to a uniform value. By removing the local color information from the image, a more careful study of the surface orientation is possible by carefully changing the virtual light direction.">Shaded</label>
+				  <input type="radio" id="pld_shaded_exag" name="radio1"><label for="pld_shaded_exag" id="lpld_shaded_exag" title="This visual style is the same as the Shaded style, except that surface orientation is exaggerated w.r.t. the orientation parallell to the camera direction.">Shaded exaggerated</label>
+				  <input type="radio" id="pld_sketch1" name="radio1"><label for="pld_sketch1" id="lpld_sketch1" title="This visual style is inspired by pencil drawings of objects with local relief like cuneiform tablets. Where the surface direction locally abrubtly changes, a black pixel value is set.">Sketch 1</label>
+				  <input type="radio" id="pld_sketch2" name="radio1"><label for="pld_sketch2" id="lpld_sketch2">Sketch 2</label>
 				  <span style="display:none;"><input type="radio" id="shader7" name="radio1"><label for="shader7" id="lshader7">xray</label></span>
-				  <input type="radio" id="shader9" name="radio1"><label for="shader9" id="lshader9">Curvature</label>
-				  <input type="radio" id="shader10" name="radio1"><label for="shader10" id="lshader10" title="The surface orientation is described by a vector that is perpendicular to the surface and is being refered to as the normal vector or more simply the normal. This calculation is performed for every pixel, resulting in a normal map or normal texture. The x, y and z components of the normal vector n at a particular pixel are stored as red, green and blue values.">Normals</label>
+				  <input type="radio" id="pld_curvature1" name="radio1"><label for="pld_curvature1" id="lpld_curvature1">Curvature 1</label>
+				  <input type="radio" id="pld_curvature2" name="radio1"><label for="pld_curvature2" id="lpld_curvature2">Curvature 2</label>
+				  <input type="radio" id="normals" name="radio1"><label for="normals" id="lnormals" title="The surface orientation is described by a vector that is perpendicular to the surface and is being refered to as the normal vector or more simply the normal. This calculation is performed for every pixel, resulting in a normal map or normal texture. The x, y and z components of the normal vector n at a particular pixel are stored as red, green and blue values.">Normals</label>
+				  <input type="radio" id="refl" name="radio1"><label for="refl" id="lrefl" title="Only reflectance (i.e. albedo or ambient, multiplied by the intensity of the virtual light)">Only reflectance</label>
 				</div>
 				<div class="visualstyle">
 				  <h5>HSH RTI</h5>
- 				  <input type="radio" id="shader11" name="radio1"><label for="shader11" id="lshader11">Default color</label>
-				  <input type="radio" id="shader13" name="radio1"><label for="shader13" id="lshader13">Specular Enhanchement</label>
-				  <input type="radio" id="shader15" name="radio1"><label for="shader15" id="lshader15">HSH Sharpening</label>
-				 <!-- <input type="radio" id="shader16" name="radio1"><label for="shader16" id="lshader16">Normals sharpening</label>-->
-				 <input type="radio" id="shader33" name="radio1"><label for="shader33" id="lshader33">PLD vs HSH relighting</label>
+ 				  <input type="radio" id="hsh_default_color" name="radio1"><label for="hsh_default_color" id="lhsh_default_color">Default color</label>
+				  <input type="radio" id="hsh_spec_enh" name="radio1"><label for="hsh_spec_enh" id="lhsh_spec_enh">Specular Enhancement</label>
+				  <input type="radio" id="hsh_sharpen_hsh" name="radio1"><label for="hsh_sharpen_hsh" id="lhsh_sharpen_hsh" title="Sharpening of HSH coefficients">Sharpening HSH</label>
+				 <input type="radio" id="hsh_sharpen_nor" name="radio1"><label for="hsh_sharpen_nor" id="lhsh_sharpen_nor"> Sharpen normals</label>
 				</div>
 				<div class="visualstyle">
 				  <h5>PTM</h5>
-				  <input type="radio" id="shader12" name="radio1"><label for="shader12" id="lshader12">Default color</label>
-				  <input type="radio" id="shader14" name="radio1"><label for="shader14" id="lshader14">Specular Enhancement</label>
+				  <input type="radio" id="ptm_default_color" name="radio1"><label for="ptm_default_color" id="lptm_default_color">Default color</label>
+				  <input type="radio" id="ptm_spec_enh" name="radio1"><label for="ptm_spec_enh" id="lptm_spec_enh">Specular Enhancement</label>
 				</div>
         <div class="visualstyle">
 				  <h5>RBF RTI</h5>
- 				  <input type="radio" id="shader31" name="radio1"><label for="shader31" id="lshader31">Default color</label>
-				  <input type="radio" id="shader32" name="radio1"><label for="shader32" id="lshader32">Specular Enhanchement</label>
+ 				  <input type="radio" id="rbf_default_color" name="radio1"><label for="rbf_default_color" id="lrbf_default_color">Default color</label>
+				  <input type="radio" id="rbf_spec_enh" name="radio1"><label for="rbf_spec_enh" id="lrbf_spec_enh">Specular Enhanchement</label>
 				</div>
 			</div>
 			<div id="filterparameters">

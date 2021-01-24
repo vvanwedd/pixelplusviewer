@@ -28,10 +28,10 @@ function Programm(vss,fss,prg){
 	this.uLightAmbient = gl.getUniformLocation(prg, "uLightAmbient");
 	this.uLightIntensity0 = gl.getUniformLocation(prg, "uLightIntensity0");
 	this.uLightIntensity1 = gl.getUniformLocation(prg, "uLightIntensity1");
-	this.uParam0 = gl.getUniformLocation(prg, "uParam0");
-    this.uParam1 = gl.getUniformLocation(prg, "uParam1");
-    this.uParam2 = gl.getUniformLocation(prg, "uParam2");
-	this.uParam3 = gl.getUniformLocation(prg, "uParam3");
+	this.uParam = gl.getUniformLocation(prg, "uParam");
+    //this.uParam1 = gl.getUniformLocation(prg, "uParam1");
+    //this.uParam2 = gl.getUniformLocation(prg, "uParam2");
+	//this.uParam3 = gl.getUniformLocation(prg, "uParam3");
 	this.uFloatTex = gl.getUniformLocation(prg, "uFloatTex");
     this.uBoolDepthMap = gl.getUniformLocation(prg, "uBoolDepthMap");
     this.uBoolFloatTexture = gl.getUniformLocation(prg, "uBoolFloatTexture");
@@ -41,45 +41,59 @@ function Programm(vss,fss,prg){
 	this.uWireframe = gl.getUniformLocation(prg, "uWireframe");
 	this.uAlpha = gl.getUniformLocation(prg, "uAlpha");
 	this.uUseVertexColor = gl.getUniformLocation(prg, "uUseVertexColor");
-	this.uUseLambert = gl.getUniformLocation(prg, "uUseLambert");
+	//this.uUseLambert = gl.getUniformLocation(prg, "uUseLambert");
     this.uAlbedoSampler = gl.getUniformLocation(prg, "uAlbedoSampler");
     this.uAlbedo2Sampler = gl.getUniformLocation(prg, "uAlbedo2Sampler");
 	this.uNormalSampler = gl.getUniformLocation(prg, "uNormalSampler");
 	this.uDispSampler = gl.getUniformLocation(prg, "uDispSampler");
 	this.uSplit = gl.getUniformLocation(prg, "uSplit");
 	this.uImgDim = gl.getUniformLocation(prg, "uImgDim");
-    this.gkernels = gl.getUniformLocation(prg, "gkernels");
-    this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");
-    this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
-    this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
-    this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
+    //this.gkernels = gl.getUniformLocation(prg, "gkernels");
+    this.reflectanceChannelMix = gl.getUniformLocation(prg, "reflectanceChannelMix");
+    //this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");
+    //this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
+    //this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
+    //this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
 
-    this.rbfCoeff0Tex = gl.getUniformLocation(prg, "rbfCoeff0Tex");
-    this.rbfCoeff1Tex = gl.getUniformLocation(prg, "rbfCoeff1Tex");
-    this.rbfCoeff2Tex = gl.getUniformLocation(prg, "rbfCoeff2Tex");
-    this.rbfCoeff3Tex = gl.getUniformLocation(prg, "rbfCoeff3Tex");
-    this.rbfCoeff4Tex = gl.getUniformLocation(prg, "rbfCoeff4Tex");
-    this.rbfCoeff5Tex = gl.getUniformLocation(prg, "rbfCoeff5Tex");
+    //this.rbfCoeff0Tex = gl.getUniformLocation(prg, "rbfCoeff0Tex");
+    //this.rbfCoeff1Tex = gl.getUniformLocation(prg, "rbfCoeff1Tex");
+    //this.rbfCoeff2Tex = gl.getUniformLocation(prg, "rbfCoeff2Tex");
+    //this.rbfCoeff3Tex = gl.getUniformLocation(prg, "rbfCoeff3Tex");
+    //this.rbfCoeff4Tex = gl.getUniformLocation(prg, "rbfCoeff4Tex");
+    //this.rbfCoeff5Tex = gl.getUniformLocation(prg, "rbfCoeff5Tex");
     if(boolRbf){
      this.rbfScale = gl.getUniformLocation(prg, "rbfScale");
      this.rbfBase = gl.getUniformLocation(prg, "rbfBase");
 	 this.rbfBias = gl.getUniformLocation(prg, "rbfBias");
     }
     this.uBoolScml = gl.getUniformLocation(prg, "uBoolScml");
+    //this.normalSource = gl.getUniformLocation(prg, "normalSource");
     if(boolScml){
-      this.scmlPldScale = gl.getUniformLocation(prg, "scmlPldScale");
-      this.scmlPldBias = gl.getUniformLocation(prg, "scmlPldBias");
+      this.scmlScale = gl.getUniformLocation(prg, "scmlScale");
+      this.scmlBias = gl.getUniformLocation(prg, "scmlBias");
+      this.scmlTex0 = gl.getUniformLocation(prg, "scmlTex0");
+      this.scmlTex1 = gl.getUniformLocation(prg, "scmlTex1");
+      this.scmlTex2 = gl.getUniformLocation(prg, "scmlTex2");
+      this.scmlTex3 = gl.getUniformLocation(prg, "scmlTex3");
+      this.scmlTex4 = gl.getUniformLocation(prg, "scmlTex4");
+      this.scmlTex5 = gl.getUniformLocation(prg, "scmlTex5");
+      this.scmlTex6 = gl.getUniformLocation(prg, "scmlTex6");
+      this.scmlTex7 = gl.getUniformLocation(prg, "scmlTex7");
+      
     }
-
-    this.uScaleHSH = gl.getUniformLocation(prg, "uScaleHSH");
-    this.uBiasHSH = gl.getUniformLocation(prg, "uBiasHSH");
-    this.uScalePTM0 = gl.getUniformLocation(prg, "uScalePTM0");
-    this.uBiasPTM0 = gl.getUniformLocation(prg, "uBiasPTM0");
-    this.uScalePTM1 = gl.getUniformLocation(prg, "uScalePTM1");
-    this.uBiasPTM1 = gl.getUniformLocation(prg, "uBiasPTM1");
-    this.ptmCoeff0Tex = gl.getUniformLocation(prg, "ptmCoeff0Tex");
-    this.ptmCoeff1Tex = gl.getUniformLocation(prg, "ptmCoeff1Tex");
-    this.ptmRgbCoeffTex = gl.getUniformLocation(prg, "ptmRgbCoeffTex");
+    this.rtiWeights0 =  gl.getUniformLocation(prg, "rtiWeights0");
+    this.rtiWeights1 =  gl.getUniformLocation(prg, "rtiWeights1");
+    
+    //this.uScaleHSH = gl.getUniformLocation(prg, "uScaleHSH");
+    //this.uBiasHSH = gl.getUniformLocation(prg, "uBiasHSH");
+    //this.uScalePTM0 = gl.getUniformLocation(prg, "uScalePTM0");
+    //this.uBiasPTM0 = gl.getUniformLocation(prg, "uBiasPTM0");
+    //this.uScalePTM1 = gl.getUniformLocation(prg, "uScalePTM1");
+    //this.uBiasPTM1 = gl.getUniformLocation(prg, "uBiasPTM1");
+    //this.ptmCoeff0Tex = gl.getUniformLocation(prg, "ptmCoeff0Tex");
+    //this.ptmCoeff1Tex = gl.getUniformLocation(prg, "ptmCoeff1Tex");
+    //this.ptmRgbCoeffTex = gl.getUniformLocation(prg, "ptmRgbCoeffTex");
+    //this.test = gl.getUniformLocation(prg, "test");
 }
 
 // our shaders base path
@@ -118,7 +132,7 @@ function loadShaders(gl, shaders, callback) {
     ) {
         (xhr = new XMLHttpRequest).i = i;
         xhr.open("get", loadShaders.base + shaders[i] + ".c", asynchronous);
-       // console.log(shaders[i]);
+        console.log(shaders[i]);
         if (asynchronous) {
             xhr.onreadystatechange = onreadystatechange;
         }

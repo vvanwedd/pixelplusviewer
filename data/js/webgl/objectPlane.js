@@ -14,8 +14,7 @@ function ObjectPlane(name,xres,yres,xScale,ratio,xOffset,yOffset,height,width){
 	this.lightDirection1 = [0.0,0.0,1.0];
 	this.lightIntensity0 = 1.0;
 	this.lightIntensity1 = 0.0;
-	this.param0 = 0.1;
-	this.param1 = 0.0;
+	this.param = [0.1, 0.0, 0.0, 0.0, 0.0];
 	var v = [];
 	var i = [];
 	var uv = [];
@@ -89,5 +88,6 @@ else{
 	this.vertices = v;
 	this.indices = i;
 	this.textureCoords = uv;
+	// /console.log(this.vertices);
 }
 //normals and tangents are calculated by utils.js when needed (in scene.js)

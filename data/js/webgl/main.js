@@ -1,68 +1,58 @@
-/*
-* please see the technical paper for additional info
-*/
 
 ///globals
 var useVertexColors = false;
 var texture = null;
 var gl = null;     		// WebGL context
-var program1 = null; 	//WebGL program
-var program2 = null;
-var program3 = null;
-var program4 = null;
-var program5 = null;
-var program6 = null;
-var program7 = null;
-var program8 = null;
-var program9 = null;
-var program10 = null;
-var program11 = null;
-var program12 = null;
-var program13 = null;
-var program14 = null;
-var program15 = null;
-var program16 = null;
-var program17 = null;
-var program18 = null;
-var program19 = null;
-var program20 = null;
-var program21 = null;
-var program22 = null;
-var program23 = null;
-var program24 = null;
-var program25 = null;
-var program31 = null;
-var program32 = null;
-var program33 = null;
 
-var prg1 = null;
-var prg2 = null;
-var prg3 = null;
-var prg4 = null;
-var prg5 = null;
-var prg6 = null;
-var prg7 = null;
-var prg8 = null;
-var prg9 = null;
-var prg10 = null;
-var prg11 = null;
-var prg12 = null;
-var prg13 = null;
-var prg14 = null;
-var prg15 = null;
-var prg16 = null;
-var prg17 = null;
-var prg18 = null;
-var prg19 = null;
-var prg20 = null;
-var prg21 = null;
-var prg22 = null;
-var prg23 = null;
-var prg24 = null;
-var prg25 = null;
-var prg31 = null;
-var prg32 = null;
-var prg33 = null;
+
+
+
+
+var program_pld_default_color = null; 	//WebGL program
+var program_pld_color_specular = null;
+var program_pld_sharpen_refl = null;
+var program_pld_sharpen_nor = null;
+var program_pld_curvature1 = null;
+var program_pld_curvature2 = null;
+var program_pld_sketch1 = null;
+var program_pld_sketch2 = null;
+var program_pld_shaded = null;
+var program_pld_shaded_exag = null;
+var program_normals = null;
+var program_refl = null;
+var program_hsh_default_color = null;
+var program_hsh_sharpen_hsh = null;
+var program_hsh_sharpen_nor = null;
+var program_hsh_spec_enh = null;
+var program_ptm_default_color = null;
+var program_ptm_spec_enh = null;
+var program_rbf_default_color = null;
+var program_rbf_spec_enh = null;
+
+var prg_pld_default_color = null; 	//WebGL program
+var prg_pld_color_specular = null;
+var prg_pld_sharpen_refl = null;
+var prg_pld_sharpen_nor = null;
+var prg_pld_curvature1 = null;
+var prg_pld_curvature2 = null;
+var prg_pld_sketch1 = null;
+var prg_pld_sketch2 = null;
+var prg_pld_shaded = null;
+var prg_pld_shaded_exag = null;
+var prg_normals = null;
+var prg_refl = null;
+var prg_hsh_default_color = null;
+var prg_hsh_sharpen_hsh = null;
+var prg_hsh_sharpen_nor = null;
+var prg_hsh_spec_enh = null;
+var prg_ptm_default_color = null;
+var prg_ptm_spec_enh = null;
+var prg_rbf_default_color = null;
+var prg_rbf_spec_enh = null;
+
+const GlPrg = {"pld_default_color":1, "pld_color_specular":2, "pld_sharpen_refl":3, "pld_sharpen_nor":4, "pld_curvature1":5, "pld_curvature2":6, "pld_sketch1":7, "pld_sketch2":8, "pld_shaded":9, "pld_shaded_exag":10, "normals": 20, "refl":21, "hsh_default_color":30, "hsh_sharpen_hsh":31, "hsh_sharpen_nor":32, "hsh_spec_enh":33, "ptm_default_color":40, "ptm_spec_enh":41, "rbf_default_color":50, "rbf_spec_enh":51 };
+
+var neededTexPl;
 
 var tan15 = Math.tan(15/180*Math.PI);
 var tan30 = Math.tan(30/180*Math.PI);
@@ -93,10 +83,9 @@ var lightDirection1 = [0.5,0.5,0.7];
 
 var lightIntensity0 = 3;
 var lightIntensity1 = 1;
-var param0 = 0;
-var param1 = 0;
-var param2 = 0;
-var param3 = 0;
+
+var param = [0,0,0,0,0];
+
 var useAmbient = false;
 
 var updateLightPosition = false;
@@ -126,7 +115,9 @@ var hshTex = new Array(4);
 var ptmTex = new Array(3);
 var rbfTex = new Array(6);
 
-var kerneltest = new Array(1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.375, 0.25, 0.062, 0, 0, 0, 0, 0, 0, 0, 0, 0.312, 0.234, 0.093, 0.015, 0, 0, 0, 0, 0, 0, 0, 0.274, 0.219, 0.109, 0.03, 0.003, 0, 0, 0, 0, 0, 0, 0.247, 0.206, 0.117, 0.043, 0.009, 0, 0, 0, 0, 0, 0, 0.227, 0.194, 0.121, 0.053, 0.015, 0.002, 0, 0, 0, 0, 0, 0.211, 0.184, 0.122, 0.06, 0.021, 0.004, 0, 0, 0, 0, 0, 0.198, 0.176, 0.122, 0.066, 0.026, 0.007, 0.001, 0, 0, 0, 0, 0.188, 0.169, 0.122, 0.07, 0.031, 0.01, 0.002, 0, 0, 0, 0, 0.179, 0.162, 0.121, 0.073, 0.035, 0.013, 0.003, 0, 0, 0, 0, 0.171, 0.157, 0.12, 0.076, 0.039, 0.016, 0.004, 0, 0, 0, 0);
+var reflectanceChannelMix = [0.0, 1.0, 2.0];
+
+//var kerneltest = new Array(1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.375, 0.25, 0.062, 0, 0, 0, 0, 0, 0, 0, 0, 0.312, 0.234, 0.093, 0.015, 0, 0, 0, 0, 0, 0, 0, 0.274, 0.219, 0.109, 0.03, 0.003, 0, 0, 0, 0, 0, 0, 0.247, 0.206, 0.117, 0.043, 0.009, 0, 0, 0, 0, 0, 0, 0.227, 0.194, 0.121, 0.053, 0.015, 0.002, 0, 0, 0, 0, 0, 0.211, 0.184, 0.122, 0.06, 0.021, 0.004, 0, 0, 0, 0, 0, 0.198, 0.176, 0.122, 0.066, 0.026, 0.007, 0.001, 0, 0, 0, 0, 0.188, 0.169, 0.122, 0.07, 0.031, 0.01, 0.002, 0, 0, 0, 0, 0.179, 0.162, 0.121, 0.073, 0.035, 0.013, 0.003, 0, 0, 0, 0, 0.171, 0.157, 0.12, 0.076, 0.039, 0.016, 0.004, 0, 0, 0, 0);
 
 var nuoud;
 var timeoutid;
@@ -138,6 +129,9 @@ var boolFloatTexture = 1.0;
 var offscreenRenderHeight;
 var offscreenRenderWidth;
 
+var lightColor0 = intensity2Color(lightIntensity0);
+var lightColor1 = intensity2Color(lightIntensity1);
+
 /*
 * Invoked by runWebGL()
 */
@@ -145,63 +139,47 @@ function initWebGL(){
 	useVertexColors = false;
 	texture = null;
 	gl = null;     		// WebGL context
-	program1 = null; 		//WebGL program
-	program2 = null;
-	program3 = null;
-	program4 = null;
-	program5 = null;
-	program6 = null;
-	program7 = null;
-	program8 = null;
-	program9 = null;
-	program10 = null;
-	program11 = null;
-	program12 = null;
-	program13 = null;
-	program14 = null;
-	program15 = null;
-	program16 = null;
-	program17 = null;
-	program18 = null;
-	program19 = null;
-	program20 = null;
-	program21 = null;
-	program22 = null;
-	program23 = null;
-	program24 = null;
-	program25 = null;
-	program31 = null;
-	program32 = null;
-	program33 = null;
+	program_pld_default_color = null; 	//WebGL program
+	program_pld_color_specular = null;
+	program_pld_sharpen_refl = null;
+	program_pld_sharpen_nor = null;
+	program_pld_curvature1 = null;
+	program_pld_curvature2 = null;
+	program_pld_sketch1 = null;
+	program_pld_sketch2 = null;
+	program_pld_shaded = null;
+	program_pld_shaded_exag = null;
+	program_hsh_default_color = null;
+	program_hsh_sharpen_hsh = null;
+	program_hsh_sharpen_nor = null;
+	program_hsh_spec_enh = null;
+	program_normals = null;
+	program_refl = null;
+	program_ptm_default_color = null;
+	program_ptm_spec_enh = null;
+	program_rbf_default_color = null;
+	program_rbf_spec_enh = null;
 
-	prg1 = null;
-	prg2 = null;
-	prg3 = null;
-	prg4 = null;
-	prg5 = null;
-	prg6 = null;
-	prg7 = null;
-	prg8 = null;
-	prg9 = null;
-	prg10 = null;
-	prg11 = null;
-	prg12 = null;
-	prg13 = null;
-	prg14 = null;
-	prg15 = null;
-	prg16 = null;
-	prg17 = null;
-	prg18 = null;
-	prg19 = null;
-	prg20 = null;
-	prg21 = null;
-	prg22 = null;
-	prg23 = null;
-	prg24 = null;
-	prg25 = null;
-	prg31 = null;
-	prg32 = null;
-	prg33 = null;
+	prg_pld_default_color = null; 	//WebGL program
+	prg_pld_color_specular = null;
+	prg_pld_sharpen_refl = null;
+	prg_pld_sharpen_nor = null;
+	prg_pld_curvature1 = null;
+	prg_pld_curvature2 = null;
+	prg_pld_sketch1 = null;
+	prg_pld_sketch2 = null;
+	prg_pld_shaded = null;
+	prg_pld_shaded_exag = null;
+	prg_hsh_default_color = null;
+	prg_hsh_sharpen_hsh = null;
+	prg_hsh_sharpen_nor = null;
+	prg_hsh_spec_enh = null;
+	prg_normals = null;
+	prg_refl = null;
+	prg_ptm_default_color = null;
+	prg_ptm_spec_enh = null;
+	prg_rbf_default_color = null;
+	prg_rbf_spec_enh = null;
 
 	mainPrg = null;
 	mainProgram = null;
@@ -227,11 +205,11 @@ function initWebGL(){
 
 	lightIntensity0 = 3;
 	lightIntensity1 = 1;
-	param0 = 0.1;
-	param1 = 0;
-	param2 = 0;
-	param3 = 0;
+ 
+	param = [0.1, 0, 0, 0, 0];
+
 	useAmbient = false;
+	reflectanceChannelMix = [0.0, 1.0, 2.0];
 
 	updateLightPosition = false;
 
@@ -256,6 +234,9 @@ function initWebGL(){
 	oldY0 = lightDirection0[1]* canvasHeight2/2/lightEllipseFactor +canvasHeight2/2;
 	oldX1 = lightDirection1[0]* canvasWidth2/2/lightEllipseFactor +canvasWidth2/2;
 	oldY1 = lightDirection1[1]* canvasHeight2/2/lightEllipseFactor +canvasHeight2/2;
+
+	lightColor0 = intensity2Color(lightIntensity0);
+	lightColor1 = intensity2Color(lightIntensity1);
 
 }
 /*
@@ -283,7 +264,15 @@ function runWebGL() {
 	load();
 
 	updateCanvasSize();
-	$(document).ready(function(){updateProgram(1);});
+	$(document).ready(function(){
+		console.log("document ready"); 
+		if(!boolScml){
+		  if(boolPhotometric){updateProgram("pld_default_color");}
+		  else if(boolPtm){updateProgram("ptm_default_color");}
+		  else if(boolHsh){updateProgram("hsh_default_color");}
+		  else if(boolRbf){updateProgram("rbf_default_color");}
+		}
+	});
 
 }
 
@@ -317,72 +306,72 @@ function configure(){
 
 	vs = loadShaders(gl,"vs/mainVertexShader"); //since every program uses the same vertex shader, we only need to load it once
 
-	prg1 = gl.createProgram();
-	
-	program1 = new Programm("vs/color","fs/color_rgb",prg1);
-	mainPrg = prg1;
-	mainProgram = program1;
-	
-	prg2 = gl.createProgram();
-	program2 = new Programm("vs/color_specular","fs/color_specular",prg2); //specular
-	prg3 = gl.createProgram();
-	program3 = new Programm("vs/shaded","fs/shaded",prg3);
-	prg4 = gl.createProgram();
-	program4 = new Programm("vs/shaded_exag","fs/shaded_exag",prg4);
-	prg5 = gl.createProgram();
-	program5 = new Programm("vs/sketch1","fs/sketch1",prg5);
-	prg6 = gl.createProgram();
-	program6 = new Programm("vs/sketch2","fs/sketch2",prg6);
-	/*prg7 = gl.createProgram();
-	program7 = new Programm("vs/xray","fs/xray",prg7);*/
-	prg8 = gl.createProgram();
-	program8 = new Programm("vs/sharpen","fs/sharpen",prg8);
-	prg9 = gl.createProgram();
-	program9 = new Programm("vs/curvature","fs/curvature",prg9);
-	prg10 = gl.createProgram();
-	program10 = new Programm("vs/normals","fs/normals",prg10);
-	prg11 = gl.createProgram();
-	program11 = new Programm("vs/color_irg","fs/color_irg",prg11);
-	prg12 = gl.createProgram();
-	program12 = new Programm("vs/color_igb","fs/color_igb",prg12);
-	prg13 = gl.createProgram();
-	program13 = new Programm("vs/color_rgu","fs/color_rgu",prg13);
-	prg14 = gl.createProgram();
-	program14 = new Programm("vs/color_gbu","fs/color_gbu",prg14);
-	prg15 = gl.createProgram();
-	program15 = new Programm("vs/color_i","fs/color_i",prg15);
-	prg16 = gl.createProgram();
-	program16 = new Programm("vs/color_r","fs/color_r",prg16);
-	prg17 = gl.createProgram();
-	program17 = new Programm("vs/color_g","fs/color_g",prg17);
-	prg18 = gl.createProgram();
-	program18 = new Programm("vs/color_b","fs/color_b",prg18);
-	prg19 = gl.createProgram();
-	program19 = new Programm("vs/color_u","fs/color_u",prg19);
-	prg20 = gl.createProgram();
-	program20 = new Programm("vs/hsh","fs/hsh",prg20);
-	prg21 = gl.createProgram();
-	program21 = new Programm("vs/ptm","fs/ptm",prg21);
-	prg22 = gl.createProgram();
-	program22 = new Programm("vs/hsh_spec_enh","fs/hsh_spec_enh",prg22);
-	prg23 = gl.createProgram();
-	program23 = new Programm("vs/ptm_spec_enh","fs/ptm_spec_enh",prg23);
-	prg24 = gl.createProgram();
-	program24 = new Programm("vs/hsh_spec_enh","fs/hsh_sharpen_hsh",prg24);
-	prg25 = gl.createProgram();
-	program25 = new Programm("vs/hsh_spec_enh","fs/hsh_sharpen_nor",prg25);
-	prg31 = gl.createProgram();
-	program31 = new Programm("vs/hsh_spec_enh","fs/rbf_default_color",prg31);
-	prg32 = gl.createProgram();
-	program32 = new Programm("vs/hsh_spec_enh","fs/rbf_spec_enh",prg32);
-	prg33 = gl.createProgram();
-	program33 = new Programm("vs/hsh_spec_enh","fs/pld_vs_hsh",prg33);
+	prg_pld_default_color = gl.createProgram();
+	program_pld_default_color = new Programm("vs/color","fs/pld_default_color",prg_pld_default_color);
 
-	/*
-	prg21 = gl.createProgram();
-	program21 = new Programm("vs/ptm","fs/ptm",prg21);
-	*/
-	//document.onmouseup = handleMouseUp; //see interaction.js
+	mainPrg = prg_pld_default_color;
+	mainProgram = program_pld_default_color;
+
+	prg_pld_color_specular = gl.createProgram();
+	program_pld_color_specular = new Programm("vs/color","fs/pld_color_specular",prg_pld_color_specular);
+
+	prg_pld_sharpen_refl = gl.createProgram();
+	program_pld_sharpen_refl = new Programm("vs/color","fs/pld_sharpen_refl",prg_pld_sharpen_refl);
+
+	prg_pld_sharpen_nor = gl.createProgram();
+	program_pld_sharpen_nor = new Programm("vs/color","fs/pld_sharpen_nor",prg_pld_sharpen_nor);
+
+	prg_normals = gl.createProgram();
+	program_normals = new Programm("vs/color","fs/normals",prg_normals);
+	
+	prg_pld_shaded = gl.createProgram();
+	program_pld_shaded = new Programm("vs/color","fs/pld_shaded",prg_pld_shaded);
+
+	prg_pld_shaded_exag = gl.createProgram();
+	program_pld_shaded_exag = new Programm("vs/color","fs/pld_shaded_exag",prg_pld_shaded_exag);
+
+	prg_pld_curvature1 = gl.createProgram();
+	program_pld_curvature1 = new Programm("vs/color","fs/pld_curvature",prg_pld_curvature1);
+
+	prg_pld_curvature2 = gl.createProgram();
+	program_pld_curvature2 = new Programm("vs/color","fs/pld_curvature2",prg_pld_curvature2);
+
+	prg_pld_sketch1 = gl.createProgram();
+	program_pld_sketch1 = new Programm("vs/color","fs/pld_sketch",prg_pld_sketch1);
+
+	prg_pld_sketch2 = gl.createProgram();
+	program_pld_sketch2 = new Programm("vs/color","fs/pld_sketch2",prg_pld_sketch2);
+
+	prg_refl = gl.createProgram();
+	program_refl = new Programm("vs/color","fs/refl",prg_refl);
+
+	
+
+	prg_hsh_default_color = gl.createProgram();
+	program_hsh_default_color = new Programm("vs/color","fs/hsh_default_color",prg_hsh_default_color);
+
+	prg_hsh_sharpen_hsh = gl.createProgram();
+	program_hsh_sharpen_hsh = new Programm("vs/color","fs/hsh_sharpen_hsh",prg_hsh_sharpen_hsh);
+
+	prg_hsh_sharpen_nor = gl.createProgram();
+	program_hsh_sharpen_nor = new Programm("vs/color","fs/hsh_sharpen_nor",prg_hsh_sharpen_nor);
+
+	prg_hsh_spec_enh = gl.createProgram();
+	program_hsh_spec_enh = new Programm("vs/color","fs/hsh_spec_enh",prg_hsh_spec_enh);
+	
+	prg_ptm_default_color = gl.createProgram();
+	program_ptm_default_color = new Programm("vs/color","fs/ptm_default_color",prg_ptm_default_color);
+
+	prg_ptm_spec_enh = gl.createProgram();
+	program_ptm_spec_enh = new Programm("vs/color","fs/ptm_spec_enh",prg_ptm_spec_enh);
+
+	prg_rbf_default_color = gl.createProgram();
+	program_rbf_default_color = new Programm("vs/color","fs/rbf_default_color",prg_rbf_default_color);
+
+	prg_rbf_spec_enh = gl.createProgram();
+	program_rbf_spec_enh = new Programm("vs/color","fs/rbf_spec_enh",prg_rbf_spec_enh);
+	
+
 	document.onmousemove = handleMouseMove;
 }
 
@@ -411,6 +400,7 @@ function load(){
 	Scene.addObject(light0);
 	light1 = new ObjectLight("objectLight1");
 	Scene.addObject(light1);
+	
 }
 
 /*
@@ -433,6 +423,22 @@ function updateCanvasSize(){
 	rect = canvas.getBoundingClientRect();
 	if(gl){render(0);}
 	//console.log(canvasWidth2);
+}
+
+// r g b ir uv -> 0 1 2 3 4
+function updateRefl(mix){
+
+	if(mix === "IRG"){ reflectanceChannelMix = [3.0, 0.0, 1.0];}
+	else if(mix === "IGB"){ reflectanceChannelMix = [3.0, 1.0, 2.0];}
+	else if(mix === "RGB"){ reflectanceChannelMix = [0.0, 1.0, 2.0];}
+	else if(mix === "RGU"){ reflectanceChannelMix = [0.0, 1.0, 4.0];}
+	else if(mix === "GBU"){ reflectanceChannelMix = [1.0, 2.0, 4.0];}
+	else if(mix === "III"){ reflectanceChannelMix = [3.0, 3.0, 3.0];}
+	else if(mix === "RRR"){ reflectanceChannelMix = [0.0, 0.0, 0.0];}
+	else if(mix === "GGG"){ reflectanceChannelMix = [1.0, 1.0, 1.0];}
+	else if(mix === "BBB"){ reflectanceChannelMix = [2.0, 2.0, 2.0];}
+	else if(mix === "UUU"){ reflectanceChannelMix = [3.0, 3.0, 3.0];}
+
 }
 
 function updateNormal(spectralNb){
@@ -703,14 +709,42 @@ $("#errorMessages").css("display","block");
 		console.log("BuildSidePlane: bool SCML");
 		sidePlane[0] = null;
 		sidePlane[0] = new ObjectPlane(0,200,200,1,singleFile.height/singleFile.width,0,0,singleFile.height,singleFile.width);
+		singleFile.object = sidePlane[0];
+		//console.log(singleFile.object);
 		Scene.addObject(sidePlane[0]);
 		var canvasWidthMinSidebar = canvasWidth - $('#rightAside').width();
-		if(singleFile.height/canvasHeight > singleFile.width/canvasWidthMinSidebar){
+	/*	if(singleFile.height/canvasHeight > singleFile.width/canvasWidthMinSidebar){
 		  position = [0,0,-1/Math.tan(15/180*Math.PI)*(50*singleFile.height/singleFile.width)];
 	    }else{
 			position = [0,0,-1/Math.tan(15/180*Math.PI)*(50)/canvasWidthMinSidebar*canvasHeight];
+		}*/
+
+
+		scaleFactor[0] = 1;
+		var xOff,yOff=0;
+		var widthBack;
+		widthBack=0;
+		var widthLeft;
+		widthLeft=0;
+		var widthRight;
+		widthRight=0;
+		var heightBottom;
+		heightBottom=0;
+		var heightTop;
+		heightTop=0;
+		var heightFront = 50*textureData[0].height/textureData[0].width;
+		if((heightFront+heightBottom+heightTop)>canvasHeight/canvasWidth*(widthBack+50+widthRight+widthLeft)){
+			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(50*textureData[0].height/textureData[0].width+heightBottom+heightTop)];
 		}
+		else{
+			HOME= [-widthBack,0,-1/Math.tan(15/180*Math.PI)*(1/canvasWidth*canvasHeight*(widthBack+50+widthRight+widthLeft))];
+		}
+		position = HOME.slice(0);
 		changeSide(10);
+	//	if(boolPhotometric){updateProgram(1);}
+	//	else if(boolPtm){updateProgram(21);}
+	//	else if(boolHsh){updateProgram(20);}
+	//	else if(boolRbf){updateProgram(31);}
 	}
 
 	else if(boolGLTF || boolRbf ){
@@ -1402,17 +1436,296 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 	}
 
 }
+//add rti nor
+function neededTexturePlanes(){
 
-function updateProgram(number){
+	if(mainPrg == prg_pld_default_color || mainPrg == prg_pld_color_specular || mainPrg == prg_pld_sharpen_nor || mainPrg == prg_pld_sharpen_refl){
+			neededTexPl = [];
+			singleFile.scmlScale = [];
+			singleFile.scmlBias = [];
+			switch(singleFile.normalSource){
+				case 0: 
+					neededTexPl.push("pld_ir_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
+				case 1: 					
+					neededTexPl.push("pld_r_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
+				case 2: 	
+					if(!boolMultiSpectral){
+						neededTexPl = ["pld_wl_nor"];
+						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_nor.scale);
+						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_nor.bias);break;
+					} else {				
+						neededTexPl.push("pld_g_nor"); 
+						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
+						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
+					}
+				case 3: 					
+					neededTexPl.push("pld_b_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
+				case 4: 
+					neededTexPl.push("pld_uv_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
+				case 5: 
+					neededTexPl.push("hsh_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
+				case 6: 					
+					neededTexPl.push("ptm_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
+				case 7: 					
+					neededTexPl.push("rbf_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
+				}
+			if(boolMultiSpectral){		
+				
+				if(useAmbient){
+					neededTexPl.push("pld_rgb_amb");
+					neededTexPl.push("pld_iruv_amb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_amb.bias); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_amb.bias); 
+				}else {
+					neededTexPl.push("pld_rgb_alb");
+					neededTexPl.push("pld_iruv_alb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_alb.bias); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_alb.bias); 
+				}
+			} else{//todo switch(colormix)
+				if(singleFile.pld_wl_amb){
+				neededTexPl.push(useAmbient?"pld_wl_amb":"pld_wl_alb");
+				singleFile.scmlScale = singleFile.scmlScale.concat(useAmbient?singleFile.pld_wl_amb.scale:singleFile.pld_wl_alb.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(useAmbient?singleFile.pld_wl_amb.bias:singleFile.pld_wl_alb.bias);
+			}
+		
+				}
+		
+			//console.log(param);
+
+		
+	
+	} else if(mainPrg == prg_pld_shaded || mainPrg == prg_pld_shaded_exag || mainPrg == prg_normals || mainPrg == prg_pld_sketch1 || mainPrg == prg_pld_sketch2 || mainPrg == prg_pld_curvature1 || mainPrg == prg_pld_curvature2 ){
+			neededTexPl = [];
+			singleFile.scmlScale = [];
+			singleFile.scmlBias = [];
+			switch(singleFile.normalSource){
+				case 0: 
+					neededTexPl.push("pld_ir_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
+				case 1: 					
+					neededTexPl.push("pld_r_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
+				case 2: 	
+					if(!boolMultiSpectral){
+						neededTexPl = ["pld_wl_nor"];
+						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_nor.scale);
+						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_nor.bias);break;
+					} else {				
+						neededTexPl.push("pld_g_nor"); 
+						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
+						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
+					}
+				case 3: 					
+					neededTexPl.push("pld_b_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
+				case 4: 
+					neededTexPl.push("pld_uv_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
+				case 5: 
+					neededTexPl.push("hsh_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
+				case 6: 					
+					neededTexPl.push("ptm_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
+				case 7: 					
+					neededTexPl.push("rbf_nor"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
+			}
+	}
+	else if( mainPrg == prg_refl){
+		if(!boolMultiSpectral){
+			if(singleFile.pld_wl_amb){
+				neededTexPl = [useAmbient?"pld_wl_amb":"pld_wl_alb"];
+				singleFile.scmlScale = [];
+				singleFile.scmlBias = [];
+				singleFile.scmlScale = useAmbient?singleFile.pld_wl_amb.scale:singleFile.pld_wl_alb.scale;
+				singleFile.scmlBias = useAmbient?singleFile.pld_wl_amb.bias:singleFile.pld_wl_alb.bias;
+			}
+		}
+
+	} else if (mainPrg == prg_hsh_default_color || mainPrg == prg_hsh_sharpen_hsh){
+		singleFile.type = "hsh";
+		neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2"];
+		singleFile.scmlScale = singleFile.hshScale;
+		singleFile.scmlBias = singleFile.hshBias;
+	} else if(mainPrg == prg_hsh_sharpen_nor || mainPrg == prg_hsh_spec_enh){
+		singleFile.type = "hsh";
+		neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2"];
+		singleFile.scmlScale = singleFile.hshScale;
+		singleFile.scmlBias = singleFile.hshBias;
+
+		switch(singleFile.normalSource){
+			case 0: 
+				neededTexPl.push("pld_ir_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
+			case 1: 					
+				neededTexPl.push("pld_r_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
+			case 2: 					
+				neededTexPl.push("pld_g_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
+			case 3: 					
+				neededTexPl.push("pld_b_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
+			case 4: 
+				neededTexPl.push("pld_uv_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
+			case 5: 
+				neededTexPl.push("hsh_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
+			case 6: 					
+				neededTexPl.push("ptm_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
+			case 7: 					
+				neededTexPl.push("rbf_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
+		}
+	}
+	else if (mainPrg == prg_ptm_default_color){
+		singleFile.type = "ptm";
+		neededTexPl = ["ptm_plane_0", "ptm_plane_1", "ptm_plane_2", "ptm_plane_3", "ptm_plane_4", "ptm_plane_5"];
+		singleFile.scmlScale = singleFile.ptmScale;
+		singleFile.scmlBias = singleFile.ptmBias;
+	}
+	else if (mainPrg == prg_ptm_spec_enh){
+
+		singleFile.type = "ptm";
+		neededTexPl = ["ptm_plane_0", "ptm_plane_1", "ptm_plane_2", "ptm_plane_3", "ptm_plane_4", "ptm_plane_5"];
+		singleFile.scmlScale = singleFile.ptmScale;
+		singleFile.scmlBias = singleFile.ptmBias;
+
+		switch(singleFile.normalSource){
+			case 0: 
+				neededTexPl.push("pld_ir_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
+			case 1: 					
+				neededTexPl.push("pld_r_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
+			case 2: 					
+				neededTexPl.push("pld_g_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
+			case 3: 					
+				neededTexPl.push("pld_b_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
+			case 4: 
+				neededTexPl.push("pld_uv_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
+			case 5: 
+				neededTexPl.push("hsh_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
+			case 6: 					
+				neededTexPl.push("ptm_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
+			case 7: 					
+				neededTexPl.push("rbf_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
+		}
+	} else if (mainPrg == prg_rbf_default_color){
+		singleFile.type = "rbf";
+		neededTexPl = ["rbf_plane_0", "rbf_plane_1", "rbf_plane_2", "rbf_plane_3", "rbf_plane_4", "rbf_plane_5"];
+		singleFile.scmlScale = singleFile.factor;
+		singleFile.scmlBias = singleFile.bias;
+	} else if (mainPrg == prg_rbf_spec_enh){
+		singleFile.type = "rbf";
+		neededTexPl = ["rbf_plane_0", "rbf_plane_1", "rbf_plane_2", "rbf_plane_3", "rbf_plane_4", "rbf_plane_5"];
+		singleFile.scmlScale = Array.from(singleFile.factor);
+		singleFile.scmlBias = Array.from(singleFile.bias);
+		switch(singleFile.normalSource){
+			case 0: 
+				neededTexPl.push("pld_ir_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
+			case 1: 					
+				neededTexPl.push("pld_r_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
+			case 2: 					
+				neededTexPl.push("pld_g_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
+			case 3: 					
+				neededTexPl.push("pld_b_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
+			case 4: 
+				neededTexPl.push("pld_uv_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
+			case 5: 
+				neededTexPl.push("hsh_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
+			case 6: 					
+				neededTexPl.push("ptm_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
+			case 7: 					
+				neededTexPl.push("rbf_nor"); 
+				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
+				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
+		} 
+	} 
+
+	if(boolDepthMap){neededTexPl.push("pld_rgb_depth");}
+
+}
+
+function updateProgram(prgName){
 	if(!gl){return;}
-	switch(number){
+
+mainPrg = eval("prg_" + prgName);
+mainProgram = eval("program_" + prgName);
+
+	/*switch(number){
 		case 1: mainPrg = prg1; mainProgram = program1; break;
 		case 2: mainPrg = prg2; mainProgram = program2; break;
 		case 3: mainPrg = prg3; mainProgram = program3; break;
 		case 4: mainPrg = prg4; mainProgram = program4; break;
 		case 5: mainPrg = prg5; mainProgram = program5; break;
 		case 6: mainPrg = prg6; mainProgram = program6; break;
-		case 7: /*mainPrg = prg7; mainProgram = program7; */break;
+		
 		case 8: mainPrg = prg8; mainProgram = program8; break;
 		case 9: mainPrg = prg9; mainProgram = program9; break;
 		case 10: mainPrg = prg10; mainProgram = program10; break;
@@ -1432,9 +1745,10 @@ function updateProgram(number){
 		case 31: mainPrg = prg31; mainProgram = program31; break;
 		case 32: mainPrg = prg32; mainProgram = program32; break;
 		case 33: mainPrg = prg33; mainProgram = program33; break;
-	}
+	}*/
+	//console.log(mainProgram);
 	render(0);
-	console.log("program: "+number);
+	console.log("program: "+prgName);
 }
 /*
 * to do: major performance hit when readpixels and building canvas, create screenshotmode and hybrid mode
@@ -1511,19 +1825,7 @@ function animateTest2(){
 	//dddd1 = new Date().getTime();
 	//setTimeout(animateTest2,1000/60);
 	timeoutid = window.requestAnimationFrame(animateTest2);
-/*
-var ddd1 = new Date().getTime();
-if(rotation[2]%360==0){
-	dddd2 = new Date().getTime();
-console.log((dddd2-dddd1));
-dddd1 = dddd2;
-}
-	rotation[2]+=3;
-	render(0);
-	var ddd2 = new Date().getTime();
 
-//console.log((ddd2-ddd1));
-*/
 lightDirection0[0]=Math.cos(timeVar);
 lightDirection0[1]=Math.sin(timeVar);
 lightDirection0[2]=0.1;
@@ -1545,8 +1847,8 @@ function animateM(n){
 * main idea: for each object in scene: update matrices, lightdirection and scene
 */
 function render(s) {
-	//console.log("render" + useAmbient);
 //renderTime0 = new Date().getTime();
+//console.log("render");
 	if(s==0){
 		gl.viewport(0, 0, canvasWidth, canvasHeight);
 	}
@@ -1566,14 +1868,11 @@ function render(s) {
 				gl.useProgram(mainPrg);
 				curProgram = mainProgram;
 				curPrg = mainPrg;
-				//gl.useProgram(prg1);
-				//curProgram = program1;
-				//curPrg = prg1;
 			}
 			else{
-				gl.useProgram(prg1);
-				curProgram = program1;
-				curPrg = prg1;
+				gl.useProgram(prg_pld_default_color);
+				curProgram = program_pld_default_color;
+				curPrg = prg_pld_default_color;
 			}
 
 			var renderPosition = position.slice(0);
@@ -1585,15 +1884,16 @@ function render(s) {
 			if(object.isMiddle==true){
 				object.lightDirection0 = lightDirection0.slice(0);
 				object.lightDirection1 = lightDirection1.slice(0);
-				object.param0 = param0;
-				object.param1 = param1;
-				object.param2 = param2;
-				object.param3 = param3;
+				object.param = param;
+				//console.log(param);
+				//object.param1 = param1;
+				//object.param2 = param2;
+				//object.param3 = param3;
 				object.lightIntensity0 = lightIntensity0;
 				object.lightIntensity1 = lightIntensity1;
 			}
 
-			gl.uniform1fv(curProgram.gkernels, kerneltest);
+		//	gl.uniform1fv(curProgram.gkernels, kerneltest);
 
 			if(s==1){
 				mat4.perspective(30*piDev180, offscreenRenderWidth/offscreenRenderHeight, 1, 10000.0, pMatrix);
@@ -1650,6 +1950,8 @@ function render(s) {
 			gl.uniform1f(curProgram.uFloatTex, floatingPointTextureSupport);
 			gl.uniform1f(curProgram.uBoolFloatTexture, boolFloatTexture);
 			gl.uniform1f(curProgram.uBoolScml, boolScml);
+			gl.uniform3fv(curProgram.reflectanceChannelMix, reflectanceChannelMix);
+			//gl.uniform1f(curProgram.normalSource, normalSource);
 			gl.uniform3fv(curProgram.uScalePTM0, vec3ScalePTM0);
 			gl.uniform3fv(curProgram.uBiasPTM0, vec3BiasPTM0);
 			gl.uniform3fv(curProgram.uScalePTM1, vec3ScalePTM1);
@@ -1662,10 +1964,12 @@ function render(s) {
 			//	gl.uniform1f(curProgram.uParam1, 0);
 			//}
 			//else{
-				gl.uniform1f(curProgram.uParam0, object.param0);
-				gl.uniform1f(curProgram.uParam1, object.param1);
-				gl.uniform1f(curProgram.uParam2, object.param2);
-				gl.uniform1f(curProgram.uParam3, object.param3);
+				//console.log(object.param);
+				//console.log(param);
+				gl.uniform1fv(curProgram.uParam, object.param);
+				//gl.uniform1f(curProgram.uParam1, object.param1);
+				//gl.uniform1f(curProgram.uParam2, object.param2);
+				//gl.uniform1f(curProgram.uParam3, object.param3);
 			//}
 
 			mat4.set(mvMatrixCopy,mvMatrix); //switch back to old mvMatrix
@@ -1703,7 +2007,6 @@ function render(s) {
 					gl.uniform1i(curProgram.uNormalSampler, 1);
 				}
 				if(useAmbient && boolPhotometric){
-					console.log(object.id);
 					gl.activeTexture(gl.TEXTURE2);
 					gl.bindTexture(gl.TEXTURE_2D, ambientTex[object.id]);
 					gl.uniform1i(curProgram.uAlbedoSampler, 2);
@@ -1789,29 +2092,27 @@ function render(s) {
 				}
 			}
 			else if(boolScml && singleFile.object){
-
-				if(boolMultiSpectral){
-					gl.uniform1fv(curProgram.scmlPldBias, singleFile.pld_r_nor.bias.concat(singleFile.pld_rgb_alb.bias).concat(singleFile.pld_iu_alb.bias));
-					gl.uniform1fv(curProgram.scmlPldScale, singleFile.pld_r_nor.scale.concat(singleFile.pld_rgb_alb.scale).concat(singleFile.pld_iu_alb.scale));
-
-				} else {
- 					gl.uniform1fv(curProgram.scmlPldBias, singleFile.pld_wl_nor.bias.concat(singleFile.pld_wl_alb.bias));
-                    gl.uniform1fv(curProgram.scmlPldScale, singleFile.pld_wl_nor.scale.concat(singleFile.pld_wl_alb.scale));
+				neededTexturePlanes();
+				if(singleFile.boolHsh || singleFile.boolRbf || singleFile.boolPtm){
+					singleFile.computeLightWeights(lightDirection0);
+					singleFile.lweights0 = singleFile.lweights;
+					singleFile.computeLightWeights(lightDirection1);
+					singleFile.lweights1 = singleFile.lweights;
 				}
-					gl.uniform4fv(curProgram.uMaterialAmbient, [66666666.0,0.0,0.0, 1.0]);
 				if(singleFile.layout=="image"){
 					gl.uniform2fv(curProgram.uImgDim, [singleFile.width, singleFile.height]);
+				} else{ 
+					gl.uniform2fv(curProgram.uImgDim, [singleFile.tilesize, singleFile.tilesize	]);
 				}
-				else{
-					gl.uniform2fv(curProgram.uImgDim, [singleFile.tilesize, singleFile.tilesize]);
-				}
-				if(boolDepthMap){
-					gl.uniform1f(curProgram.uBoolDepthMap, boolDepthMap);
-				}
+
 				//console.log(singleFile.width + " "+ singleFile.height);
 				singleFile.prefetch();
+				
 				singleFile.draw(position, object, curProgram, canvasHeight, canvasWidth);
-
+				//console.log(singleFile.object.lightDirection0);
+				//console.log(object.lightDirection0);
+				//console.log(lightDirection0);
+			
 			}
 		}
 
@@ -1819,10 +2120,10 @@ function render(s) {
 				gl.uniform1f(curProgram.uBoolDepthMap, false);
 			}
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, object.ibo);
-			if((object.type=="lightCone")&& boolLightToggle() && s==0 &&(mainPrg != prg2 || mainPrg != prg2 )){
+			if((object.type=="lightCone")&& boolLightToggle() && s==0 /*&&(mainPrg != prg2 || mainPrg != prg2 )*/){
 
-				if(object.id=="objectLight0"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity0/10+0.1, lightIntensity0/10+0.1,lightIntensity0/20, 1.0]);}
-				if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, [lightIntensity1/10+0.1, lightIntensity1/10+0.1,lightIntensity1/20, 1.0]);}
+				if(object.id=="objectLight0"){gl.uniform4fv(curProgram.uMaterialAmbient, lightColor0);} //[lightIntensity0/10+0.1, lightIntensity0/10+0.1,lightIntensity0/20, 1.0]);}
+				if(object.id=="objectLight1"){gl.uniform4fv(curProgram.uMaterialAmbient, lightColor1);} //[lightIntensity1/10+0.1, lightIntensity1/10+0.1,lightIntensity1/20, 1.0]);}
 
 				gl.drawElements(gl.TRIANGLES, object.indices.length, gl.UNSIGNED_INT,0);
 				gl.uniform4fv(curProgram.uMaterialAmbient, [1.0,1.0,1.0, 1.0]);

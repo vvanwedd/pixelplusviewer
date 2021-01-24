@@ -28,6 +28,10 @@ uniform vec3 uBiasPTM0;
 uniform vec3 uScalePTM1;
 uniform vec3 uBiasPTM1;
 
+uniform float uBoolScml;
+uniform float scmlBias[30];
+uniform float scmlScale[30];
+
 //varying
 varying vec4 vColor;
 varying vec2 vTextureCoord;
@@ -38,17 +42,30 @@ void main(void)
 {
   vec3 ptmCoeff0 = vec3( texture2D(ptmCoeff0Tex, vTextureCoord) ).rgb;
   vec3 ptmCoeff1 = vec3( texture2D(ptmCoeff1Tex, vTextureCoord) ).rgb;
-  if(uBoolFloatTexture!=1.0){
+  if(uBoolFloatTexture!=1.0  && uBoolScml != 1.0){
     ptmCoeff0 *= 255.0;
     ptmCoeff1 *= 255.0;
     ptmCoeff0 = ptmCoeff0.bgr;
     ptmCoeff1 = ptmCoeff1.bgr;
-    ptmCoeff0.x = uScalePTM0.x*(ptmCoeff0.x - uBiasPTM0.x);
-    ptmCoeff0.y = uScalePTM0.y*(ptmCoeff0.y - uBiasPTM0.y);
-    ptmCoeff0.z = uScalePTM0.z*(ptmCoeff0.z - uBiasPTM0.z);
-    ptmCoeff1.x = uScalePTM1.x*(ptmCoeff1.x - uBiasPTM1.x);
-    ptmCoeff1.y = uScalePTM1.y*(ptmCoeff1.y - uBiasPTM1.y);
-    ptmCoeff1.z = uScalePTM1.z*(ptmCoeff1.z - uBiasPTM1.z);
+    ptmCoeff0.x = scmlScale[3]*(ptmCoeff0.x - scmlBias[3]);
+    ptmCoeff0.y = scmlScale[4]*(ptmCoeff0.y - scmlBias[4]);
+    ptmCoeff0.z = scmlScale[5]*(ptmCoeff0.z - scmlBias[5]);
+    ptmCoeff1.x = scmlScale[6]*(ptmCoeff1.x - scmlBias[6]);
+    ptmCoeff1.y = scmlScale[7]*(ptmCoeff1.y - scmlBias[7]);
+    ptmCoeff1.z = scmlScale[8]*(ptmCoeff1.z - scmlBias[8]);
+  }
+  if(uBoolScml == 1.0){
+        ptmCoeff0 *= 255.0;
+    ptmCoeff1 *= 255.0;
+        ptmCoeff0 = ptmCoeff0.bgr;
+    ptmCoeff1 = ptmCoeff1.bgr;
+    ptmCoeff0.x = scmlScale[3]*(ptmCoeff0.x - scmlBias[3]);
+    ptmCoeff0.y = scmlScale[4]*(ptmCoeff0.y - scmlBias[4]);
+    ptmCoeff0.z = scmlScale[5]*(ptmCoeff0.z - scmlBias[5]);
+    ptmCoeff1.x = scmlScale[6]*(ptmCoeff1.x - scmlBias[6]);
+    ptmCoeff1.y = scmlScale[7]*(ptmCoeff1.y - scmlBias[7]);
+    ptmCoeff1.z = scmlScale[8]*(ptmCoeff1.z - scmlBias[8]);
+
   }
 
   vec3 ptmCoeffRgb = vec3( texture2D(ptmRgbCoeffTex, vTextureCoord) ).rgb;
@@ -61,7 +78,7 @@ void main(void)
   vec3 tmp0 = ptmCoeff0*lm0;
   vec3 tmp1 = ptmCoeff1*lm1;
 
-  float lum = (tmp0.x + tmp0.y + tmp0.z + tmp1.x + tmp1.y + tmp1.z)*uLightIntensity0/255.0/255.0/2.3;
+  float lum = (tmp0.x + tmp0.y + tmp0.z + tmp1.x + tmp1.y + tmp1.z)*uLightIntensity0/255.0/255.0;
 
   vec3 lightDirection1 = normalize(uLightDirection1.xyz);
 

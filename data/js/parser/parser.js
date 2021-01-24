@@ -90,7 +90,7 @@ function loadDataSource(datasource, dataType){
     progress.style.width = '100%';
     progress.textContent = '100%';
     fileLength = this.response.byteLength;
-	loadFileWrapper(this.response, dataType);
+	loadFileWrapper(this.response, datasource, dataType);
 	} else if (xhr.status === 404){
 		setProgressText(false, "Error 404: The selected file could not be found. Redirecting to <a href=\"http://www.heritage-visualisation.org\"> www.heritage-visualisation.org</a>." , true);
 		abortExecution();
@@ -215,7 +215,7 @@ window.history.pushState("object or string", "Title", "/viewer/");
 
 document.getElementById('fileinput').addEventListener('change', handleFileSelect, false);
 
-function loadFileWrapper(arrayBuffer, dataType){
+function loadFileWrapper(arrayBuffer, filename, dataType){
 //	inputFilename = filename;
  if(dataType == 'cun' || dataType == 'zun' ){
 	 console.log('Loading PLD file... ');
@@ -233,7 +233,7 @@ function loadFileWrapper(arrayBuffer, dataType){
 	console.log('Loading glTF file... ');
 	loadFileGLTF(arrayBuffer, filename);
  }
- else if (dataType == 'son'){
+ else if (dataType == 'json'){
 	console.log('Loading RELIGHT RTI file... ');
 	loadFileRelight(arrayBuffer, filename);
  }
@@ -278,17 +278,18 @@ function readTillNewLine (inputBuffer) {
 function updateShaderList(){
 
 	if(boolRti){
-		$('#lshader11').button( "enable");
-		$('#lshader13').button( "enable");
-		$('#lshader15').button( "enable");
-		if(boolPhotometric){$('#lshader33').button( "enable");}
-		else{$('#lshader33').button( "disable");}
+		$('#lhsh_default_color').button( "enable");
+		//$('#lhsh_spec_enh').button( "enable");
+		$('#lhsh_sharpen_nor').button( "disable");
+		$('#lhsh_sharpen_hsh').button( "disable");
+		if(boolPhotometric){$('#lhsh_spec_enh').button( "enable");}
+		else{$('#lhsh_spec_enh').button( "disable");}
 	}
 	else{
-		$('#lshader11').button( "disable");
-		$('#lshader13').button( "disable");
-		$('#lshader15').button( "disable");
-		$('#lshader33').button( "disable");
+		$('#lhsh_default_color').button( "disable");
+		$('#lhsh_sharpen_hsh').button( "disable");
+		$('#lhsh_sharpen_nor').button( "disable");
+		$('#lhsh_spec_enh').button( "disable");
 	}
 	if(boolHasAmbient[0]){
 		$('#color1').button( "enable");
@@ -298,43 +299,44 @@ function updateShaderList(){
 		$('#color1').button( "disable");
 	}
 	if(boolPhotometric){
-		$('#lshader1').button( "enable");
-		$('#lshader2').button( "enable");
-		$('#lshader3').button( "enable");
-		$('#lshader4').button( "enable");
-		$('#lshader5').button( "enable");
-		$('#lshader6').button( "enable");
-		$('#lshader7').button( "enable");
-		$('#lshader8').button( "enable");
-		$('#lshader9').button( "enable");
-		$('#lshader10').button( "enable");
+		$('#lpld_default_color').button( "enable");
+		$('#lpld_color_specular').button( "enable");
+		$('#lpld_sharpen_refl').button( "enable");
+		$('#lpld_sharpen_nor').button( "enable");
+		$('#lpld_shaded').button( "enable");
+		$('#lpld_shaded_exag').button( "enable");
+		$('#lpld_sketch1').button( "enable");
+		$('#lpld_sketch2').button( "enable");
+		$('#lpld_curvature1').button( "enable");
+		$('#lnormals').button( "enable");
+		$('#lrefl').button( "enable");
+		$('#lpld_curvature2').button( "enable");
 	}
 	else{
-		$('#lshader1').button( "disable");
-		$('#lshader2').button( "disable");
-		$('#lshader3').button( "disable");
-		$('#lshader4').button( "disable");
-		$('#lshader5').button( "disable");
-		$('#lshader6').button( "disable");
-		$('#lshader7').button( "disable");
-		$('#lshader8').button( "disable");
-		$('#lshader9').button( "disable");
-		$('#lshader10').button( "disable");
+		$('#lpld_default_color').button( "disable");
+		$('#lpld_color_specular').button( "disable");
+		$('#lpld_sharpen_refl').button( "disable");
+		$('#lpld_sharpen_nor').button( "disable");
+		$('#lpld_shaded').button( "disable");
+		$('#lpld_shaded_exag').button( "disable");
+		$('#lpld_sketch1').button( "disable");
+		$('#lpld_sketch2').button( "disable");
+		$('#lpld_curvature1').button( "disable");
+		$('#lnormals').button( "disable");
+		$('#lrefl').button( "disable");
+		$('#lpld_curvature2').button( "disable");
 	}
 	if(boolPtm){
-		$('#lshader12').button( "enable");
-		$('#lshader14').button( "enable");
+		$('#lptm_default_color').button( "enable");
+		if(boolPhotometric){$('#lptm_spec_enh').button( "enable");}
 	}
 	else{
-		$('#lshader12').button( "disable");
-		$('#lshader14').button( "disable");
+		$('#lptm_default_color').button( "disable");
+		$('#lptm_spec_enh').button( "disable");
 	}
 	if(boolRbf){
-    $('#lshader31').button( "enable");
-    $('#lshader32').button( "enable");
-
-    $('#lshader31').button( "enable");
-    $('#lshader32').button( "enable");
+    $('#lrbf_default_color').button( "enable");
+    if(boolPhotometric){$('#lrbf_spec_enh').button( "enable");}
     $("#color1").button({enabled:true});
     $('#color1').button( "enable");
     $('#color0').button( "disable");
@@ -342,11 +344,9 @@ function updateShaderList(){
     useAmbient = true;
 	}
 	else{
-                $('#lshader31').button( "disable");
-                $('#lshader32').button( "disable");
-
+        $('#lrbf_default_color').button( "disable");
+        $('#lrbf_spec_enh').button( "disable");
 	}
-
 }
 function ab2str(buf){
 return String.fromCharCode.apply(null, new Uint8Array(buf));
@@ -381,8 +381,8 @@ function loadFileRelight(arrayBuffer,filename){
   textureData.push(sideData);
   runWebGL();
   updateShaderList();
-  updateProgram(31);
-  $('#lshader31').trigger("click");
+  updateProgram("rbf_default_color");
+  $('#lrbf_default_color').trigger("click");
 
 }
 
@@ -431,8 +431,8 @@ function loadFileSCML(arrayBuffer,filename){
     
 	scmlObj.initTree();
 	updateShaderList();
-	updateProgram(1);
-	$('#lshader1').trigger("click");
+	updateProgram("pld_default_color");
+	$('#lpld_default_color').trigger("click");
  
   }
 
@@ -446,7 +446,7 @@ function loadFileSCML(arrayBuffer,filename){
 
 	boolFloatTexture = false;
 	boolRti = false;
-	boolPhotometric = true; // only when normal map is available, should check
+	boolPhotometric = false; // only when normal map is available, should check
 	boolMultiSpectral = false;
 	boolPtm = false;
 	boolGLTF = false;
@@ -464,25 +464,33 @@ function loadFileSCML(arrayBuffer,filename){
 	sideData.width = singleFile.width;
 	sideData.height = singleFile.height;
 	sideData.isMiddle = true;
+	sideData.position = position;
 	updateCanvasSize();
 	singleFile.canvas.width = canvasWidth;
 	singleFile.canvas.height = canvasHeight;
 	
 	if(singleFile.boolRbf){
-		singleFile.loadFactorAndBias();
-		singleFile.loadBasis(singleFile.infobasis);
-		singleFile.computeLightWeights(lightDirection0);
+		//singleFile.loadFactorAndBias();
+		//singleFile.loadBasis(singleFile.infobasis);
+		//singleFile.computeLightWeights(lightDirection0);
 	}
 
 	textureData.push(sideData);
 	runWebGL();
 
-	singleFile.object = sideData;
+	//singleFile.object = sideData;
+	//singleFile.object = Scene.objects[0];
+	//console.log(Scene.objects[0]);
     
 	singleFile.initTree();
 	updateShaderList();
-	updateProgram(1);
-	$('#lshader1').trigger("click");
+	//updateProgram(1);
+	//$('#lpld_default_color').trigger("click");
+	if(singleFile.boolPld){updateProgram("pld_default_color");}
+	else if(singleFile.boolPtm){updateProgram("ptm_default_color");}
+	else if(singleFile.boolHsh){updateProgram("hsh_default_color");}
+	else if(singleFile.boolRbf){updateProgram("rbf_default_color");}
+	
     });
   }
 
@@ -611,9 +619,9 @@ function loadFilePTM(arrayBuffer){
 
 	//console.log(mHshData);
 		runWebGL();
-		updateProgram(21);
+		updateProgram("ptm_default_color");
 		updateShaderList();
-    $('#lshader12').trigger("click");
+    $('#lptm_default_color').trigger("click");
 
 		workerPtmNorm = new Worker('data/js/parser/workerCalculateNormals.js');
 		workerPtmNorm.onerror = function(e){
@@ -726,7 +734,7 @@ $("#progressIndicator").css("display","none");
 //console.log(mHshData);
 runWebGL();
 updateShaderList();
-updateProgram(20);
+updateProgram("hsh_default_color");
 $('#lshader11').trigger("click");
 
 

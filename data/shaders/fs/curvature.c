@@ -16,6 +16,9 @@ uniform vec3 uLightDirection1;
 uniform vec2 uImgDim;
 
 uniform float uBoolFloatTexture;
+uniform float uBoolScml;
+uniform float scmlPldBias[9];
+uniform float scmlPldScale[9];
 
 
 //samplers
@@ -36,7 +39,16 @@ void main(void)
 	vec3 normal;
 	// Unpack tangent-space normal from texture
   normal = texture2D(uNormalSampler, vTextureCoord).rgb;
-	if(uBoolFloatTexture!=1.0){normal = 2.0*(normal - 0.5);}
+
+    vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
+  if(uBoolScml == 1.0){
+    normal.x = scmlPldScale[0]*( normal.x - scmlPldBias[0]);
+    normal.y = scmlPldScale[1]*( normal.y - scmlPldBias[1]);
+    normal.z = scmlPldScale[2]*( normal.z - scmlPldBias[2]);
+    lightIntensity *= 0.33;
+  }
+  
+	if(uBoolFloatTexture !=1.0 && uBoolScml != 1.0){normal = 2.0*(normal - 0.5);}
 	normal = (uNMatrix * vec4(normal, 0.0)).xyz;
 
 	// curvature
@@ -68,6 +80,6 @@ void main(void)
   float curv = 1.0 - dot(normal, sum); // [0,1]
   rawcolor = 1.0-sqrt( (2.0-curv)*curv );
 
-  gl_FragColor = vec4(dot(normal, uLightDirection0)*pow(rawcolor, gamma)*uLightIntensity0*vec3(1.0,1.0,1.0),1.0);
+  gl_FragColor = vec4(dot(normal, uLightDirection0)*pow(rawcolor, gamma)*lightIntensity.x*vec3(1.0,1.0,1.0),1.0);
 	//gl_FragColor = vec4(1.0,1.0,1.0,1.0);
 }

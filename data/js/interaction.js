@@ -86,31 +86,34 @@ function initInteraction(){
 	$("#color0").button("refresh");
 	//$("#color1").button("widget").css({"display": "none"});
 	//$("#color1").button("refresh");
-	$("#shader1")[0].checked =true;
-	$("#shader1").button("refresh");
+	$("#pld_default_color")[0].checked =true;
+	$("#pld_default_color").button("refresh");
 	$("#radio8")[0].checked =true;
 	$("#radio8").button("refresh");
 
 	$("#colorIRG").button("refresh");
 
-	$('#lshader1').button();
-	$('#lshader2').button();
-	$('#lshader3').button();
-	$('#lshader4').button();
-	$('#lshader5').button();
-	$('#lshader6').button();
-	$('#lshader7').button();
-	$('#lshader8').button();
-	$('#lshader9').button();
-	$('#lshader10').button();
-	$('#lshader11').button();
-	$('#lshader12').button();
-	$('#lshader13').button();
-	$('#lshader14').button();
-	$('#lshader15').button();
-	$('#lshader31').button();
-	$('#lshader32').button();
-	$('#lshader33').button();
+	$('#lpld_default_color').button();
+	$('#lpld_color_specular').button();
+	$('#lpld_sharpen_refl').button();
+	$('#lpld_sharpen_nor').button();
+	$('#lpld_shaded').button();
+	$('#lpld_shaded_exag').button();
+	$('#lpld_sketch1').button();
+	$('#lpld_sketch2').button();
+	$('#lpld_curvature1').button();
+	$('#lpld_curvature2').button();
+	$('#lnormals').button();
+	$('#lrefl').button();
+	$('#lhsh_default_color').button();
+	$('#lhsh_spec_enh').button();
+	$('#lhsh_sharpen_hsh').button();
+	$('#lhsh_sharpen_nor').button();
+	$('#lptm_default_color').button();
+	$('#lptm_spec_enh').button();
+	$('#lrbf_default_color').button();
+	$('#lrbf_spec_enh').button();
+	//$('#lshader33').button();
 
 	$("#colorI").button();
 	$("#colorR").button();
@@ -311,47 +314,50 @@ $(document).ready(function(){
  $("#colorSet").change(function(){
 	if($("#colorIRG")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(11);
+		updateRefl("IRG");
 	}
 	if($("#colorIGB")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(12);
+		updateRefl("IGB");
 	}
 	if($("#colorRGB")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(1);
+		updateRefl("RGB");
 	}
 	if($("#colorRGU")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(13);
+		updateRefl("RGU");
+	}
+	if($("#colorIGB")[0].checked==true){
+		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+		updateRefl("IGB");
 	}
 	if($("#colorGBU")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(14);
+		updateRefl("GBU");
 	}
 	if($("#colorI")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(15);
+		updateRefl("III");
 	}
 	if($("#colorR")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(16);
+		updateRefl("RRR");
 	}
 	if($("#colorG")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(17);
+		updateRefl("GGG");
 	}
 	if($("#colorB")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(18);
+		updateRefl("BBB");
 	}
 	if($("#colorU")[0].checked==true){
 		if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-		updateProgram(19);
+		updateRefl("UUU");
 	}
 
-
-
+if(gl){render(0);}
 
 
 });
@@ -446,9 +452,9 @@ $(document).ready(function(){
 
 	$("#shaderSet" ).buttonset();
 	$("#shaderSet").change(function(){
-		if($("#shader1")[0].checked==true){
+		if($("#pld_default_color")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(1);
+			updateProgram("pld_default_color");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="none";
@@ -457,66 +463,24 @@ $(document).ready(function(){
 			document.getElementById("param3wrapper").style.display="none";
 			document.getElementById("content").style.background="black";
 		}
-		/*else if($("#shader2")[0].checked==true){
+		else if($("#pld_color_specular")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(2);
-			document.getElementById("light0wrapper").style.display="inline";
-			document.getElementById("light1wrapper").style.display="none";
-			document.getElementById("param0").innerHTML = "texture intensity factor";
-			document.getElementById("param1").innerHTML = "specular factor";
-			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="inline";
-			document.getElementById("content").style.background="black";
-		}*/
-		else if($("#shader3")[0].checked==true){
-			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(3);
+			updateProgram("pld_color_specular");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
-			document.getElementById("param0wrapper").style.display="none";
-			document.getElementById("param1wrapper").style.display="none";
-			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "exp";
+			document.getElementById("param1").innerHTML = "Ks";
+			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
+
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader4")[0].checked==true){
+		else if($("#pld_sharpen_refl")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(4);
-			document.getElementById("light0wrapper").style.display="inline";
-			document.getElementById("light1wrapper").style.display="inline";
-			document.getElementById("param0wrapper").style.display="none";
-			document.getElementById("param1wrapper").style.display="none";
-			document.getElementById("param2wrapper").style.display="none";
-			document.getElementById("param3wrapper").style.display="none";
-		}
-		else if($("#shader5")[0].checked==true){
-			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
-			updateProgram(5);
-			document.getElementById("light0wrapper").style.display="none";
-			document.getElementById("light1wrapper").style.display="none";
-			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="inline";
-			document.getElementById("param0").innerHTML = "Sensitivity";
-			document.getElementById("param1").innerHTML = "Thickness";
-			document.getElementById("param2wrapper").style.display="none";
-			document.getElementById("param3wrapper").style.display="none";
-		}
-		else if($("#shader6")[0].checked==true){
-			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
-			updateProgram(6);
-			document.getElementById("light0wrapper").style.display="none";
-			document.getElementById("light1wrapper").style.display="none";
-			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="inline";
-			document.getElementById("param0").innerHTML = "Sensitivity";
-			document.getElementById("param1").innerHTML = "Thickness";
-			document.getElementById("param2wrapper").style.display="none";
-			document.getElementById("param3wrapper").style.display="none";
-		}
-		else if($("#shader7")[0].checked==true){if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}updateProgram(7);}
-		else if($("#shader8")[0].checked==true){
-			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(8);
+			updateProgram("pld_sharpen_refl");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
@@ -525,24 +489,93 @@ $(document).ready(function(){
 			document.getElementById("param1").innerHTML = "Size";
 			document.getElementById("param2wrapper").style.display="none";
 			document.getElementById("param3wrapper").style.display="none";
+			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader9")[0].checked==true){
-			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
-			updateProgram(9);
+		else if($("#pld_sharpen_nor")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram("pld_sharpen_nor");
 			document.getElementById("light0wrapper").style.display="inline";
-			document.getElementById("light1wrapper").style.display="none";
-			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="none";
 			document.getElementById("param1wrapper").style.display="none";
-			document.getElementById("param0").innerHTML = "Area";
-			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param2").innerHTML = "Amount";
+			document.getElementById("param2wrapper").style.display="inline";
 			document.getElementById("param3wrapper").style.display="none";
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader10")[0].checked==true){
+		else if($("#pld_curvature1")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram("pld_curvature1");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="none";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
+		}
+		else if($("#pld_curvature2")[0].checked==true){
+			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
+			updateProgram("pld_curvature2");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="none";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "Sensitivity";
+			document.getElementById("param1").innerHTML = "Thickness";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
+		}
+		else if($("#pld_sketch1")[0].checked==true){
+			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
+			updateProgram("pld_sketch1");
+			document.getElementById("light0wrapper").style.display="none";
+			document.getElementById("light1wrapper").style.display="none";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "Sensitivity";
+			document.getElementById("param1").innerHTML = "Thickness";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
+		}
+		else if($("#pld_sketch2")[0].checked==true){
+			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
+			updateProgram("pld_sketch2");
+			document.getElementById("light0wrapper").style.display="none";
+			document.getElementById("light1wrapper").style.display="none";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "Sensitivity";
+			document.getElementById("param1").innerHTML = "Thickness";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
+		}
+		else if($("#pld_shaded")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram("pld_shaded");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="none";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param3wrapper").style.display="none";
+		}
+		else if($("#pld_shaded_exag")[0].checked==true){
+			if(gl){gl.clearColor(1.0, 1.0, 1.0, 1.0);}
+			updateProgram("pld_shaded_exag");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="none";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2").innerHTML = "Amount";
+			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param3wrapper").style.display="none";
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#normals")[0].checked==true){
 			if(gl){gl.clearColor(0.5, 0.5, 1.0, 1.0);} //default color for normal map view
 			//gl.useProgram(prg1);
 			//animateTest2();
-			updateProgram(10);
+			updateProgram("normals");
 			document.getElementById("light0wrapper").style.display="none";
 			document.getElementById("light1wrapper").style.display="none";
 			document.getElementById("param0wrapper").style.display="none";
@@ -551,9 +584,9 @@ $(document).ready(function(){
 			document.getElementById("param3wrapper").style.display="none";
 
 		}
-		else if($("#shader11")[0].checked==true){
+		else if($("#refl")[0].checked==true){
             if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(20);
+			updateProgram("refl");
             document.getElementById("light0wrapper").style.display="inline";
             document.getElementById("light1wrapper").style.display="inline";
             document.getElementById("param0wrapper").style.display="none";
@@ -563,9 +596,9 @@ $(document).ready(function(){
             document.getElementById("content").style.background="black";
 
 		}
-		else if($("#shader12")[0].checked==true){
+		else if($("#hsh_default_color")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(21);
+			updateProgram("hsh_default_color");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="none";
@@ -575,9 +608,37 @@ $(document).ready(function(){
 
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader13")[0].checked==true){
+		else if($("#hsh_sharpen_hsh")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(22);
+			updateProgram("hsh_sharpen_hsh");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param0").innerHTML = "size";
+			document.getElementById("param1").innerHTML = "percentage";
+			document.getElementById("param3wrapper").style.display="none";
+
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#hsh_sharpen_nor")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram("hsh_sharpen_nor");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="inline";
+			document.getElementById("param1wrapper").style.display="inline";
+			document.getElementById("param2wrapper").style.display="none";
+			document.getElementById("param0").innerHTML = "size";
+			document.getElementById("param1").innerHTML = "percentage";
+			document.getElementById("param3wrapper").style.display="none";
+
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#hsh_spec_enh")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram("hsh_spec_enh");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
@@ -590,24 +651,9 @@ $(document).ready(function(){
 
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader14")[0].checked==true){
+		else if($("#ptm_default_color")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(23);
-			document.getElementById("light0wrapper").style.display="inline";
-			document.getElementById("light1wrapper").style.display="inline";
-			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="inline";
-			document.getElementById("param2wrapper").style.display="inline";
-			document.getElementById("param0").innerHTML = "exp";
-			document.getElementById("param1").innerHTML = "Ks";
-			document.getElementById("param2").innerHTML = "Kd";
-			document.getElementById("param3wrapper").style.display="none";
-
-			document.getElementById("content").style.background="black";
-		}
-		else if($("#shader15")[0].checked==true){
-			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(24);
+			updateProgram("ptm_default_color");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
@@ -620,14 +666,29 @@ $(document).ready(function(){
 
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader33")[0].checked==true){
+		else if($("#ptm_spec_enh")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(33);
-			document.getElementById("light0wrapper").style.display="none";
-			document.getElementById("light1wrapper").style.display="none";
+			updateProgram("ptm_spec_enh");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
-			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param1wrapper").style.display="inline";
 			document.getElementById("param2wrapper").style.display="inline";
+			document.getElementById("param0").innerHTML = "exp";
+			document.getElementById("param1").innerHTML = "Ks";
+			document.getElementById("param2").innerHTML = "Kd";
+			document.getElementById("param3wrapper").style.display="none";
+
+			document.getElementById("content").style.background="black";
+		}
+		else if($("#rbf_default_color")[0].checked==true){
+			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
+			updateProgram("rbf_default_color");
+			document.getElementById("light0wrapper").style.display="inline";
+			document.getElementById("light1wrapper").style.display="inline";
+			document.getElementById("param0wrapper").style.display="none";
+			document.getElementById("param1wrapper").style.display="none";
+			document.getElementById("param2wrapper").style.display="none";
 			document.getElementById("param0").innerHTML = "Rel. %";
 			document.getElementById("param2").innerHTML = "Intensity";
 
@@ -635,24 +696,9 @@ $(document).ready(function(){
 
 			document.getElementById("content").style.background="black";
 		}
-		else if($("#shader31")[0].checked==true){
+		else if($("#rbf_spec_enh")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(31);
-			document.getElementById("light0wrapper").style.display="inline";
-			document.getElementById("light1wrapper").style.display="inline";
-			document.getElementById("param0wrapper").style.display="none";
-			document.getElementById("param1wrapper").style.display="none";
-			document.getElementById("param2wrapper").style.display="none";
-			document.getElementById("param0").innerHTML = "rel Amount";
-			document.getElementById("param1").innerHTML = "Ks";
-			document.getElementById("param2").innerHTML = "Kd";
-			document.getElementById("param3wrapper").style.display="none";
-
-			document.getElementById("content").style.background="black";
-		}
-		else if($("#shader32")[0].checked==true){
-			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
-			updateProgram(32);
+			updateProgram("rbf_spec_enh");
 			document.getElementById("light0wrapper").style.display="inline";
 			document.getElementById("light1wrapper").style.display="inline";
 			document.getElementById("param0wrapper").style.display="inline";
@@ -677,6 +723,7 @@ $(document).ready(function(){
         resetPosition();
       });
 	function resetPosition(){
+		console.log("resetPosition");
 		position = HOME.slice(0); //slice: clones the array and returns the reference to the new array
 		rotation = [0,0,0];
 		mainSide = 0;
@@ -779,26 +826,32 @@ $(document).ready(function(){
 });
 	function updateLight0(){
 		lightIntensity0 = $( "#sliderLight0" ).slider( "value" );
+		lightColor0 = intensity2Color(lightIntensity0);
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateLight1(){
 		lightIntensity1 = $( "#sliderLight1" ).slider( "value" );
+		lightColor1 = intensity2Color(lightIntensity1); 
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam0(){
-		param0 = $( "#sliderParam0" ).slider( "value" );
+		param[0] = $( "#sliderParam0" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam1(){
-		param1 = $( "#sliderParam1" ).slider( "value" );
+		param[1] = $( "#sliderParam1" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam2(){
-		param2 = $( "#sliderParam2" ).slider( "value" );
+		param[2] = $( "#sliderParam2" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 	function updateParam3(){
-		param3 = $( "#sliderParam3" ).slider( "value" );
+		param[3] = $( "#sliderParam3" ).slider( "value" );
+		if(gl&&!alreadyRendering){render(0)};
+	}
+	function updateParam4(){
+		param[4] = $( "#sliderParam4" ).slider( "value" );
 		if(gl&&!alreadyRendering){render(0)};
 	}
 
@@ -818,6 +871,49 @@ $(window).resize(function(){
 	updateCanvasSize();
 });
 
+function intensity2Color(intensity){ // intensity between 0 and 10
+	var i = intensity * 3900 + 1000; // convert 0 10 -> 1000 40000 Kelvin
+	var i = i/100; 
+	var c = [0.0, 0.0, 0.0, 1.0];
+	//red
+	if(i <= 66){
+		c[0] = 255;
+	} else{
+		c[0] = i - 60;
+		c[0] = 329.698727446 * ( Math.pow(c[0], -0.1332047592));
+		if(c[0] < 0){ c[0] = 0;} 
+		else if(c[0] > 255) {c[0] = 255;}
+	}
+	//green
+	if(i <= 66){
+		c[1] = i;
+		c[1] = 99.4708025861 * Math.log(c[1]) - 161.1195681661;
+		if(c[1] < 0){ c[1] = 0;} 
+		else if(c[1] > 255) {c[1] = 255;}
+	} else{
+		c[1] = i - 60;
+		c[1] = 288.1221695283 * Math.pow(c[1],-0.0755148492);
+		if(c[1] < 0){ c[1] = 0;} 
+		else if(c[1] > 255) {c[1] = 255;}
+	}
+	//blue
+	if(i >= 66)	{
+		c[2] = 255;
+	} else{
+		if (i <= 19){
+			c[2] = 0;
+		} else{
+			c[2] = i - 10;
+			c[2] = 138.5177312231 * Math.log(c[2]) - 305.0447927307;
+			if(c[2] < 0){ c[2] = 0;} 
+			else if(c[2] > 255) {c[2] = 255;}
+		}
+	}
+	c[0] = c[0]/255.0*(3*intensity/40.0+0.25)+0.1;
+	c[1] = c[1]/255.0*(3*intensity/40.0+0.25)+0.1;
+	c[2] = c[2]/255.0*(3*intensity/40.0+0.25);
+	return c;
+}
 
 $(document).ready(function(){
 $("#canvasOverlay").bind('mousewheel DOMMouseScroll',function(e) {
@@ -978,7 +1074,7 @@ function handleMouseMove(event) {
 		position[1]=dragStartPosition[1]+(newY-oldY)/canvasHeight2*(position[2])*Math.tan(15/180*Math.PI)*2;
 		if(hasMeasurement){drawUpdatePan();}
 	}
-	else if((keyLightToggle==true||touchLightToggle==true)&&(mainPrg != prg2 || mainPrg != prg2) ){
+	else if((keyLightToggle==true||touchLightToggle==true)/*&&(mainPrg != prg2 || mainPrg != prg2)*/ ){
 		var closerToLight0;
 		if(Math.pow(newX-oldX0,2) + Math.pow(newY-oldY0,2) > Math.pow(newX-oldX1,2) + Math.pow(newY-oldY1,2)){
 			closerToLight0 = false;
@@ -1228,10 +1324,10 @@ function handleOrientation(event) {
 	var y    = event.gamma;
 	if(gl){
 		if(window.innerHeight < window.innerWidth){
-			rotation = [-y*1.5,x*1.5,0];
+			rotation = [-y*1.5,x*1.5,boolZRotation ? pZRotation : 0];
 		}
 		else{
-			rotation = [x*1.5,y*1.5,0];
+			rotation = [x*1.5,y*1.5,boolZRotation ? pZRotation : 0];
 		}
 		render();
 
