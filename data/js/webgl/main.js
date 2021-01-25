@@ -52,7 +52,7 @@ var prg_rbf_spec_enh = null;
 
 const GlPrg = {"pld_default_color":1, "pld_color_specular":2, "pld_sharpen_refl":3, "pld_sharpen_nor":4, "pld_curvature1":5, "pld_curvature2":6, "pld_sketch1":7, "pld_sketch2":8, "pld_shaded":9, "pld_shaded_exag":10, "normals": 20, "refl":21, "hsh_default_color":30, "hsh_sharpen_hsh":31, "hsh_sharpen_nor":32, "hsh_spec_enh":33, "ptm_default_color":40, "ptm_spec_enh":41, "rbf_default_color":50, "rbf_spec_enh":51 };
 
-var neededTexPl;
+
 
 var tan15 = Math.tan(15/180*Math.PI);
 var tan30 = Math.tan(30/180*Math.PI);
@@ -444,6 +444,7 @@ function updateColorMix(mix){
 function updateReflectance(id){
 	if(boolScml){
 		singleFile.reflectanceSource = id;
+		singleFile.onShaderChange(mainProgram);
 	}
 	console.log("updateReflectance: " + id);
 	if(gl){render(0);}
@@ -451,7 +452,8 @@ function updateReflectance(id){
 
 function updateNormal(spectralNb){
 	if(boolScml){
-	singleFile.normalSource = spectralNb;
+		singleFile.normalSource = spectralNb;
+		singleFile.onShaderChange(mainProgram);
 	}
 	else if(boolGLTF || boolRbf){
 		var normalData;
@@ -1444,349 +1446,8 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 	}
 
 }
-//add rti nor
-function neededTexturePlanes(){
 
-	if(mainPrg == prg_pld_default_color || mainPrg == prg_pld_color_specular || mainPrg == prg_pld_sharpen_nor || mainPrg == prg_pld_sharpen_refl){
-			neededTexPl = [];
-			singleFile.scmlScale = [];
-			singleFile.scmlBias = [];
-			switch(singleFile.normalSource){
-				case 0: 
-					neededTexPl.push("pld_ir_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
-				case 1: 					
-					neededTexPl.push("pld_r_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
-				case 2: 	
-					if(!boolMultiSpectral){
-						neededTexPl = ["pld_wl_nor"];
-						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_nor.scale);
-						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_nor.bias);break;
-					} else {				
-						neededTexPl.push("pld_g_nor"); 
-						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
-						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
-					}
-				case 3: 					
-					neededTexPl.push("pld_b_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
-				case 4: 
-					neededTexPl.push("pld_uv_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
-				case 5: 
-					neededTexPl.push("hsh_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
-				case 6: 					
-					neededTexPl.push("ptm_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
-				case 7: 					
-					neededTexPl.push("rbf_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
-				}
-			switch(singleFile.reflectanceSource)
-			{
-				case 0: //wl alb
-					neededTexPl.push("pld_wl_alb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_alb.bias);break;
-				case 1: //wl amb
-					neededTexPl.push("pld_wl_amb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_amb.bias);break;
-				case 2: //ms alb
-					neededTexPl.push("pld_rgb_alb");
-					neededTexPl.push("pld_iruv_alb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_alb.bias); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_alb.bias); break;
-				case 3: //ms amb
-					neededTexPl.push("pld_rgb_amb");
-					neededTexPl.push("pld_iruv_amb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_amb.bias); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_amb.bias); 
-				case 4: //ptm amb
-					neededTexPl.push("ptm_amb"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_amb.bias);break;
-				case 5: //ms alb
-					neededTexPl.push("hsh_amb"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_amb.bias);break;
-				case 6: //ms alb
-					neededTexPl.push("rbf_amb"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_amb.bias);break;
-				}
-		/*	if(boolMultiSpectral){		
-				
-				if(useAmbient){
-					neededTexPl.push("pld_rgb_amb");
-					neededTexPl.push("pld_iruv_amb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_amb.bias); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_amb.bias); 
-				}else {
-					neededTexPl.push("pld_rgb_alb");
-					neededTexPl.push("pld_iruv_alb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_alb.bias); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_alb.bias); 
-				}
-			} else{//todo switch(colormix)
-				if(singleFile.pld_wl_amb){
-				neededTexPl.push(useAmbient?"pld_wl_amb":"pld_wl_alb");
-				singleFile.scmlScale = singleFile.scmlScale.concat(useAmbient?singleFile.pld_wl_amb.scale:singleFile.pld_wl_alb.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(useAmbient?singleFile.pld_wl_amb.bias:singleFile.pld_wl_alb.bias);
-			}
-		
-				}*/
-		
-			//console.log(param);
 
-		
-	
-	} else if(mainPrg == prg_pld_shaded || mainPrg == prg_pld_shaded_exag || mainPrg == prg_normals || mainPrg == prg_pld_sketch1 || mainPrg == prg_pld_sketch2 || mainPrg == prg_pld_curvature1 || mainPrg == prg_pld_curvature2 ){
-			neededTexPl = [];
-			singleFile.scmlScale = [];
-			singleFile.scmlBias = [];
-			switch(singleFile.normalSource){
-				case 0: 
-					neededTexPl.push("pld_ir_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
-				case 1: 					
-					neededTexPl.push("pld_r_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
-				case 2: 	
-					if(!boolMultiSpectral){
-						neededTexPl = ["pld_wl_nor"];
-						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_nor.scale);
-						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_nor.bias);break;
-					} else {				
-						neededTexPl.push("pld_g_nor"); 
-						singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
-						singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
-					}
-				case 3: 					
-					neededTexPl.push("pld_b_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
-				case 4: 
-					neededTexPl.push("pld_uv_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
-				case 5: 
-					neededTexPl.push("hsh_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
-				case 6: 					
-					neededTexPl.push("ptm_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
-				case 7: 					
-					neededTexPl.push("rbf_nor"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
-			}
-	}
-	else if( mainPrg == prg_refl){
-		neededTexPl = [];
-		singleFile.scmlScale = [1.0,1.0,1.0];
-		singleFile.scmlBias = [0.0,0.0,0.0];
-		switch(singleFile.reflectanceSource)
-			{
-				case 0: //wl alb
-					neededTexPl.push("pld_wl_alb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_alb.bias);break;
-				case 1: //wl amb
-					neededTexPl.push("pld_wl_amb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_amb.bias);break;
-				case 2: //ms alb
-					neededTexPl.push("pld_rgb_alb");
-					neededTexPl.push("pld_iruv_alb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_alb.bias); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_alb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_alb.bias); break;
-				case 3: //ms amb
-					neededTexPl.push("pld_rgb_amb");
-					neededTexPl.push("pld_iruv_amb");
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_amb.bias); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_amb.bias); 
-				case 4: //ptm amb
-					neededTexPl.push("ptm_amb"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_amb.bias);break;
-				case 5: //ms alb
-					neededTexPl.push("hsh_amb"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_amb.bias);break;
-				case 6: //ms alb
-					neededTexPl.push("rbf_amb"); 
-					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_amb.scale);
-					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_amb.bias);break;
-				}
-
-	} else if (mainPrg == prg_hsh_default_color || mainPrg == prg_hsh_sharpen_hsh){
-		singleFile.type = "hsh";
-		neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2"];
-		singleFile.scmlScale = singleFile.hshScale;
-		singleFile.scmlBias = singleFile.hshBias;
-	} else if(mainPrg == prg_hsh_sharpen_nor || mainPrg == prg_hsh_spec_enh){
-		singleFile.type = "hsh";
-		neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2"];
-		singleFile.scmlScale = singleFile.hshScale;
-		singleFile.scmlBias = singleFile.hshBias;
-
-		switch(singleFile.normalSource){
-			case 0: 
-				neededTexPl.push("pld_ir_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
-			case 1: 					
-				neededTexPl.push("pld_r_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
-			case 2: 					
-				neededTexPl.push("pld_g_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
-			case 3: 					
-				neededTexPl.push("pld_b_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
-			case 4: 
-				neededTexPl.push("pld_uv_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
-			case 5: 
-				neededTexPl.push("hsh_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
-			case 6: 					
-				neededTexPl.push("ptm_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
-			case 7: 					
-				neededTexPl.push("rbf_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
-		}
-	}
-	else if (mainPrg == prg_ptm_default_color){
-		singleFile.type = "ptm";
-		neededTexPl = ["ptm_plane_0", "ptm_plane_1", "ptm_plane_2", "ptm_plane_3", "ptm_plane_4", "ptm_plane_5"];
-		singleFile.scmlScale = singleFile.ptmScale;
-		singleFile.scmlBias = singleFile.ptmBias;
-	}
-	else if (mainPrg == prg_ptm_spec_enh){
-
-		singleFile.type = "ptm";
-		neededTexPl = ["ptm_plane_0", "ptm_plane_1", "ptm_plane_2", "ptm_plane_3", "ptm_plane_4", "ptm_plane_5"];
-		singleFile.scmlScale = singleFile.ptmScale;
-		singleFile.scmlBias = singleFile.ptmBias;
-
-		switch(singleFile.normalSource){
-			case 0: 
-				neededTexPl.push("pld_ir_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
-			case 1: 					
-				neededTexPl.push("pld_r_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
-			case 2: 					
-				neededTexPl.push("pld_g_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
-			case 3: 					
-				neededTexPl.push("pld_b_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
-			case 4: 
-				neededTexPl.push("pld_uv_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
-			case 5: 
-				neededTexPl.push("hsh_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
-			case 6: 					
-				neededTexPl.push("ptm_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
-			case 7: 					
-				neededTexPl.push("rbf_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
-		}
-	} else if (mainPrg == prg_rbf_default_color){
-		singleFile.type = "rbf";
-		neededTexPl = ["rbf_plane_0", "rbf_plane_1", "rbf_plane_2", "rbf_plane_3", "rbf_plane_4", "rbf_plane_5"];
-		singleFile.scmlScale = singleFile.factor;
-		singleFile.scmlBias = singleFile.bias;
-	} else if (mainPrg == prg_rbf_spec_enh){
-		singleFile.type = "rbf";
-		neededTexPl = ["rbf_plane_0", "rbf_plane_1", "rbf_plane_2", "rbf_plane_3", "rbf_plane_4", "rbf_plane_5"];
-		singleFile.scmlScale = Array.from(singleFile.factor);
-		singleFile.scmlBias = Array.from(singleFile.bias);
-		switch(singleFile.normalSource){
-			case 0: 
-				neededTexPl.push("pld_ir_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_ir_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_ir_nor.bias); break;
-			case 1: 					
-				neededTexPl.push("pld_r_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_r_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_r_nor.bias); break;
-			case 2: 					
-				neededTexPl.push("pld_g_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_g_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_g_nor.bias); break;
-			case 3: 					
-				neededTexPl.push("pld_b_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_b_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_b_nor.bias); break;
-			case 4: 
-				neededTexPl.push("pld_uv_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_uv_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_uv_nor.bias); break;
-			case 5: 
-				neededTexPl.push("hsh_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_nor.bias);break;
-			case 6: 					
-				neededTexPl.push("ptm_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_nor.bias);break;
-			case 7: 					
-				neededTexPl.push("rbf_nor"); 
-				singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
-				singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
-		} 
-	} 
-
-	if(boolDepthMap){neededTexPl.push("pld_rgb_depth");}
-
-}
 
 function updateProgram(prgName){
 	if(!gl){return;}
@@ -1794,34 +1455,9 @@ function updateProgram(prgName){
 mainPrg = eval("prg_" + prgName);
 mainProgram = eval("program_" + prgName);
 
-	/*switch(number){
-		case 1: mainPrg = prg1; mainProgram = program1; break;
-		case 2: mainPrg = prg2; mainProgram = program2; break;
-		case 3: mainPrg = prg3; mainProgram = program3; break;
-		case 4: mainPrg = prg4; mainProgram = program4; break;
-		case 5: mainPrg = prg5; mainProgram = program5; break;
-		case 6: mainPrg = prg6; mainProgram = program6; break;
-		
-		case 8: mainPrg = prg8; mainProgram = program8; break;
-		case 9: mainPrg = prg9; mainProgram = program9; break;
-		case 10: mainPrg = prg10; mainProgram = program10; break;
-		case 11: mainPrg = prg11; mainProgram = program11; break;
-		case 12: mainPrg = prg12; mainProgram = program12; break;
-		case 13: mainPrg = prg13; mainProgram = program13; break;
-		case 14: mainPrg = prg14; mainProgram = program14; break;
-		case 15: mainPrg = prg15; mainProgram = program15; break;
-		case 16: mainPrg = prg16; mainProgram = program16; break;
-		case 17: mainPrg = prg17; mainProgram = program17; break;
-		case 18: mainPrg = prg18; mainProgram = program18; break;
-		case 19: mainPrg = prg19; mainProgram = program19; break;
-		case 20: mainPrg = prg20; mainProgram = program20; break;
-		case 21: mainPrg = prg21; mainProgram = program21; break;
-		case 22: mainPrg = prg22; mainProgram = program22; break;
-		case 23: mainPrg = prg23; mainProgram = program23; break;
-		case 31: mainPrg = prg31; mainProgram = program31; break;
-		case 32: mainPrg = prg32; mainProgram = program32; break;
-		case 33: mainPrg = prg33; mainProgram = program33; break;
-	}*/
+if(boolScml && singleFile){
+	singleFile.onShaderChange(mainProgram);
+}
 	//console.log(mainProgram);
 	render(0);
 	console.log("program: "+prgName);
@@ -2168,7 +1804,7 @@ function render(s) {
 				}
 			}
 			else if(boolScml && singleFile.object){
-				neededTexturePlanes();
+				singleFile.neededTexturePlanes(curProgram);
 				if(singleFile.boolHsh || singleFile.boolRbf || singleFile.boolPtm){
 					singleFile.computeLightWeights(lightDirection0);
 					singleFile.lweights0 = singleFile.lweights;
