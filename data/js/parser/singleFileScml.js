@@ -615,12 +615,15 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	  this.planes.push(this.pld_wl_nor);
 	  this.planes.push(this.pld_wl_alb);
 	  this.njpegs +=2;
+	  $("#lwlAlbPLD").button({disabled:false});
+
 	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_amb){
 		  boolHasAmbient[0] = true;
 		  this.reflectanceSource = 1;
 		  this.pld_wl_amb = {name: "pld_side_0_wl_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.bias, plane: 2 };
 		  this.planes.push(this.pld_wl_amb);
 		  this.njpegs +=1;
+		  $("#lwlAmbPLD").button({disabled:false});
 		  for(var id = 0; id<3; id++){
 			this.pld_wl_amb.scale[i] = parseFloat(this.pld_wl_amb.scale[i]);
 			this.pld_wl_amb.bias[i] = parseFloat(this.pld_wl_amb.bias[i]);
@@ -684,6 +687,8 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 		this.planes.push(this.pld_rgb_amb);
 		this.planes.push(this.pld_iruv_amb);
 		this.njpegs +=9;
+		$("#lmsAmbPLD").button({disabled:false});
+		$("#lmsAlbPLD").button({disabled:false});
 		if(this.scmlFiles[index].scmlFile.side_0.pld.r_depth){
 			boolDepthMap = true;
 			this.pld_ir_depth = {name: "pld_side_0_ir_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.bias, plane: 0 };
@@ -755,6 +760,7 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 		this.planes.push( this.hsh_amb);
 		this.njpegs +=1;
 		this.reflectanceSource = 5;
+		$("#lambHSH").button({disabled:false});
 		for(var id = 0; id<3; id++){
 			this.hsh_amb.scale[id] = parseFloat(this.hsh_amb.scale[id]);
 			this.hsh_amb.bias[id] = parseFloat(this.hsh_amb.bias[id]);
@@ -829,6 +835,7 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 		  this.planes.push( this.ptm_amb);
 		  this.njpegs+=1;
 		  this.reflectanceSource = 4;
+		  $("#lambPTM").button({disabled:false});
 		  for(var id = 0; id<3; id++){
 			this.ptm_amb.scale[id] = parseFloat(this.ptm_amb.scale[id]);
 			this.ptm_amb.bias[id] = parseFloat(this.ptm_amb.bias[id]);
@@ -887,6 +894,7 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 			this.planes.push( this.rbf_amb);
 			this.njpegs+=1;
 			this.reflectanceSource = 6;
+			$("#lambRBF").button({disabled:false});
 			for(var id = 0; id<3; id++){
 				this.rbf_amb.scale[id] = parseFloat(this.rbf_amb.scale[id]);
 				this.rbf_amb.bias[id] = parseFloat(this.rbf_amb.bias[id]);

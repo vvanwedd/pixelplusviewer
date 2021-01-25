@@ -433,13 +433,13 @@ if(gl){render(0);}
 		}
 	});
 	$("#reflectanceSet" ).buttonset();
-	$("#lwlAmbPLD").button({disabled:false});
-	$("#lwlAlbPLD").button({disabled:false});
-	$("#lmsAmbPLD").button({disabled:false});
-	$("#lmsAlbPLD").button({disabled:false});
-	$("#lambPTM").button({disabled:false});
-	$("#lambHSH").button({disabled:false});
-	$("#lambRBF").button({disabled:false});
+	$("#lwlAmbPLD").button({disabled:true});
+	$("#lwlAlbPLD").button({disabled:true});
+	$("#lmsAmbPLD").button({disabled:true});
+	$("#lmsAlbPLD").button({disabled:true});
+	$("#lambPTM").button({disabled:true});
+	$("#lambHSH").button({disabled:true});
+	$("#lambRBF").button({disabled:true});
 	$("#reflectanceSet").change(function(){
 		if($("#wlAlbPLD")[0].checked==true){
 			useAmbient = false;
