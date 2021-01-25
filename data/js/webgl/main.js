@@ -129,8 +129,8 @@ var boolFloatTexture = 1.0;
 var offscreenRenderHeight;
 var offscreenRenderWidth;
 
-var lightColor0 = intensity2Color(lightIntensity0);
-var lightColor1 = intensity2Color(lightIntensity1);
+var lightColor0 = [0.45077517154912006, 0.49069184135855726, 0.475, 1];//intensity2Color(lightIntensity0);
+var lightColor1 = [0.42500000000000004, 0.3880429377746968, 0.2579906775424386, 1];//intensity2Color(lightIntensity1);
 
 /*
 * Invoked by runWebGL()
@@ -426,7 +426,7 @@ function updateCanvasSize(){
 }
 
 // r g b ir uv -> 0 1 2 3 4
-function updateRefl(mix){
+function updateColorMix(mix){
 
 	if(mix === "IRG"){ reflectanceChannelMix = [3.0, 0.0, 1.0];}
 	else if(mix === "IGB"){ reflectanceChannelMix = [3.0, 1.0, 2.0];}
@@ -439,6 +439,14 @@ function updateRefl(mix){
 	else if(mix === "BBB"){ reflectanceChannelMix = [2.0, 2.0, 2.0];}
 	else if(mix === "UUU"){ reflectanceChannelMix = [3.0, 3.0, 3.0];}
 
+}
+
+function updateReflectance(id){
+	if(boolScml){
+		singleFile.reflectanceSource = id;
+	}
+	console.log("updateReflectance: " + id);
+	if(gl){render(0);}
 }
 
 function updateNormal(spectralNb){
@@ -1483,7 +1491,44 @@ function neededTexturePlanes(){
 					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_nor.scale);
 					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_nor.bias);break;
 				}
-			if(boolMultiSpectral){		
+			switch(singleFile.reflectanceSource)
+			{
+				case 0: //wl alb
+					neededTexPl.push("pld_wl_alb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_alb.bias);break;
+				case 1: //wl amb
+					neededTexPl.push("pld_wl_amb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_amb.bias);break;
+				case 2: //ms alb
+					neededTexPl.push("pld_rgb_alb");
+					neededTexPl.push("pld_iruv_alb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_alb.bias); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_alb.bias); break;
+				case 3: //ms amb
+					neededTexPl.push("pld_rgb_amb");
+					neededTexPl.push("pld_iruv_amb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_amb.bias); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_amb.bias); 
+				case 4: //ptm amb
+					neededTexPl.push("ptm_amb"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_amb.bias);break;
+				case 5: //ms alb
+					neededTexPl.push("hsh_amb"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_amb.bias);break;
+				case 6: //ms alb
+					neededTexPl.push("rbf_amb"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_amb.bias);break;
+				}
+		/*	if(boolMultiSpectral){		
 				
 				if(useAmbient){
 					neededTexPl.push("pld_rgb_amb");
@@ -1507,7 +1552,7 @@ function neededTexturePlanes(){
 				singleFile.scmlBias = singleFile.scmlBias.concat(useAmbient?singleFile.pld_wl_amb.bias:singleFile.pld_wl_alb.bias);
 			}
 		
-				}
+				}*/
 		
 			//console.log(param);
 
@@ -1559,15 +1604,46 @@ function neededTexturePlanes(){
 			}
 	}
 	else if( mainPrg == prg_refl){
-		if(!boolMultiSpectral){
-			if(singleFile.pld_wl_amb){
-				neededTexPl = [useAmbient?"pld_wl_amb":"pld_wl_alb"];
-				singleFile.scmlScale = [];
-				singleFile.scmlBias = [];
-				singleFile.scmlScale = useAmbient?singleFile.pld_wl_amb.scale:singleFile.pld_wl_alb.scale;
-				singleFile.scmlBias = useAmbient?singleFile.pld_wl_amb.bias:singleFile.pld_wl_alb.bias;
-			}
-		}
+		neededTexPl = [];
+		singleFile.scmlScale = [1.0,1.0,1.0];
+		singleFile.scmlBias = [0.0,0.0,0.0];
+		switch(singleFile.reflectanceSource)
+			{
+				case 0: //wl alb
+					neededTexPl.push("pld_wl_alb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_alb.bias);break;
+				case 1: //wl amb
+					neededTexPl.push("pld_wl_amb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_wl_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_wl_amb.bias);break;
+				case 2: //ms alb
+					neededTexPl.push("pld_rgb_alb");
+					neededTexPl.push("pld_iruv_alb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_alb.bias); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_alb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_alb.bias); break;
+				case 3: //ms amb
+					neededTexPl.push("pld_rgb_amb");
+					neededTexPl.push("pld_iruv_amb");
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_rgb_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_rgb_amb.bias); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.pld_iruv_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.pld_iruv_amb.bias); 
+				case 4: //ptm amb
+					neededTexPl.push("ptm_amb"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.ptm_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.ptm_amb.bias);break;
+				case 5: //ms alb
+					neededTexPl.push("hsh_amb"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.hsh_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.hsh_amb.bias);break;
+				case 6: //ms alb
+					neededTexPl.push("rbf_amb"); 
+					singleFile.scmlScale = singleFile.scmlScale.concat(singleFile.rbf_amb.scale);
+					singleFile.scmlBias = singleFile.scmlBias.concat(singleFile.rbf_amb.bias);break;
+				}
 
 	} else if (mainPrg == prg_hsh_default_color || mainPrg == prg_hsh_sharpen_hsh){
 		singleFile.type = "hsh";

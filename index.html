@@ -180,12 +180,17 @@
 					<h4>Reflectance source</h4>
 					<div class="visualstyle">
 
-					<input type="radio" id="color0" name="radio3"><label for="color0">Albedo</label>
-					<input type="radio" id="color1" name="radio3" checked="checked"><label for="color1">Ambient</label>
+					<input type="radio" id="wlAlbPLD" name="radio3"><label for="wlAlbPLD" id="lwlAlbPLD">PLD WL Albedo</label>
+					<input type="radio" id="wlAmbPLD" name="radio3" checked="checked"><label for="wlAmbPLD" id="lwlAmbPLD">PLD WL Ambient</label>
+					<input type="radio" id="msAlbPLD" name="radio3"><label for="msAlbPLD" id="lmsAlbPLD">PLD MS Albedo</label>
+					<input type="radio" id="msAmbPLD" name="radio3"><label for="msAmbPLD" id="lmsAmbPLD">PLD MS Ambient</label>
+					<input type="radio" id="ambPTM" name="radio3"><label for="ambPTM" id="lambPTM">PTM mean</label>
+					<input type="radio" id="ambHSH" name="radio3"><label for="ambHSH" id="lambHSH">HSH mean</label>
+					<input type="radio" id="ambRBF" name="radio3"><label for="ambRBF" id="lambRBF">RBF mean</label>
 				</div>
 				</div>
 				<div id="colorSet">
-					<h4>Color source</h4>
+					<h4>Color Mix</h4>
 					<div class="visualstyle">
                                                 <input type="radio" id="colorI" name="radioColorSet"><label for="colorI">IR</label>
                                                 <input type="radio" id="colorR" name="radioColorSet"><label for="colorR">R</label>
@@ -199,20 +204,7 @@
 						<input type="radio" id="colorGBU" name="radioColorSet"><label for="colorGBU">GBU</label>
 					</div>
 				</div>
-				<div id="depthSet">
-					<h4>3D source</h4>
-					<div class="visualstyle">
-					
-						<input type="radio" name="radioDepth" id="depthNone"><label for="depthNone" checked="checked" title="No 3D mode" id="lDepthNone">None</label>
-						<input type="radio" name="radioDepth" id="depthPldWl"><label for="depthPldWl" title="PLD White Light" id="lDepthPldWl">PLD WL</label>
-						 <input type="radio" name="radioDepth" id="depthPldI"><label for="depthPldI" title="Source: PLD Near Infra-Red" id="lDepthPldI">PLD I</label>
-						 <input type="radio" name="radioDepth" id="depthPldR"><label for="depthPldR" title="Source: PLD Red" id="lDepthPldR">PLD R</label>
-						 <input type="radio" name="radioDepth" id="depthPldG"><label for="depthPldG" title="Source; PLD Green" id="lDepthPldG">PLD G</label>
-						 <input type="radio" name="radioDepth" id="depthPldB"><label for="depthPldUV" title="Source: PLD Blue" id="lDepthPldB">PLD B</label>
-						 <input type="radio" name="radioDepth" id="depthPldUV"><label for="depthPldUV" title="Source: PLD Near UV " id="lDepthPldUV">PLD UV</label>
-		
-					</div>
-					</div>
+
 				<div id="normalSet">
                 	<h4>Normal source</h4>
 					<div class="normalsource">
@@ -232,13 +224,26 @@
 				  		<h5>PTM</h5>
 							<input type="radio" id="normalPTM" name="radioNormalSet"><label for="normalPTM">PTM</label>
 					</div>
-          <div class="normalsource">
-              <h5>RBF</h5>
-              <input type="radio" id="normalRBF" name="radioNormalSet"><label for="normalRBF">RBF</label>
-          </div>
+          			<div class="normalsource">
+              			<h5>RBF</h5>
+              			<input type="radio" id="normalRBF" name="radioNormalSet"><label for="normalRBF">RBF</label>
+          			</div>
                 </div>
 
-
+				<div id="depthSet">
+					<h4>3D source</h4>
+					<div class="visualstyle">
+					
+						<input type="radio" name="radioDepth" id="depthNone"><label for="depthNone" checked="checked" title="No 3D mode" id="lDepthNone">None</label>
+						<input type="radio" name="radioDepth" id="depthPldWl"><label for="depthPldWl" title="PLD White Light" id="lDepthPldWl">PLD WL</label>
+						 <input type="radio" name="radioDepth" id="depthPldIR"><label for="depthPldIR" title="Source: PLD Near Infra-Red" id="lDepthPldIR">PLD I</label>
+						 <input type="radio" name="radioDepth" id="depthPldR"><label for="depthPldR" title="Source: PLD Red" id="lDepthPldR">PLD R</label>
+						 <input type="radio" name="radioDepth" id="depthPldG"><label for="depthPldG" title="Source; PLD Green" id="lDepthPldG">PLD G</label>
+						 <input type="radio" name="radioDepth" id="depthPldB"><label for="depthPldB" title="Source: PLD Blue" id="lDepthPldB">PLD B</label>
+						 <input type="radio" name="radioDepth" id="depthPldUV"><label for="depthPldUV" title="Source: PLD Near UV " id="lDepthPldUV">PLD UV</label>
+		
+					</div>
+				</div>
 				<div id="positioning">
 					<h4>Position</h4>
 					<div class="visualstyle">

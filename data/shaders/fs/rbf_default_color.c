@@ -54,6 +54,7 @@ void main(void)
 		gl_FragColor = uMaterialAmbient;
 	}
 	else{
+  vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
 
   vec3 rbf0 = vec3( 0.0, 0.0, 0.0);
   vec3 rbf1 = vec3( 0.0, 0.0, 0.0);
@@ -79,7 +80,7 @@ void main(void)
    rbf0 = color;
   } else {
 
- 
+ lightIntensity *= 0.33;
 
     rbfCoeff[0] = vec3( texture2D(scmlTex0, vTextureCoord) ).rgb;
     rbfCoeff[1] = vec3( texture2D(scmlTex1, vTextureCoord) ).rgb;
@@ -116,6 +117,6 @@ rbf1 += rtiWeights1[i*3+3] * (rbfCoeff[i].z - scmlBias[3*i+3]) * scmlScale[3*i+3
 
   }
  
-	 gl_FragColor =  vec4(rbf0 * uLightIntensity0 + rbf1 * uLightIntensity1, 1.0);
+	 gl_FragColor =  vec4(rbf0 * lightIntensity.x + rbf1 * lightIntensity.y, 1.0);
   }
 }

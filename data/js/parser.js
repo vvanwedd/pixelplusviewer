@@ -231,6 +231,7 @@ function updateShaderList(){
 		$('#lshader11').button( "enable");
 		$('#lshader13').button( "enable");
 		$('#lshader15').button( "enable");
+		$("#ambHsh").button({disabled:false});
 	}
 	else{
 		$('#lshader11').button( "disable");
@@ -238,10 +239,10 @@ function updateShaderList(){
 		$('#lshader15').button( "disable");
 	}
 	if(boolHasAmbient[0]){
-		$('#color1').button( "enable");
+		$('#ambPLD').button( "enable");
 	}
 	else{
-		$('#color1').button( "disable");
+		$('#ambPLD').button( "disable");
 	}
 	if(boolPhotometric){
 		$('#lshader1').button( "enable");
@@ -281,10 +282,10 @@ function updateShaderList(){
 
     $('#lshader31').button( "enable");
     $('#lshader32').button( "enable");
-    $("#color1").button({enabled:true});
-    $('#color1').button( "enable");
-    $('#color0').button( "disable");
-    $("#color0").button({disabled:true});
+    $("#ambPLD").button({enabled:true});
+    $('#ambPLD').button( "enable");
+    $('#albPLD').button( "disable");
+    $("#albPLD").button({disabled:true});
     useAmbient = true;
 	}
 	else{

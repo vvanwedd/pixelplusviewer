@@ -57,7 +57,8 @@ void main(void)
 		gl_FragColor = uMaterialAmbient;
 	}
 	else{
-    
+
+  vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
   vec3 hsh0;
   vec3 hsh1;
   vec3 hsh2;
@@ -83,7 +84,7 @@ vec3 hsh = vec3(0.0, 0.0, 0.0);
 if(uBoolScml == 1.0){
 
   vec3 lightDirection = normalize(uLightDirection0.xyz);
-  
+  lightIntensity *= 0.33;
   //float hweights4 = sqrt(30.0f/M_PI)     *  (cos(2.0f*phi)*(-cosTheta + cosTheta2));
 	//float	hweights5 = sqrt(30.0f/M_PI)     *  (cosPhi*(-1.0f + 2.0f*cosTheta)*sqrt(cosTheta - cosTheta2));
 
@@ -102,7 +103,7 @@ if(uBoolScml == 1.0){
         hshCoeff[i].y = scmlScale[3*i+1] * (hshCoeff[i].y - scmlBias[3*i+1]);
         hshCoeff[i].z = scmlScale[3*i+2] * (hshCoeff[i].z - scmlBias[3*i+2]);
         
-        hshCoeff[i] *= (rtiWeights0[i] * uLightIntensity0 + rtiWeights1[i] * uLightIntensity1);
+        hshCoeff[i] *= (rtiWeights0[i] * lightIntensity.x + rtiWeights1[i] * lightIntensity.y);
         hsh += hshCoeff[i];
       }
       

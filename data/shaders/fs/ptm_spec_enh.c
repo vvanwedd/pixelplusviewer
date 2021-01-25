@@ -55,7 +55,7 @@ void main(void)
     gl_FragColor = uMaterialAmbient;
   }
   else{
-
+  vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
   vec3 ptmCoeff[6];
   vec3 ptm = vec3(0.0);
   vec3 lightDirection = uLightDirection0;
@@ -74,6 +74,7 @@ void main(void)
 
   if(uBoolScml == 1.0){
    // for(int i = 0; i < 1; i++){
+     lightIntensity *= 0.33;
       ptmCoeff[0] = vec3( texture2D(scmlTex0, vTextureCoord) ).rgb;
       ptmCoeff[1] = vec3( texture2D(scmlTex1, vTextureCoord) ).rgb;
       ptmCoeff[2] = vec3( texture2D(scmlTex2, vTextureCoord) ).rgb;
@@ -86,7 +87,7 @@ void main(void)
         ptmCoeff[i].y = scmlScale[3*i+1] * (ptmCoeff[i].y - scmlBias[3*i+1]);
         ptmCoeff[i].z = scmlScale[3*i+2] * (ptmCoeff[i].z - scmlBias[3*i+2]);
         
-        ptm +=   ptmCoeff[i]*(rtiWeights0[i]*uLightIntensity0 + rtiWeights1[i]*uLightIntensity1);
+        ptm +=   ptmCoeff[i]*(rtiWeights0[i]*lightIntensity.x + rtiWeights1[i]*lightIntensity.y);
     }
   }
   vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
@@ -116,7 +117,7 @@ void main(void)
   float spec1 = uParam[1] / 10.0 * nDotH1;
 
 
-    gl_FragColor = vec4((ptm * uParam[2]/100.0 + vec3(1.0,1.0,1.0)*(spec0*uLightIntensity0 + spec1*uLightIntensity1)), 1.0);
+    gl_FragColor = vec4((ptm * uParam[2]/100.0 + vec3(1.0,1.0,1.0)*(spec0*lightIntensity.x + spec1*lightIntensity.y)), 1.0);
   
 
 }

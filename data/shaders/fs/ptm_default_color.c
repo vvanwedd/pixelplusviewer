@@ -55,6 +55,7 @@ void main(void)
     gl_FragColor = uMaterialAmbient;
   }
   else{
+  vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
   vec3 ptmCoeff[6];
   vec3 ptm;
   vec3 lightDirection = uLightDirection0;
@@ -72,6 +73,7 @@ void main(void)
   //	var w = [1.0, v[0], v[1], v[0]*v[0], v[0]*v[1], v[1]*v[1], 0, 0, 0];
 
   if(uBoolScml == 1.0){
+    lightIntensity *=0.33;
    // for(int i = 0; i < 1; i++){
       ptmCoeff[0] = vec3( texture2D(scmlTex0, vTextureCoord) ).rgb;
       ptmCoeff[1] = vec3( texture2D(scmlTex1, vTextureCoord) ).rgb;
@@ -85,7 +87,7 @@ void main(void)
         ptmCoeff[i].y = scmlScale[3*i+1] * (ptmCoeff[i].y - scmlBias[3*i+1]);
         ptmCoeff[i].z = scmlScale[3*i+2] * (ptmCoeff[i].z - scmlBias[3*i+2]);
 
-       ptm +=   ptmCoeff[i]*(rtiWeights0[i]*uLightIntensity0 + rtiWeights1[i]*uLightIntensity1);
+       ptm +=   ptmCoeff[i]*(rtiWeights0[i]*lightIntensity.x + rtiWeights1[i]*lightIntensity.y);
       
     }
   }

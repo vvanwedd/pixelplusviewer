@@ -292,11 +292,11 @@ function updateShaderList(){
 		$('#lhsh_spec_enh').button( "disable");
 	}
 	if(boolHasAmbient[0]){
-		$('#color1').button( "enable");
+		$('#ambPLD').button( "enable");
 		useAmbient = true;
 	}
 	else{
-		$('#color1').button( "disable");
+		$('#ambPLD').button( "disable");
 	}
 	if(boolPhotometric){
 		$('#lpld_default_color').button( "enable");
@@ -337,10 +337,10 @@ function updateShaderList(){
 	if(boolRbf){
     $('#lrbf_default_color').button( "enable");
     if(boolPhotometric){$('#lrbf_spec_enh').button( "enable");}
-    $("#color1").button({enabled:true});
-    $('#color1').button( "enable");
-    $('#color0').button( "disable");
-    $("#color0").button({disabled:true});
+    $("#ambPLD").button({enabled:true});
+    $('#ambPLD').button( "enable");
+    $('#albPLD').button( "disable");
+    $("#albPLD").button({disabled:true});
     useAmbient = true;
 	}
 	else{

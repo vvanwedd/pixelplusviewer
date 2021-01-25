@@ -58,6 +58,7 @@ void main(void)
 		gl_FragColor = uMaterialAmbient;
 	}
 	else{
+  vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
   vec3 hsh0;
   vec3 hsh1;
   vec3 hsh2;
@@ -83,7 +84,7 @@ vec3 hshL0 = vec3(0.0, 0.0, 0.0);
 vec3 hshL1 = vec3(0.0, 0.0, 0.0);
 
 if(uBoolScml == 1.0){
-
+  lightIntensity *= 0.33;
   vec3 lightDirection = normalize(uLightDirection0.xyz);
   
   //float hweights4 = sqrt(30.0f/M_PI)     *  (cos(2.0f*phi)*(-cosTheta + cosTheta2));
@@ -105,8 +106,8 @@ if(uBoolScml == 1.0){
         hshCoeff[i].z = scmlScale[3*i+2] * (hshCoeff[i].z - scmlBias[3*i+2]);
         
         //hshCoeff[i] *= (rtiWeights0[i] * uLightIntensity0 + rtiWeights1[i] * uLightIntensity1);
-        hshL0 += (hshCoeff[i] *rtiWeights0[i] * uLightIntensity0);
-        hshL1 += (hshCoeff[i] *rtiWeights1[i] * uLightIntensity1);
+        hshL0 += (hshCoeff[i] *rtiWeights0[i] * lightIntensity.x);
+        hshL1 += (hshCoeff[i] *rtiWeights1[i] * lightIntensity.y);
         //hsh += hshCoeff[i];
       }
       
@@ -117,12 +118,10 @@ if(uBoolScml == 1.0){
 	// Unpack tangent-space normal from texture
   normal = texture2D(uNormalSampler, vTextureCoord).rgb;
 
-    vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
   if(uBoolScml == 1.0){
     normal.x = scmlScale[18]*( normal.x - scmlBias[18]);
     normal.y = scmlScale[19]*( normal.y - scmlBias[19]);
     normal.z = scmlScale[20]*( normal.z - scmlBias[20]);
-    lightIntensity *= 0.33;
   }
   
 	if(uBoolFloatTexture !=1.0 && uBoolScml != 1.0){normal = 2.0*(normal - 0.5);}
@@ -136,7 +135,7 @@ if(uBoolScml == 1.0){
   float nDotH0 = max(0.0,dot(normal,h0));
 
   nDotH0 = pow(nDotH0, uParam[0]*50.0);
-  float spec0 = /*(hshL0.x + hshL0.y + hshL0.z) * */uParam[1] / uLightIntensity0 /10.0* nDotH0;
+  float spec0 = /*(hshL0.x + hshL0.y + hshL0.z) * */uParam[1] / lightIntensity.x /10.0* nDotH0;
 
   vec3 lightDirection1 = normalize(uLightDirection1.xyz);
 
@@ -146,14 +145,9 @@ if(uBoolScml == 1.0){
   nDotH0 = max(0.0,dot(normal,h0));
 
   nDotH0 = pow(nDotH0, uParam[0]*50.0);
-  float spec1 = /*(hshL1.x + hshL1.y + hshL1.z) * */uParam[1] /uLightIntensity0 /10.0 * nDotH0;
+  float spec1 = /*(hshL1.x + hshL1.y + hshL1.z) * */uParam[1] /lightIntensity.y /10.0 * nDotH0;
   
-//hsh = 0.000005*hweights0*hsh0 + 10000.0*hweights1*hsh1;//+hsh0;
- //float nDotH = max(min(dot(normal, lightDirection), 0.0f), 1.0f);
- //gl_FragColor = vec4(hsh0.x,1.0,1.0,1.0);
 
-  //vec3 test = max(0.0,dot(normal,lightDirection))*vec3(1.0, 1.0, 1.0);
-	// gl_FragColor =  vec4(test * uLightIntensity0/5.0, 1.0  );
-	 gl_FragColor =  vec4(hshL0 * uParam[2] / 100.0 + spec0*vec3(1.0, 1.0, 1.0) * uLightIntensity0  + hshL1 * uParam[2] / 100.0 + spec1*vec3(1.0, 1.0, 1.0) * uLightIntensity1, 1.0);
+	 gl_FragColor =  vec4(hshL0 * uParam[2] / 100.0 + spec0*vec3(1.0, 1.0, 1.0) * lightIntensity.x  + hshL1 * uParam[2] / 100.0 + spec1*vec3(1.0, 1.0, 1.0) * lightIntensity.y, 1.0);
   }
 }
