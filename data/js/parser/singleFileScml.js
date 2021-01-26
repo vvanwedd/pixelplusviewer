@@ -2602,14 +2602,13 @@ neededTexturePlanes(curPrg){
 					}
 	
 		} else if (t.curPrg == program_hsh_default_color || t.curPrg == program_hsh_sharpen_hsh){
-			console.log("hsh");
 			t.type = "hsh";
-			this.neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2"];
+			this.neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2", "hsh_plane_3", "hsh_plane_4", "hsh_plane_5"];
 			t.scmlScale = t.hshScale;
 			t.scmlBias = t.hshBias;
 		} else if(t.curPrg == program_hsh_sharpen_nor || t.curPrg == program_hsh_spec_enh){
 			t.type = "hsh";
-			this.neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2"];
+			this.neededTexPl = ["hsh_plane_0", "hsh_plane_1", "hsh_plane_2", "hsh_plane_3", "hsh_plane_4", "hsh_plane_5"];
 			t.scmlScale = t.hshScale;
 			t.scmlBias = t.hshBias;
 	

@@ -498,6 +498,12 @@ if(gl){render(0);}
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
+			$("#sliderParam0").slider({value: 0.4});
+			$("#sliderParam1").slider({value: 0.8});
+			$("#sliderParam2").slider({value: 100});
+			$("#sliderParam3").slider({value: 0});
+
+			//param = [0.4, 0.8, 100, 0, 0];
 
 			document.getElementById("content").style.background="black";
 		}
@@ -525,6 +531,9 @@ if(gl){render(0);}
 			document.getElementById("param2wrapper").style.display="inline";
 			document.getElementById("param3wrapper").style.display="none";
 			document.getElementById("content").style.background="black";
+
+			$("#sliderParam2").slider({value: 50});
+			
 		}
 		else if($("#pld_curvature1")[0].checked==true){
 			if(gl){gl.clearColor(0.0, 0.0, 0.0, 1.0);}
@@ -671,7 +680,10 @@ if(gl){render(0);}
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-
+			$("#sliderParam0").slider({value: 0.4});
+			$("#sliderParam1").slider({value: 0.8});
+			$("#sliderParam2").slider({value: 100});
+			$("#sliderParam3").slider({value: 0});
 			document.getElementById("content").style.background="black";
 		}
 		else if($("#ptm_default_color")[0].checked==true){
@@ -701,7 +713,10 @@ if(gl){render(0);}
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-
+			$("#sliderParam0").slider({value: 0.4});
+			$("#sliderParam1").slider({value: 0.8});
+			$("#sliderParam2").slider({value: 100});
+			$("#sliderParam3").slider({value: 0});
 			document.getElementById("content").style.background="black";
 		}
 		else if($("#rbf_default_color")[0].checked==true){
@@ -731,7 +746,10 @@ if(gl){render(0);}
 			document.getElementById("param1").innerHTML = "Ks";
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
-
+			$("#sliderParam0").slider({value: 0.4});
+			$("#sliderParam1").slider({value: 0.8});
+			$("#sliderParam2").slider({value: 100});
+			$("#sliderParam3").slider({value: 0});
 			document.getElementById("content").style.background="black";
 		}
 
