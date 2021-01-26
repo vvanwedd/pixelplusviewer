@@ -1613,7 +1613,6 @@ t.loadEntry(t.findEntry(t.getTileURL(name, x, y, level))).then(function(e){
 	} else {
 		blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
 	}
-	$("#progressFooter").html("Loaded " + name + " (" + x + "," + y + "," + level+")");
 	var urlCreator = window.URL || window.webkitURL;
 	var imageUrl = urlCreator.createObjectURL( blob );
 	//console.log(imageUrl);
@@ -1642,6 +1641,9 @@ gl.bindTexture(gl.TEXTURE_2D, null);
 		//t.redraw();
 		if(gl){render();}
 	}
+	$("#progressFooter").html("Loaded " + name + " (" + x + "," + y + "," + level+") Missing: " + t.queued.length);
+	if(t.queued.length == 0){$("#progressFooter").html("Finished loading textures");}
+
 	//if(gl){render();} //major performance drop
 }
 }).catch(function(e){
@@ -2378,6 +2380,8 @@ neededBox(pos, border, canvas) {
 	if(scale>16) {minlevel = 4;}
 	if(scale>32) {minlevel = 5;}
 	if(scale>64) {minlevel = 6;}
+	minlevel -=1;
+	minlevel = Math.max(0, minlevel);
 	var box = [];
 	var bbox = t.getIBox(pos);
 	for(var level = t.nlevels-1; level >= minlevel; level--) {
