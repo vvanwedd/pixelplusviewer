@@ -1263,19 +1263,23 @@ initTree() {
 
 initBoxes() {
 	var t = this;
-	console.log("initBoxes");
+	console.log("initBoxes2");
 	t.qbox = []; //by level (0 is the bottom)
 	t.bbox = [];
 	var w = t.width;
 	var h = t.height;
 	var count = 0;
+	var ty = t.tilesize;
+	var tx = t.tilesize;
+	if(t.layout ==="image"){ty = t.height; tx = t.width;}
+	
 	for(var level = t.nlevels - 1; level >= 0; level--) {
 		var ilevel = t.nlevels -1 - level;
 		t.qbox[ilevel] = [0, 0, 0, 0];
 		t.bbox[ilevel] = [0, 0, w, h];
-		for(var y = 0; y*t.tilesize < h; y++) {
+		for(var y = 0; y*ty < h; y++) {
 			t.qbox[ilevel][3] = y+1;
-			for(var x = 0; x*t.tilesize < w; x ++) {
+			for(var x = 0; x*tx < w; x ++) {
 			//	t.nodes[count++] = { tex: [], missing: t.njpegs };
 				t.nodes[count++] = { tex: [], missing: t.neededTexPl.length };
 				t.qbox[ilevel][2] = x+1;
@@ -1700,10 +1704,10 @@ drawNode(pos, minlevel, level, x, y) {
 		return; //missing image
 	}
 	//compute coords of the corners
-	var z = Math.pow(2, pos.z);
-	var a = Math.PI*pos.a/180;
-	var c = Math.cos(a);
-	var s = Math.sin(a);
+	//var z = Math.pow(2, pos.z);
+	//var a = Math.PI*pos.a/180;
+	//var c = Math.cos(a);
+	//var s = Math.sin(a);
 
 //TODO use a static buffer
 	var coords = new Float32Array([ 0, 0, 0,  1, 0, 0,   0, 1, 0,   1,  1, 0]);
@@ -1776,14 +1780,14 @@ drawNode(pos, minlevel, level, x, y) {
 		gl.enableVertexAttribArray(0);
 		gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);	
 
-		gl.bufferData(gl.ARRAY_BUFFER, coords, gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, coords, gl.DYNAMIC_DRAW); //gl.STATIC_DRAW
 		gl.bindBuffer(gl.ARRAY_BUFFER, null);
 	
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.object.tbo);
 	gl.enableVertexAttribArray(1);
 	gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 0, 0);
-	gl.bufferData(gl.ARRAY_BUFFER, tcoords, gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, tcoords, gl.DYNAMIC_DRAW); //gl.STATIC_DRAW
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
 }
 	
@@ -1794,7 +1798,7 @@ drawNode(pos, minlevel, level, x, y) {
 	/*
 	
 	*/
-
+if(true){
 if(this.curPrg == program_hsh_default_color || this.curPrg == program_hsh_sharpen_hsh || this.curPrg == program_hsh_spec_enh || this.curPrg == program_hsh_sharpen_nor){ 
 	//console.log(t.curPrg.scmlScale);
 	//console.log(t.curPrg.rtiWeights);
@@ -2143,7 +2147,7 @@ if(boolDepthMap){
 	gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_depth")]);
 	gl.uniform1i(this.curPrg.uDispSampler, 0);
 }
-	
+}
 }
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.object.ibo);
 	gl.drawElements(gl.TRIANGLES, this.object.indices.length, gl.UNSIGNED_INT,0);
@@ -2300,7 +2304,11 @@ if(1){
 		var x = id[1];
 		var y = id[2];
 		//if(x==0 && y==2){
+			//var timera = new timer("drawnode");
+		//	console.time("drawNode");
 		  t.drawNode(pos, minlevel, level, x, y);
+		  //console.timeEnd("drawNode");
+		 // timera.stop();
 	   // }
 	}
 }
@@ -2374,13 +2382,14 @@ neededBox(pos, border, canvas) {
 
 	//size of a rendering pixel in original image pixels.
 	var scale = -Math.tan(15/180*Math.PI)*this.object.position[2]/this.object.vertices[1]*this.height/this.canvas.height;
+	//console.log(scale);
 	if(scale>2) {minlevel = 1;}
 	if(scale>4) {minlevel = 2;}
 	if(scale>8) {minlevel = 3;}
 	if(scale>16) {minlevel = 4;}
 	if(scale>32) {minlevel = 5;}
 	if(scale>64) {minlevel = 6;}
-	minlevel -=1;
+	//minlevel -=1;
 	minlevel = Math.max(0, minlevel);
 	var box = [];
 	var bbox = t.getIBox(pos);
