@@ -12,6 +12,7 @@ uniform float uLightIntensity1;
 uniform float uParam0;
 uniform float uParam1;
 uniform float uMoving;
+uniform float uTextureLevel;
 uniform vec3 uLightDirection0;
 uniform vec3 uLightDirection1;
 uniform vec2 uImgDim;

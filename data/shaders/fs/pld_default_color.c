@@ -47,6 +47,8 @@ void main(void)
     normal.y = scmlScale[1]*( normal.y - scmlBias[1]);
     normal.z = scmlScale[2]*( normal.z - scmlBias[2]);
     lightIntensity *= 0.33;
+  } else{
+    lightIntensity *= 0.66;
   }
 
   vec3 albedo;

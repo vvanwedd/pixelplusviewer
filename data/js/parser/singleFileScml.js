@@ -94,6 +94,7 @@ class SingleFileSCML{
 	this.reflectanceSource = -1;
 	this.normalSource = -1;
 	this.neededTexPl = [];
+	this.textureScale = 1;
 }
 
 init(){
@@ -1628,7 +1629,7 @@ t.loadEntry(t.findEntry(t.getTileURL(name, x, y, level))).then(function(e){
 	//console.log(t.findEntry(t.getTileURL(name, x, y, level)));
 	var tex = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, tex);
-	gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	gl.texParameterf(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); //_MIPMAP_LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -2232,6 +2233,7 @@ draw(pos,obj,curProgram,canvasHeight,canvasWidth){
 	var needed = t.neededBox(pos, 0);
 
 	var minlevel = needed.level; //this is the minimum level;
+	this.neededLevel = minlevel;
 	var ilevel = t.nlevels - 1 - minlevel;
 	//size of a rendering pixel in original image pixels.
 	var scale = -Math.tan(15*Math.PI/180)*this.object.position[2]/this.canvas.height;
@@ -2382,13 +2384,14 @@ neededBox(pos, border, canvas) {
 
 	//size of a rendering pixel in original image pixels.
 	var scale = -Math.tan(15/180*Math.PI)*this.object.position[2]/this.object.vertices[1]*this.height/this.canvas.height;
+	this.textureScale = 1;
 	//console.log(scale);
-	if(scale>2) {minlevel = 1;}
-	if(scale>4) {minlevel = 2;}
-	if(scale>8) {minlevel = 3;}
-	if(scale>16) {minlevel = 4;}
-	if(scale>32) {minlevel = 5;}
-	if(scale>64) {minlevel = 6;}
+	if(scale>2) {minlevel = 1; this.textureScale = 2;}
+	if(scale>4) {minlevel = 2; this.textureScale = 4;}
+	if(scale>8) {minlevel = 3; this.textureScale = 8;}
+	if(scale>16) {minlevel = 4; this.textureScale = 16;}
+	if(scale>32) {minlevel = 5; this.textureScale = 32;}
+	if(scale>64) {minlevel = 6; this.textureScale = 64;}
 	//minlevel -=1;
 	minlevel = Math.max(0, minlevel);
 	var box = [];

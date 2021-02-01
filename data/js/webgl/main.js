@@ -1816,6 +1816,8 @@ function render(s) {
 				} else{ 
 					gl.uniform2fv(curProgram.uImgDim, [singleFile.tilesize, singleFile.tilesize	]);
 				}
+				gl.uniform2fv(curProgram.uImgDim, [singleFile.width,singleFile.height]);
+				gl.uniform1f(curProgram.uTextureLevel, singleFile.textureScale);
 
 				//console.log(singleFile.width + " "+ singleFile.height);
 				singleFile.prefetch();

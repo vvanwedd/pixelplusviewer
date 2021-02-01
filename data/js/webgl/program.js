@@ -47,7 +47,8 @@ function Programm(vss,fss,prg){
 	this.uNormalSampler = gl.getUniformLocation(prg, "uNormalSampler");
 	this.uDispSampler = gl.getUniformLocation(prg, "uDispSampler");
 	this.uSplit = gl.getUniformLocation(prg, "uSplit");
-	this.uImgDim = gl.getUniformLocation(prg, "uImgDim");
+    this.uImgDim = gl.getUniformLocation(prg, "uImgDim");
+    this.uTextureLevel = gl.getUniformLocation(prg, "uTextureLevel");
     //this.gkernels = gl.getUniformLocation(prg, "gkernels");
     this.reflectanceChannelMix = gl.getUniformLocation(prg, "reflectanceChannelMix");
     //this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");

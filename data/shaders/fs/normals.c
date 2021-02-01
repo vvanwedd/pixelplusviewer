@@ -16,12 +16,15 @@ varying vec3 vTangentEyeDir;
 
 void main(void)
 {
-	vec3 normal = 0.5*texture2D(uNormalSampler, vTextureCoord).rgb + 0.5; 
+	vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb; 
 	if(uBoolScml == 1.0){
     	normal.x = scmlScale[0]*( normal.x - scmlBias[0]);
     	normal.y = scmlScale[1]*( normal.y - scmlBias[1]);
     	normal.z = scmlScale[2]*( normal.z - scmlBias[2]);
 	}
+    normal = (uNMatrix * vec4(normal, 0.0)).xyz;
+
+	normal = 0.5*(normal + vec3(1.0,1.0,1.0));
 	if(uBoolFloatTexture!=1.0 && uBoolScml != 1.0 )
 	{normal = 2.0*(normal - 0.5);}
 	gl_FragColor =  vec4(normal,1.0);

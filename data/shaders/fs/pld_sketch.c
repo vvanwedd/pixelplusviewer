@@ -21,6 +21,9 @@ uniform float uParam[5];
 uniform float uMoving;
 uniform vec3 uSplit;
 
+uniform vec2 uImgDim;
+uniform float uTextureLevel;
+
 
 //samplers
 uniform sampler2D uNormalSampler;
@@ -39,15 +42,18 @@ void main(void)
   }
   else{
   vec3 reflectanceChannels = reflectanceChannelMix;
-  vec2 uImgDim = vec2(1000.0, 1000.0);
+  //vec2 uImgDim = vec2(1000.0, 1000.0);
   // Unpack tangent-space normal from texture
   vec3 normal = texture2D(uNormalSampler, vTextureCoord).rgb;
   vec2 lightIntensity = vec2(uLightIntensity0, uLightIntensity1);
+  vec2 imgDim = uImgDim;
   if(uBoolScml == 1.0){
     normal.x = scmlScale[0]*( normal.x - scmlBias[0]);
     normal.y = scmlScale[1]*( normal.y - scmlBias[1]);
     normal.z = scmlScale[2]*( normal.z - scmlBias[2]);
     lightIntensity *= 0.33;
+
+    //imgDim /= uTextureLevel;
   }
 
   if(uBoolFloatTexture!=1.0 && uBoolScml != 1.0){normal = 2.0*(normal - 0.5);}
@@ -62,18 +68,19 @@ float rawcolor = 1.0;
   for(int i=1; i<=11; i++){ //11: MAXVALUE of int(1.0 + 5.0*uParam1);
 	for (int y=-1; y<=1; y+=1){
 		for (int x=-1; x<=1; x+=1){
-			vec3 neighbourN = vec3( texture2D(uNormalSampler, vTextureCoord+vec2(float(x*i)/uImgDim[0],float(y*i)/uImgDim[1]))).rgb;
-			sum = sum + neighbourN;
+			vec3 neighbourN = vec3( texture2D(uNormalSampler, vTextureCoord+vec2(float(x*i)/imgDim[0],float(y*i)/imgDim[1]))).rgb;
+			if(uBoolScml == 1.0){
+        neighbourN.x = scmlScale[0]*( neighbourN.x - scmlBias[0]);
+        neighbourN.y = scmlScale[1]*( neighbourN.y - scmlBias[1]);
+        neighbourN.z = scmlScale[2]*( neighbourN.z - scmlBias[2]);
+      }
+      sum = sum + neighbourN;
 		}
 	}
 	if(i==s){break;}
   }
 
-if(uBoolScml == 1.0){
-    sum.x = scmlScale[0]*( sum.x - scmlBias[0]);
-    sum.y = scmlScale[1]*( sum.y - scmlBias[1]);
-    sum.z = scmlScale[2]*( sum.z - scmlBias[2]);
-  }
+
 
 
   float invn = 1.0/float((2*s+1)*(2*s+1));
@@ -87,7 +94,7 @@ if(uBoolScml == 1.0){
 	for (int y=-1; y<=1; y+=1){
 		for (int x=-1; x<=1; x+=1){
 
-      vec3 neighbourN = vec3( texture2D(uNormalSampler, vTextureCoord+vec2(float(x*i)/uImgDim[0],float(y*i)/uImgDim[1]))).rgb;
+      vec3 neighbourN = vec3( texture2D(uNormalSampler, vTextureCoord+vec2(float(x*i)/imgDim[0],float(y*i)/imgDim[1]))).rgb;
       if(uBoolScml == 1.0){
         neighbourN.x = scmlScale[0]*( neighbourN.x - scmlBias[0]);
         neighbourN.y = scmlScale[1]*( neighbourN.y - scmlBias[1]);
@@ -126,8 +133,8 @@ if(uBoolScml == 1.0){
   if ((vTextureCoord.t - (1.0 - (uSplit.y+1.0)/2.0 ) )>0.0) { // split.y ranges from -1 to 1, convert to proper 0-1 range for uv coordinates
     rawcolor = dot(normal, vec3(0.0,0.0,1.0));
 
-    //  } else if ((gl_TexCoord[0].t-(1.0-split.y)+.5)*(gl_TexCoord[0].s-split.x-.5)<0) {
-    //    rawcolor = wedge1;
+     // } else if ((gl_TexCoord[0].t-(1.0-split.y)+.5)*(gl_TexCoord[0].s-split.x-.5)<0) {
+      //  rawcolor = wedge1;
 
   } else {
     rawcolor = wedge2;
