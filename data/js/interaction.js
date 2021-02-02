@@ -802,6 +802,7 @@ if(gl){render(0);}
        $("#ButtonExamples")
       .button()
       .click(function( event ) {
+		$("#mainIntro").css("display","block");
        location.href = "index.html";
         });
 

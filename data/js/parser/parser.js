@@ -102,14 +102,16 @@ function loadDataSource(datasource, dataType){
 }
 
 function parseURL(){
+	const queryString = window.location.search;
+	const urlParams = new URLSearchParams(queryString);
+	if(urlParams.has('ds')){
   $("#mainIntro").css("display","none");
   $("#progressIndicator").css("display","block");
   displayRightAside(true);
   initViewerParameters();
 
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  if(urlParams.has('ds')){
+
+  
 	var dsType = "dsType";
 	const dataSource = urlParams.get('ds');
 	if(urlParams.has('type')){
@@ -129,11 +131,12 @@ function parseURL(){
 	else{
 		loadDataSource(dataSource, dsType);
 	}
-  }
+  
   if(urlParams.has('zrotation')){
     boolZRotation = true;
     pZRotation = parseFloat(urlParams.get('zrotation'));
   }
+}
 }
 $(document).ready(function(){
   parseURL();
