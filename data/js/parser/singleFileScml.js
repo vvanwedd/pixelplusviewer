@@ -175,6 +175,33 @@ init2(){
 
 }
 
+initLocalFile(data, filename){
+	var _this = this;
+	_this.http206 = false;
+	_this.url = filename;
+	_this.entireSCML = data;
+return new Promise(function (resolve, reject) {
+	_this.fileSize = _this.entireSCML.byteLength;
+	if(_this.fileSize <= 500*1024*1024){_this.lastChunkSize = 1024*1024*2;} else {_this.lastChunkSize = 1024*1024*10;}
+	//_this.lastChunkSize = _this.fileSize;
+	_this.endOfFile = _this.entireSCML.slice(_this.fileSize - _this.lastChunkSize, _this.fileSize);
+	_this.dataView = new DataView(_this.endOfFile);
+
+	var index = 0;
+	_this.zipBrowse(_this.dataView);
+		setProgressText(false, "Number of entries: " + _this.entries.length, false );
+		_this.loadEntry(_this.scmlFiles[index]).then(function() {
+					_this.parseSCML(index);
+					setProgressText(false, "Loaded settings file " + _this.scmlFiles[index].filename, false );
+					resolve();
+		}).catch(e => {
+					reject({status: e});
+				});
+}).catch(e => {
+	console.log("Error: " + e);
+});	
+}
+
 downloadEntireSCML(url){
 	setProgressText(false, "Downloading entire dataset ... " , false );
 	document.getElementById('progressbar').className = 'loading';
@@ -237,10 +264,9 @@ downloadEntireSCML(url){
 		}
 		xhr.send(null);
 	});
-	
-
-
 }
+
+
 
 getFileSize(url) {
 //	console.log("getfilesize");
@@ -723,8 +749,8 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	if(this.scmlFiles[index].scmlFile.side_0.hsh ){
 	  
 	  this.boolHsh = true;
-	  boolRti = true;
-	  //boolHsh = true;
+	  //boolRti = true;
+	  boolHsh = true;
 
 	  this.hshBias = [];
 		this.hshScale = [];

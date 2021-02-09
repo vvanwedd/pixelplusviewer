@@ -54,7 +54,7 @@ var vec4ScaleHSH = [1.0, 1.0, 1.0, 1.0];
 var vec4BiasHSH = [0.0, 0.0, 0.0, 0.0];
 
 
-var boolRti = false;
+var boolHsh = false;
 var boolPhotometric = false;
 var boolMultiSpectral = false;
 var boolPtm = false;
@@ -192,7 +192,7 @@ function handleFileSelect(evt) {
 	$("#mainIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
   initViewerParameters();
-window.history.pushState("object or string", "Title", "/viewer/");
+window.history.pushState("object or string", "Title", "/ppv/");
   reader = new FileReader();
     reader.onerror = errorHandler;
     reader.onprogress = updateProgress;
@@ -209,7 +209,9 @@ window.history.pushState("object or string", "Title", "/viewer/");
 		bytePointer = 0;
 
 		//initParser();
-		loadFileWrapper(e.target.result, evt.target.files[0].name.substr(-3));
+		var nm = evt.target.files[0].name;
+		var ext = nm.substr(nm.lastIndexOf('.') + 1).toLowerCase();
+		loadFileWrapper(e.target.result, nm, ext);
     }
 
     reader.readAsArrayBuffer(evt.target.files[0]);
@@ -242,13 +244,9 @@ function loadFileWrapper(arrayBuffer, filename, dataType){
  }
  else if (dataType == 'scml'){
 	console.log('Loading SCML file... ');
-	loadFileSCML(arrayBuffer, filename);
+	loadLocalSingleFileScml(arrayBuffer, filename);
  }
- else if (dataType == 'zip'){
-	console.log('Loading single SCML file...');
-	loadFileSingleSCML
 
- }
  else{
 	// $("#loader").css("display","none");
     //   $("#errorMessages").css("display","block");
@@ -280,7 +278,7 @@ function readTillNewLine (inputBuffer) {
 }
 function updateShaderList(){
 
-	if(boolRti){
+	if(boolHsh){
 		$('#lhsh_default_color').button( "enable");
 		//$('#lhsh_spec_enh').button( "enable");
 		$('#lhsh_sharpen_nor').button( "disable");
@@ -361,7 +359,7 @@ function loadFileRelight(arrayBuffer,filename){
   $("#radiosetIntro").css("display","none");
 
   boolFloatTexture = false;
-  boolRti = false;
+  boolHsh = false;
   boolPhotometric = true; // only when normal map is available, should check
   boolMultiSpectral = false;
   boolPtm = false;
@@ -395,7 +393,7 @@ function loadFileSCML(arrayBuffer,filename){
 	$("#radiosetIntro").css("display","none");
   
 	boolFloatTexture = false;
-	boolRti = false;
+	boolHsh = false;
 	boolPhotometric = true; // only when normal map is available, should check
 	boolMultiSpectral = false;
 	boolPtm = false;
@@ -448,7 +446,7 @@ function loadFileSCML(arrayBuffer,filename){
 	$("#radiosetIntro").css("display","none");
 
 	boolFloatTexture = false;
-	boolRti = false;
+	boolHsh = false;
 	boolPhotometric = false; // only when normal map is available, should check
 	boolMultiSpectral = false;
 	boolPtm = false;
@@ -461,6 +459,64 @@ function loadFileSCML(arrayBuffer,filename){
 	singleFile = new SingleFileSCML(dataSource );
 
 	singleFile.init().then(function() {
+
+	textureData.length = 0;
+	var sideData = new Object();
+	sideData.width = singleFile.width;
+	sideData.height = singleFile.height;
+	sideData.isMiddle = true;
+	sideData.position = position;
+	updateCanvasSize();
+	singleFile.canvas.width = canvasWidth;
+	singleFile.canvas.height = canvasHeight;
+	
+	if(singleFile.boolRbf){
+		//singleFile.loadFactorAndBias();
+		//singleFile.loadBasis(singleFile.infobasis);
+		//singleFile.computeLightWeights(lightDirection0);
+	}
+
+	textureData.push(sideData);
+	runWebGL();
+
+	//singleFile.object = sideData;
+	//singleFile.object = Scene.objects[0];
+	//console.log(Scene.objects[0]);
+    
+	singleFile.initTree();
+	updateShaderList();
+	//updateProgram(1);
+	//$('#lpld_default_color').trigger("click");
+	if(singleFile.boolPld){updateProgram("pld_default_color");}
+	else if(singleFile.boolPtm){updateProgram("ptm_default_color");}
+	else if(singleFile.boolHsh){updateProgram("hsh_default_color");}
+	else if(singleFile.boolRbf){updateProgram("rbf_default_color");}
+	
+    });
+  }
+
+  function loadLocalSingleFileScml(dataSource, name){
+	$("#mainIntro").css("display","none");
+	setProgressText(true, "Loading " + dataSource + " ...", false);
+	//$("#progressText").html("<p>Loading " + dataSource + " ...</p>");
+	$("#progressIndicator").css("display","block");
+	$("#loader").css("display","block");
+	$("#radiosetIntro").css("display","none");
+
+	boolFloatTexture = false;
+	boolHsh = false;
+	boolPhotometric = false; // only when normal map is available, should check
+	boolMultiSpectral = false;
+	boolPtm = false;
+	boolGLTF = false;
+	boolRbf = false;
+	boolScml = true;
+
+	dsType = "SCML";
+	
+	singleFile = new SingleFileSCML(name );
+
+	singleFile.initLocalFile(dataSource, name).then(function() {
 
 	textureData.length = 0;
 	var sideData = new Object();
@@ -523,7 +579,7 @@ function loadFileGLTF(arrayBuffer,filename){
 	glTFObj.filename = filename.substr(0,filename.lastIndexOf('/')+1);
 	boolGLTF = true;
 	boolPtm = false;
-	boolRti = false;
+	boolHsh = false;
 	boolRbf = false;
 	boolScml = false;
 	dsType = "glTF";
@@ -534,7 +590,7 @@ function loadFileGLTF(arrayBuffer,filename){
 	if(glTFObj.hsh){
 	  vec4BiasHSH = [parseFloat(glTFObj.hsh[0].hshCoef0[0].bias) , parseFloat(glTFObj.hsh[0].hshCoef1[0].bias), parseFloat(glTFObj.hsh[0].hshCoef2[0].bias), parseFloat(glTFObj.hsh[0].hshCoef3[0].bias)];
 	  vec4ScaleHSH = [parseFloat(glTFObj.hsh[0].hshCoef0[0].scale) , parseFloat(glTFObj.hsh[0].hshCoef1[0].scale), parseFloat(glTFObj.hsh[0].hshCoef2[0].scale),parseFloat(glTFObj.hsh[0].hshCoef3[0].scale)];
-	  boolRti = true;
+	  boolHsh = true;
 	}
 	if(glTFObj.pld[0].depthTex){boolDepthMap = true;}
 	if(glTFObj.ptm){
@@ -576,7 +632,7 @@ function loadFilePTM(arrayBuffer){
 	$("#progressText").text("Parsing PTM file");
 	$("#content").css("display","none");
   boolFloatTexture = true;
-	boolRti = false;
+	boolHsh = false;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = true;
@@ -660,7 +716,7 @@ function loadFileRTI(arrayBuffer){
 	//$("#loader").css("display","block");
 	//$("#radiosetIntro").css("display","none");
   boolFloatTexture = true;
-	boolRti = true;
+	boolHsh = true;
 	boolPhotometric = false;
 	boolMultiSpectral = false;
 	boolPtm = false;
@@ -860,7 +916,7 @@ runWebGL();
 
 function loadFile(arrayBuffer){
   boolFloatTexture = true;
-	boolRti = false;
+	boolHsh = false;
 	boolPhotometric = true;
 	boolMultiSpectral = false;
 	boolPtm = false;
