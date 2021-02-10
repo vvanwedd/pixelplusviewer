@@ -550,7 +550,7 @@ switch(spectralNb){
 	gl.bindTexture(gl.TEXTURE_2D, null);
 render(0);
 }
-if(boolRti && !boolGLTF){
+if(boolHsh && !boolGLTF){
 	var normalData;
 
 
@@ -1009,8 +1009,8 @@ else{
 		}
 	}
 
-	if(boolRti){
-		console.log("boolRti");
+	if(boolHsh){
+		console.log("boolHsh");
 		for(var i = 0; i<4; i++){
 		hshTex[i] = gl.createTexture();
 		//var hshData = new Uint8Array(textureData[0].hshCoef0);
@@ -1740,7 +1740,7 @@ function render(s) {
 					gl.uniform1i(curProgram.uAlbedo2Sampler, 3);
 				}
 
-				if(boolRti){
+				if(boolHsh){
 					gl.activeTexture(gl.TEXTURE11);
 					gl.bindTexture(gl.TEXTURE_2D, hshTex[0]);
 					gl.uniform1i(curProgram.hshCoeff0Tex, 11);

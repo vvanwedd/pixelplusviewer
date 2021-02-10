@@ -192,7 +192,7 @@ function handleFileSelect(evt) {
 	$("#mainIntro").css("display","none");
 	$("#progressIndicator").css("display","block");
   initViewerParameters();
-window.history.pushState("object or string", "Title", "/ppv/");
+//window.history.pushState("object or string", "Title", "/ppv/");
   reader = new FileReader();
     reader.onerror = errorHandler;
     reader.onprogress = updateProgress;
