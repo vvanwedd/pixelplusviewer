@@ -576,11 +576,18 @@ findEntry(filename){
 
 parseSCML(index){
 console.log(this.scmlFiles[0]);
-var t = timer('parseSCML');
-if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scmlFiles[index].scmlFile["SCML Version"] == 1.0)){
+
+if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") ){
 	setProgressText(false, "Parsing SCML file failed.", true );
-} else{
-	
+} else if ( (this.scmlFiles[index].scmlFile["SCML Version"] == 1.0)){
+	this.parseSCML_10(index);
+}
+  else if((this.scmlFiles[index].scmlFile["SCML Version"] == 1.1)){
+	this.parseSCML_11(index);
+}
+}
+parseSCML_10(index){
+	var t = timer('parseSCML');
 	if(this.scmlFiles[index].scmlFile.viewersettings){
 		if(this.scmlFiles[index].scmlFile.viewersettings.zrotation){
 			boolZRotation = true;
@@ -617,7 +624,169 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	this.njpegs = 0;
 	this.planes = [];
 	this.normalSource = 99; 
-   
+
+	resetButtons();
+
+	if(this.scmlFiles[index].scmlFile.side_0.ptm){
+		this.boolPtm = true;
+		boolPtm = true;
+  
+		  this.ptmBias = [];
+		  this.ptmScale = [];
+		 for( var i = 0; i < 6; i++){
+			 var pl = "plane_" + i;
+			 var ptm_pl = "ptm_plane_" + i;
+			 var objName = "ptm_side_0_plane_" + i;
+			 this[ptm_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.side_0.ptm[pl].file, scale: this.scmlFiles[index].scmlFile.side_0.ptm[pl].scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm[pl].bias, plane: i };
+			 for(var id = 0; id<3; id++){
+				this[ptm_pl].scale[id] = parseFloat(this[ptm_pl].scale[id]);
+				this[ptm_pl].bias[id] = parseFloat(this[ptm_pl].bias[id]);
+			  }
+			  this.ptmBias = this.ptmBias.concat(this[ptm_pl].bias);
+			  this.ptmScale = this.ptmScale.concat(this[ptm_pl].scale);
+  
+			  this.planes.push(this[ptm_pl]);
+			  this.njpegs+=1;
+		 }
+  
+		  if(this.scmlFiles[index].scmlFile.side_0.ptm.hasOwnProperty("nor")){
+			this.ptm_nor = {name: "ptm_side_0_nor", file: this.scmlFiles[index].scmlFile.side_0.ptm.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.ptm.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm.nor.bias, plane: 12 };
+			this.planes.push( this.ptm_nor);
+			this.njpegs+=1;
+			this.normalSource = 6;
+			$("#normalPTM").button({disabled:false});
+			boolPhotometric = true;
+			for(var id = 0; id<3; id++){
+			  this.ptm_nor.scale[id] = parseFloat(this.ptm_nor.scale[id]);
+			  this.ptm_nor.bias[id] = parseFloat(this.ptm_nor.bias[id]);
+			}
+  
+		  }
+		  if(this.scmlFiles[index].scmlFile.side_0.ptm.hasOwnProperty("mean")){
+			this.ptm_amb = {name: "ptm_side_0_amb",  file: this.scmlFiles[index].scmlFile.side_0.ptm.mean.file, scale: this.scmlFiles[index].scmlFile.side_0.ptm.mean.scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm.mean.bias, plane: 13 };
+			this.planes.push( this.ptm_amb);
+			this.njpegs+=1;
+			this.reflectanceSource = 4;
+			$("#lambPTM").button({disabled:false});
+			for(var id = 0; id<3; id++){
+			  this.ptm_amb.scale[id] = parseFloat(this.ptm_amb.scale[id]);
+			  this.ptm_amb.bias[id] = parseFloat(this.ptm_amb.bias[id]);
+			}
+		  }
+		}
+		if(this.scmlFiles[index].scmlFile.side_0.hsh ){
+	  
+			this.boolHsh = true;
+			//boolRti = true;
+			boolHsh = true;
+	  
+			this.hshBias = [];
+			  this.hshScale = [];
+			 for( var i = 0; i < 6; i++){
+				 var pl = "plane_" + i;
+				 var hsh_pl = "hsh_plane_" + i;
+				 var objName = "hsh_side_0_plane_" + i;
+				 this[hsh_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.side_0.hsh[pl].file, scale: this.scmlFiles[index].scmlFile.side_0.hsh[pl].scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh[pl].bias, plane: i };
+				 for(var id = 0; id<3; id++){
+					this[hsh_pl].scale[id] = parseFloat(this[hsh_pl].scale[id]);
+					this[hsh_pl].bias[id] = parseFloat(this[hsh_pl].bias[id]);
+				  }
+				  this.hshBias = this.hshBias.concat(this[hsh_pl].bias);
+				  this.hshScale = this.hshScale.concat(this[hsh_pl].scale);
+	  
+				  this.planes.push(this[hsh_pl]);
+				  this.njpegs+=1;
+			 }
+			 
+			 if(this.scmlFiles[index].scmlFile.side_0.hsh.nor){
+			  this.hsh_nor = {name: "hsh_side_0_nor", file: this.scmlFiles[index].scmlFile.side_0.hsh.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.hsh.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh.nor.bias, plane: 7  };
+			  this.planes.push( this.hsh_nor );
+			  this.njpegs +=1;
+			  this.normalSource = 5;
+			  boolPhotometric = true;
+			  $("#normalHSH").button({disabled:false});
+			  for(var id = 0; id<3; id++){
+				  this.hsh_nor.scale[id] = parseFloat(this.hsh_nor.scale[id]);
+				  this.hsh_nor.bias[id] = parseFloat(this.hsh_nor.bias[id]);
+				}
+		  } else { 
+			  this.hsh_nor = {file: null, scale: 1, bias: 0};
+		  }
+		  if(this.scmlFiles[index].scmlFile.side_0.hsh.mean){
+			  this.hsh_amb = {name: "hsh_side_0_amb", file: this.scmlFiles[index].scmlFile.side_0.hsh.mean.file, scale: this.scmlFiles[index].scmlFile.side_0.hsh.mean.scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh.mean.bias, plane: 8 };
+			  this.planes.push( this.hsh_amb);
+			  this.njpegs +=1;
+			  this.reflectanceSource = 5;
+			  $("#lambHSH").button({disabled:false});
+			  for(var id = 0; id<3; id++){
+				  this.hsh_amb.scale[id] = parseFloat(this.hsh_amb.scale[id]);
+				  this.hsh_amb.bias[id] = parseFloat(this.hsh_amb.bias[id]);
+				}
+		  } else { 
+			  this.hsh_amb = {file: null, scale: 1, bias: 0};
+		  }
+		 
+	}	
+	if(this.scmlFiles[index].scmlFile.side_0.rbf){
+		this.boolRbf = true;
+		boolRbf = true;
+		this.lights = this.scmlFiles[index].scmlFile.side_0.rbf.lights;
+		this.rbfBasis = this.scmlFiles[index].scmlFile.side_0.rbf.basis;
+		
+		this.ndimensions = this.lights.length/3;
+		this.sigma = parseFloat(this.scmlFiles[index].scmlFile.side_0.rbf.sigma);
+		this.rbfBias = [];
+		this.rbfScale = [];
+		this.rbfRange = [];
+		this.nmaterials =1;
+		this.nplanes = parseInt(this.scmlFiles[index].scmlFile.side_0.rbf.nplanes);
+		
+		 for( var i = 0; i < 6; i++){
+			 var pl = "plane_" + i;
+			 var rbf_pl = "rbf_plane_" + i;
+			 var objName = "rbf_side_0_plane_" + i;
+			 this[rbf_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.side_0.rbf[pl].file, scale: this.scmlFiles[index].scmlFile.side_0.rbf[pl].scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf[pl].bias, range: this.scmlFiles[index].scmlFile.side_0.rbf[pl].range, plane: i };
+			 for(var id = 0; id<3; id++){
+				this[rbf_pl].scale[id] = parseFloat(this[rbf_pl].scale[id]);
+				this[rbf_pl].bias[id] = parseFloat(this[rbf_pl].bias[id]);
+				this[rbf_pl].range[id] = parseFloat(this[rbf_pl].range[id]);
+			  }
+			  this.rbfBias = this.rbfBias.concat(this[rbf_pl].bias);
+			  this.rbfScale = this.rbfScale.concat(this[rbf_pl].scale);
+			  this.rbfRange = this.rbfRange.concat(this[rbf_pl].range);
+			  
+  
+			  this.planes.push(this[rbf_pl]);
+			  this.njpegs+=1;
+		 }
+		 this.loadBasis(this.rbfBasis);
+		this.loadFactorAndBias();
+
+		  if(this.scmlFiles[index].scmlFile.side_0.rbf.hasOwnProperty("nor")){
+			this.rbf_nor = {name: "rbf_side_0_nor", file: this.scmlFiles[index].scmlFile.side_0.rbf.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.rbf.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf.nor.bias, plane: 12 };
+			this.planes.push( this.rbf_nor);
+			this.njpegs+=1;
+			this.normalSource = 7;
+			$("#normalRBF").button({disabled:false});
+			boolPhotometric = true;
+			for(var id = 0; id<3; id++){
+				this.rbf_nor.scale[id] = parseFloat(this.rbf_nor.scale[id]);
+				this.rbf_nor.bias[id] = parseFloat(this.rbf_nor.bias[id]);
+			  }
+
+		  }
+		  if(this.scmlFiles[index].scmlFile.side_0.rbf.hasOwnProperty("mean")){
+			this.rbf_amb = {name: "rbf_side_0_amb", file: this.scmlFiles[index].scmlFile.side_0.rbf.mean.file, scale: this.scmlFiles[index].scmlFile.side_0.rbf.mean.scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf.mean.bias, plane: 13 };
+			this.planes.push( this.rbf_amb);
+			this.njpegs+=1;
+			this.reflectanceSource = 6;
+			$("#lambRBF").button({disabled:false});
+			for(var id = 0; id<3; id++){
+				this.rbf_amb.scale[id] = parseFloat(this.rbf_amb.scale[id]);
+				this.rbf_amb.bias[id] = parseFloat(this.rbf_amb.bias[id]);
+			  }
+		  }
+		}
 	if(this.scmlFiles[index].scmlFile.side_0.pld){
 	  boolPhotometric = true;
 	  this.boolPld = true;
@@ -627,8 +796,8 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	  this.reflectanceSource = 0;
 
 	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_nor){
-	  this.pld_wl_nor = {name: "side_0_pld_wl_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.bias, plane: 0 };
-	  this.pld_wl_alb = {name: "side_0_pld_wl_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.bias, plane: 1 }; 
+	  this.pld_wl_nor = {name: "pld_side_0_wl_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.bias, plane: 0 };
+	  this.pld_wl_alb = {name: "pld_side_0_wl_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.bias, plane: 1 }; 
 	  for(var id = 0; id<3; id++){
 		  this.pld_wl_nor.scale[i] = parseFloat(this.pld_wl_nor.scale[i]);
 		  this.pld_wl_alb.scale[i] = parseFloat(this.pld_wl_alb.scale[i]);
@@ -648,7 +817,7 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_amb){
 		  boolHasAmbient[0] = true;
 		  this.reflectanceSource = 1;
-		  this.pld_wl_amb = {name: "side_0_pld_wl_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.bias, plane: 2 };
+		  this.pld_wl_amb = {name: "pld_side_0_wl_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.bias, plane: 2 };
 		  this.planes.push(this.pld_wl_amb);
 		  this.njpegs +=1;
 		  $("#lwlAmbPLD").button({disabled:false});
@@ -661,7 +830,7 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	  }
 	 /* if(this.scmlFiles[index].scmlFile.side_0.pld.wl_depth){
 		boolDepthMap = true;
-		this.pld_wl_depth = {name: "side_0_pld_wl_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.bias, plane: 3 };
+		this.pld_wl_depth = {name: "pld_side_0_wl_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.bias, plane: 3 };
 		  this.planes.push( this.pld_wl_depth );
 	  }
 	  */
@@ -675,15 +844,15 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 		this.pldScale = [];
 		this.pldBias = [];
 
-		this.pld_ir_nor = {name: "side_0_pld_ir_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.bias, plane: 0 };
-		this.pld_r_nor = {name: "side_0_pld_r_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.bias, plane: 0 };
-		this.pld_g_nor = {name: "side_0_pld_g_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.bias, plane: 0 };
-		this.pld_b_nor = {name: "side_0_pld_b_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.bias, plane: 0 };
-		this.pld_uv_nor = {name: "side_0_pld_uv_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.bias, plane: 0 };
-		this.pld_rgb_alb = {name: "side_0_pld_rgb_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.bias, plane: 0 };
-		this.pld_iruv_alb = {name: "side_0_pld_iruv_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.bias, plane: 0 };
-		this.pld_rgb_amb = {name: "side_0_pld_rgb_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.bias, plane: 0 };
-		this.pld_iruv_amb = {name: "side_0_pld_iruv_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.bias, plane: 0 };
+		this.pld_ir_nor = {name: "pld_side_0_ir_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.bias, plane: 0 };
+		this.pld_r_nor = {name: "pld_side_0_r_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.bias, plane: 0 };
+		this.pld_g_nor = {name: "pld_side_0_g_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.bias, plane: 0 };
+		this.pld_b_nor = {name: "pld_side_0_b_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.bias, plane: 0 };
+		this.pld_uv_nor = {name: "pld_side_0_uv_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.bias, plane: 0 };
+		this.pld_rgb_alb = {name: "pld_side_0_rgb_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.bias, plane: 0 };
+		this.pld_iruv_alb = {name: "pld_side_0_iruv_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.bias, plane: 0 };
+		this.pld_rgb_amb = {name: "pld_side_0_rgb_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.bias, plane: 0 };
+		this.pld_iruv_amb = {name: "pld_side_0_iruv_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.bias, plane: 0 };
 		
 		for(var id = 0; id<3; id++){
 			this.pld_ir_nor.scale[i] = parseFloat(this.pld_ir_nor.scale[i]);
@@ -717,13 +886,18 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 		this.njpegs +=9;
 		$("#lmsAmbPLD").button({disabled:false});
 		$("#lmsAlbPLD").button({disabled:false});
+		$("#normalI").button({disabled:false});
+		$("#normalR").button({disabled:false});
+		$("#normalB").button({disabled:false});
+		$("#normalG").button({disabled:false});
+		$("#normalU").button({disabled:false});
 		if(this.scmlFiles[index].scmlFile.side_0.pld.r_depth){
 			boolDepthMap = true;
-			this.pld_ir_depth = {name: "side_0_pld_ir_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.bias, plane: 0 };
-			this.pld_r_depth = {name: "side_0_pld_r_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.bias, plane: 0 };
-			this.pld_g_depth = {name: "side_0_pld_g_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.bias, plane: 0 };
-			this.pld_b_depth = {name: "side_0_pld_b_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.bias, plane: 0 };
-			this.pld_uv_depth = {name: "side_0_pld_uv_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.bias, plane: 0 };
+			this.pld_ir_depth = {name: "pld_side_0_ir_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.bias, plane: 0 };
+			this.pld_r_depth = {name: "pld_side_0_r_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.bias, plane: 0 };
+			this.pld_g_depth = {name: "pld_side_0_g_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.bias, plane: 0 };
+			this.pld_b_depth = {name: "pld_side_0_b_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.bias, plane: 0 };
+			this.pld_uv_depth = {name: "pld_side_0_uv_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.bias, plane: 0 };
 				for(var id = 0; id<3; id++){
 					this.pld_ir_depth.scale[i] = parseFloat(this.pld_ir_depth.scale[i]);
 					this.pld_ir_depth.bias[i] = parseFloat(this.pld_ir_depth.bias[i]);
@@ -746,149 +920,177 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 	}
  }
   
-	if(this.scmlFiles[index].scmlFile.side_0.hsh ){
-	  
-	  this.boolHsh = true;
-	  //boolRti = true;
-	  boolHsh = true;
-
-	  this.hshBias = [];
-		this.hshScale = [];
-       for( var i = 0; i < 6; i++){
-		   var pl = "plane_" + i;
-		   var hsh_pl = "hsh_plane_" + i;
-		   var objName = "side_0_hsh_plane_" + i;
-		   this[hsh_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.side_0.hsh[pl].file, scale: this.scmlFiles[index].scmlFile.side_0.hsh[pl].scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh[pl].bias, plane: i };
-		   for(var id = 0; id<3; id++){
-			  this[hsh_pl].scale[id] = parseFloat(this[hsh_pl].scale[id]);
-			  this[hsh_pl].bias[id] = parseFloat(this[hsh_pl].bias[id]);
-			}
-			this.hshBias = this.hshBias.concat(this[hsh_pl].bias);
-			this.hshScale = this.hshScale.concat(this[hsh_pl].scale);
-
-			this.planes.push(this[hsh_pl]);
-			this.njpegs+=1;
-	   }
-	   
-	   if(this.scmlFiles[index].scmlFile.side_0.hsh.nor){
-		this.hsh_nor = {name: "side_0_hsh_nor", file: this.scmlFiles[index].scmlFile.side_0.hsh.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.hsh.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh.nor.bias, plane: 7  };
-		this.planes.push( this.hsh_nor );
-		this.njpegs +=1;
-		this.normalSource = 5;
-		boolPhotometric = true;
-		for(var id = 0; id<3; id++){
-			this.hsh_nor.scale[id] = parseFloat(this.hsh_nor.scale[id]);
-			this.hsh_nor.bias[id] = parseFloat(this.hsh_nor.bias[id]);
-		  }
-	} else { 
-		this.hsh_nor = {file: null, scale: 1, bias: 0};
-	}
-	if(this.scmlFiles[index].scmlFile.side_0.hsh.mean){
-		this.hsh_amb = {name: "side_0_hsh_amb", file: this.scmlFiles[index].scmlFile.side_0.hsh.mean.file, scale: this.scmlFiles[index].scmlFile.side_0.hsh.mean.scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh.mean.bias, plane: 8 };
-		this.planes.push( this.hsh_amb);
-		this.njpegs +=1;
-		this.reflectanceSource = 5;
-		$("#lambHSH").button({disabled:false});
-		for(var id = 0; id<3; id++){
-			this.hsh_amb.scale[id] = parseFloat(this.hsh_amb.scale[id]);
-			this.hsh_amb.bias[id] = parseFloat(this.hsh_amb.bias[id]);
-		  }
-	} else { 
-		this.hsh_amb = {file: null, scale: 1, bias: 0};
-	}
-	 /* this.hsh_plane_0 = {name: "side_0_hsh_plane_0", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].bias), plane: 3 };
-	  this.hsh_plane_1 = {name: "side_0_hsh_plane_1", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].bias), plane: 4 };
-	  this.hsh_plane_2 = {name: "side_0_hsh_plane_2", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].bias), plane: 5 };
-	  this.hsh_plane_3 = {name: "side_0_hsh_plane_3", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].bias), plane: 6 };
-	  this.planes.push( this.hsh_plane_0);
-	  this.planes.push( this.hsh_plane_1);
-	  this.planes.push( this.hsh_plane_2);
-	  this.planes.push( this.hsh_plane_3);
+   this.njpegs = 0;
+   for(var ab = 0; ab < this.planes.length; ab++){
+	  if(this.planes[ab]){this.njpegs++;}
+   }
   
-	  vec4ScaleHSH = [this.planes[3].scale, this.planes[4].scale, this.planes[5].scale, this.planes[6].scale];
-	  vec4BiasHSH = [this.planes[3].bias, this.planes[4].bias, this.planes[5].bias, this.planes[6].bias];
-	  this.njpegs +=4;
-	  if(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor){
-		  this.hsh_nor = {name: "side_0_hsh_nor", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].bias), plane: 7  };
-		  this.planes.push( this.hsh_nor );
-		  this.njpegs +=1;
-	  } else { 
-		  this.hsh_nor = {file: null, scale: 1, bias: 0};
-	  }
-	  if(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb){
-		  this.hsh_amb = {name: "side_0_hsh_amb", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].bias), plane: 8 };
-		  this.planes.push( this.hsh_amb);
-		  this.njpegs +=1;
-	  } else { 
-		  this.hsh_amb = {file: null, scale: 1, bias: 0};
-	  }
-	  */
+	
+	this.populateFields(index);
+
+	t.stop();
+  }
+
+  parseSCML_11(index){
+	var t = timer('parseSCML');
+	if(this.scmlFiles[index].scmlFile.viewersettings){
+		if(this.scmlFiles[index].scmlFile.viewersettings.zrotation){
+			boolZRotation = true;
+    		pZRotation = parseFloat(this.scmlFiles[index].scmlFile.viewersettings.zrotation);
+		}
 	}
-	if(this.scmlFiles[index].scmlFile.side_0.ptm){
-	  this.boolPtm = true;
-	  boolPtm = true;
+	/*if(this.scmlFiles[index].scmlFile.pld){
+          this.width = parseFloat(this.scmlFiles[index].scmlFile.side_0.pld.metadata.width);
+          this.height = parseFloat(this.scmlFiles[index].scmlFile.side_0.pld.metadata.height);
+	}else {
+		*/
+	this.width = parseFloat(this.scmlFiles[index].scmlFile.side_0.metadata.width);
+	this.height = parseFloat(this.scmlFiles[index].scmlFile.side_0.metadata.height);
+	//}
+	this.layout = this.scmlFiles[index].scmlFile.layout;
 
-		this.ptmBias = [];
-		this.ptmScale = [];
-       for( var i = 0; i < 6; i++){
-		   var pl = "plane_" + i;
-		   var ptm_pl = "ptm_plane_" + i;
-		   var objName = "side_0_ptm_plane_" + i;
-		   this[ptm_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.side_0.ptm[pl].file, scale: this.scmlFiles[index].scmlFile.side_0.ptm[pl].scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm[pl].bias, plane: i };
-		   for(var id = 0; id<3; id++){
-			  this[ptm_pl].scale[id] = parseFloat(this[ptm_pl].scale[id]);
-			  this[ptm_pl].bias[id] = parseFloat(this[ptm_pl].bias[id]);
-			}
-			this.ptmBias = this.ptmBias.concat(this[ptm_pl].bias);
-			this.ptmScale = this.ptmScale.concat(this[ptm_pl].scale);
+	this.pos = { x: 0, y:0, z: 0, a: 0 };
+	//this.object = {vertices:0};
+	//this.object[0].vertices = [1.0, 1.0, 0.0];
+	this.maxRequested = 10;
+  
+	this.border = 1;
+	this.mipmapbias= 0.5;
+	
+    this.type ="img";
+	//change
+	this.pos = {x: this.width/2, y: this.height/2, z:1, a:0};
+	this.light = [-0.7, 0.7, 1.0];
+  
+	this.boolHsh = false;
+	this.boolPld = false;
+	this.boolPtm = false;
+	this.boolRbf = false;
+	this.njpegs = 0;
+	this.planes = [];
+	this.normalSource = 99; 
 
-			this.planes.push(this[ptm_pl]);
+	resetButtons();
+
+	if(this.scmlFiles[index].scmlFile.ptm.side_0.wl){
+		this.boolPtm = true;
+		boolPtm = true;
+  
+		  this.ptmBias = [];
+		  this.ptmScale = [];
+		 for( var i = 0; i < 6; i++){
+			 var pl = "plane_" + i;
+			 var ptm_pl = "ptm_plane_" + i;
+			 var objName = "ptm_side_0_plane_" + i;
+			 this[ptm_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.ptm.side_0.wl[pl].file, scale: this.scmlFiles[index].scmlFile.ptm.side_0.wl[pl].scale, bias: this.scmlFiles[index].scmlFile.ptm.side_0.wl[pl].bias, plane: i };
+			 for(var id = 0; id<3; id++){
+				this[ptm_pl].scale[id] = parseFloat(this[ptm_pl].scale[id]);
+				this[ptm_pl].bias[id] = parseFloat(this[ptm_pl].bias[id]);
+			  }
+			  this.ptmBias = this.ptmBias.concat(this[ptm_pl].bias);
+			  this.ptmScale = this.ptmScale.concat(this[ptm_pl].scale);
+  
+			  this.planes.push(this[ptm_pl]);
+			  this.njpegs+=1;
+		 }
+  
+		  if(this.scmlFiles[index].scmlFile.ptm.side_0.wl.hasOwnProperty("nor")){
+			this.ptm_nor = {name: "ptm_side_0_nor", file: this.scmlFiles[index].scmlFile.ptm.side_0.wl.nor.file, scale: this.scmlFiles[index].scmlFile.ptm.side_0.wl.nor.scale, bias: this.scmlFiles[index].scmlFile.ptm.side_0.wl.nor.bias, plane: 12 };
+			this.planes.push( this.ptm_nor);
 			this.njpegs+=1;
-	   }
-
-		if(this.scmlFiles[index].scmlFile.side_0.ptm.hasOwnProperty("nor")){
-		  this.ptm_nor = {name: "side_0_ptm_nor", file: this.scmlFiles[index].scmlFile.side_0.ptm.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.ptm.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm.nor.bias, plane: 12 };
-		  this.planes.push( this.ptm_nor);
-		  this.njpegs+=1;
-		  this.normalSource = 6;
-		  boolPhotometric = true;
-		  for(var id = 0; id<3; id++){
-			this.ptm_nor.scale[id] = parseFloat(this.ptm_nor.scale[id]);
-			this.ptm_nor.bias[id] = parseFloat(this.ptm_nor.bias[id]);
+			this.normalSource = 6;
+			$("#normalPTM").button({disabled:false});
+			boolPhotometric = true;
+			for(var id = 0; id<3; id++){
+			  this.ptm_nor.scale[id] = parseFloat(this.ptm_nor.scale[id]);
+			  this.ptm_nor.bias[id] = parseFloat(this.ptm_nor.bias[id]);
+			}
+  
 		  }
-
-		}
-		if(this.scmlFiles[index].scmlFile.side_0.ptm.hasOwnProperty("mean")){
-		  this.ptm_amb = {name: "side_0_ptm_amb",  file: this.scmlFiles[index].scmlFile.side_0.ptm.mean.file, scale: this.scmlFiles[index].scmlFile.side_0.ptm.mean.scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm.mean.bias, plane: 13 };
-		  this.planes.push( this.ptm_amb);
-		  this.njpegs+=1;
-		  this.reflectanceSource = 4;
-		  $("#lambPTM").button({disabled:false});
-		  for(var id = 0; id<3; id++){
-			this.ptm_amb.scale[id] = parseFloat(this.ptm_amb.scale[id]);
-			this.ptm_amb.bias[id] = parseFloat(this.ptm_amb.bias[id]);
+		  if(this.scmlFiles[index].scmlFile.ptm.side_0.wl.hasOwnProperty("mean")){
+			this.ptm_amb = {name: "ptm_side_0_amb",  file: this.scmlFiles[index].scmlFile.ptm.side_0.wl.mean.file, scale: this.scmlFiles[index].scmlFile.ptm.side_0.wl.mean.scale, bias: this.scmlFiles[index].scmlFile.ptm.side_0.wl.mean.bias, plane: 13 };
+			this.planes.push( this.ptm_amb);
+			this.njpegs+=1;
+			this.reflectanceSource = 4;
+			$("#lambPTM").button({disabled:false});
+			for(var id = 0; id<3; id++){
+			  this.ptm_amb.scale[id] = parseFloat(this.ptm_amb.scale[id]);
+			  this.ptm_amb.bias[id] = parseFloat(this.ptm_amb.bias[id]);
+			}
 		  }
 		}
-	  }
-	  if(this.scmlFiles[index].scmlFile.side_0.rbf){
+		if(this.scmlFiles[index].scmlFile.hsh.side_0.wl ){
+	  
+			this.boolHsh = true;
+			//boolRti = true;
+			boolHsh = true;
+	  
+			this.hshBias = [];
+			  this.hshScale = [];
+			 for( var i = 0; i < 6; i++){
+				 var pl = "plane_" + i;
+				 var hsh_pl = "hsh_plane_" + i;
+				 var objName = "hsh_side_0_plane_" + i;
+				 this[hsh_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.hsh.side_0.wl[pl].file, scale: this.scmlFiles[index].scmlFile.hsh.side_0.wl[pl].scale, bias: this.scmlFiles[index].scmlFile.hsh.side_0.wl[pl].bias, plane: i };
+				 for(var id = 0; id<3; id++){
+					this[hsh_pl].scale[id] = parseFloat(this[hsh_pl].scale[id]);
+					this[hsh_pl].bias[id] = parseFloat(this[hsh_pl].bias[id]);
+				  }
+				  this.hshBias = this.hshBias.concat(this[hsh_pl].bias);
+				  this.hshScale = this.hshScale.concat(this[hsh_pl].scale);
+	  
+				  this.planes.push(this[hsh_pl]);
+				  this.njpegs+=1;
+			 }
+			 
+			 if(this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor){
+			  this.hsh_nor = {name: "hsh_side_0_nor", file: this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor.file, scale: this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor.scale, bias: this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor.bias, plane: 7  };
+			  this.planes.push( this.hsh_nor );
+			  this.njpegs +=1;
+			  this.normalSource = 5;
+			  boolPhotometric = true;
+			  $("#normalHSH").button({disabled:false});
+			  for(var id = 0; id<3; id++){
+				  this.hsh_nor.scale[id] = parseFloat(this.hsh_nor.scale[id]);
+				  this.hsh_nor.bias[id] = parseFloat(this.hsh_nor.bias[id]);
+				}
+		  } else { 
+			  this.hsh_nor = {file: null, scale: 1, bias: 0};
+		  }
+		  if(this.scmlFiles[index].scmlFile.hsh.side_0.wl.mean){
+			  this.hsh_amb = {name: "hsh_side_0_amb", file: this.scmlFiles[index].scmlFile.hsh.side_0.wl.mean.file, scale: this.scmlFiles[index].scmlFile.hsh.side_0.wl.mean.scale, bias: this.scmlFiles[index].scmlFile.hsh.side_0.wl.mean.bias, plane: 8 };
+			  this.planes.push( this.hsh_amb);
+			  this.njpegs +=1;
+			  this.reflectanceSource = 5;
+			  $("#lambHSH").button({disabled:false});
+			  for(var id = 0; id<3; id++){
+				  this.hsh_amb.scale[id] = parseFloat(this.hsh_amb.scale[id]);
+				  this.hsh_amb.bias[id] = parseFloat(this.hsh_amb.bias[id]);
+				}
+		  } else { 
+			  this.hsh_amb = {file: null, scale: 1, bias: 0};
+		  }
+		 
+	}	
+	if(this.scmlFiles[index].scmlFile.rbf.side_0.wl){
 		this.boolRbf = true;
 		boolRbf = true;
-		this.lights = this.scmlFiles[index].scmlFile.side_0.rbf.lights;
-		this.rbfBasis = this.scmlFiles[index].scmlFile.side_0.rbf.basis;
+		this.lights = this.scmlFiles[index].scmlFile.rbf.side_0.wl.lights;
+		this.rbfBasis = this.scmlFiles[index].scmlFile.rbf.side_0.wl.basis;
 		
 		this.ndimensions = this.lights.length/3;
-		this.sigma = parseFloat(this.scmlFiles[index].scmlFile.side_0.rbf.sigma);
+		this.sigma = parseFloat(this.scmlFiles[index].scmlFile.rbf.side_0.wl.sigma);
 		this.rbfBias = [];
 		this.rbfScale = [];
 		this.rbfRange = [];
 		this.nmaterials =1;
-		this.nplanes = parseInt(this.scmlFiles[index].scmlFile.side_0.rbf.nplanes);
+		this.nplanes = parseInt(this.scmlFiles[index].scmlFile.rbf.side_0.wl.nplanes);
 		
 		 for( var i = 0; i < 6; i++){
 			 var pl = "plane_" + i;
 			 var rbf_pl = "rbf_plane_" + i;
-			 var objName = "side_0_rbf_plane_" + i;
-			 this[rbf_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.side_0.rbf[pl].file, scale: this.scmlFiles[index].scmlFile.side_0.rbf[pl].scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf[pl].bias, range: this.scmlFiles[index].scmlFile.side_0.rbf[pl].range, plane: i };
+			 var objName = "rbf_side_0_plane_" + i;
+			 this[rbf_pl] = {name: objName, file: this.scmlFiles[index].scmlFile.rbf.side_0.wl[pl].file, scale: this.scmlFiles[index].scmlFile.rbf.side_0.wl[pl].scale, bias: this.scmlFiles[index].scmlFile.rbf.side_0.wl[pl].bias, range: this.scmlFiles[index].scmlFile.rbf.side_0.wl[pl].range, plane: i };
 			 for(var id = 0; id<3; id++){
 				this[rbf_pl].scale[id] = parseFloat(this[rbf_pl].scale[id]);
 				this[rbf_pl].bias[id] = parseFloat(this[rbf_pl].bias[id]);
@@ -902,14 +1104,17 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 			  this.planes.push(this[rbf_pl]);
 			  this.njpegs+=1;
 		 }
-		 this.loadBasis(this.rbfBasis);
+		 
+		console.log(this.scmlFiles[index].scmlFile.rbf.side_0.wl);
+		this.loadBasis(this.scmlFiles[index].scmlFile.rbf.side_0.wl.basis);
 		this.loadFactorAndBias();
-
-		  if(this.scmlFiles[index].scmlFile.side_0.rbf.hasOwnProperty("nor")){
-			this.rbf_nor = {name: "side_0_rbf_nor", file: this.scmlFiles[index].scmlFile.side_0.rbf.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.rbf.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf.nor.bias, plane: 12 };
+		if(this.scmlFiles[index].scmlFile.rbf.side_0.wl.hasOwnProperty("nor")){
+		  if(this.scmlFiles[index].scmlFile.rbf.side_0.wl.hasOwnProperty("nor")){
+			this.rbf_nor = {name: "rbf_side_0_nor", file: this.scmlFiles[index].scmlFile.rbf.side_0.wl.nor.file, scale: this.scmlFiles[index].scmlFile.rbf.side_0.wl.nor.scale, bias: this.scmlFiles[index].scmlFile.rbf.side_0.wl.nor.bias, plane: 12 };
 			this.planes.push( this.rbf_nor);
 			this.njpegs+=1;
 			this.normalSource = 7;
+			$("#normalRBF").button({disabled:false});
 			boolPhotometric = true;
 			for(var id = 0; id<3; id++){
 				this.rbf_nor.scale[id] = parseFloat(this.rbf_nor.scale[id]);
@@ -917,8 +1122,8 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 			  }
 
 		  }
-		  if(this.scmlFiles[index].scmlFile.side_0.rbf.hasOwnProperty("mean")){
-			this.rbf_amb = {name: "side_0_rbf_amb", file: this.scmlFiles[index].scmlFile.side_0.rbf.mean.file, scale: this.scmlFiles[index].scmlFile.side_0.rbf.mean.scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf.mean.bias, plane: 13 };
+		  if(this.scmlFiles[index].scmlFile.rbf.side_0.wl.hasOwnProperty("mean")){
+			this.rbf_amb = {name: "rbf_side_0_amb", file: this.scmlFiles[index].scmlFile.rbf.side_0.wl.mean.file, scale: this.scmlFiles[index].scmlFile.rbf.side_0.wl.mean.scale, bias: this.scmlFiles[index].scmlFile.rbf.side_0.wl.mean.bias, plane: 13 };
 			this.planes.push( this.rbf_amb);
 			this.njpegs+=1;
 			this.reflectanceSource = 6;
@@ -929,45 +1134,138 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
 			  }
 		  }
 		}
-  /*
-	  if(this.scmlFiles[index].scmlFile.rbf && 0 ){
-		  this.boolRbf = true;
-		  boolRbf = true;
-		  this.nplanes = parseInt(this.scmlFiles[index].scmlFile.rbf[0].nplanes);
-		  for (var i = 0; i < Math.ceil(this.nplanes/3); i++){
-			  var strPlane = "rbf_plane_" + i;
-			  var plane = {file: this.scmlFiles[index].scmlFile.rbf[0].eval(strPlane)[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.rbf[0].eval(strPlane)[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.rbf[0].eval(strPlane)[0].bias), plane: i+14 };
-			  this.planes[i + 14] = plane;
-			  this.njpegs +=1;
+	if(this.scmlFiles[index].scmlFile.side_0.pld){
+	  boolPhotometric = true;
+	  this.boolPld = true;
+	  this.pldScale = [];
+	  this.pldBias = [];
+	  this.normalSource = 2;
+	  this.reflectanceSource = 0;
+
+	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_nor){
+	  this.pld_wl_nor = {name: "pld_side_0_wl_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.bias, plane: 0 };
+	  this.pld_wl_alb = {name: "pld_side_0_wl_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.bias, plane: 1 }; 
+	  for(var id = 0; id<3; id++){
+		  this.pld_wl_nor.scale[i] = parseFloat(this.pld_wl_nor.scale[i]);
+		  this.pld_wl_alb.scale[i] = parseFloat(this.pld_wl_alb.scale[i]);
+		  this.pld_wl_nor.bias[i] = parseFloat(this.pld_wl_nor.bias[i]);
+		  this.pld_wl_alb.bias[i] = parseFloat(this.pld_wl_alb.bias[i]);
+	  }
+	  this.pldScale = this.pldScale.concat(this.pld_wl_nor.scale);
+	  this.pldScale = this.pldScale.concat(this.pld_wl_alb.scale);
+	  this.pldBias = this.pldBias.concat(this.pld_wl_nor.bias);
+	  this.pldBias = this.pldBias.concat(this.pld_wl_alb.bias);
+
+	  this.planes.push(this.pld_wl_nor);
+	  this.planes.push(this.pld_wl_alb);
+	  this.njpegs +=2;
+	  $("#lwlAlbPLD").button({disabled:false});
+
+	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_amb){
+		  boolHasAmbient[0] = true;
+		  this.reflectanceSource = 1;
+		  this.pld_wl_amb = {name: "pld_side_0_wl_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_amb.bias, plane: 2 };
+		  this.planes.push(this.pld_wl_amb);
+		  this.njpegs +=1;
+		  $("#lwlAmbPLD").button({disabled:false});
+		  for(var id = 0; id<3; id++){
+			this.pld_wl_amb.scale[i] = parseFloat(this.pld_wl_amb.scale[i]);
+			this.pld_wl_amb.bias[i] = parseFloat(this.pld_wl_amb.bias[i]);
 		  }
-		  this.rbf_plane_0 = {name: "side_0_rbf_plane_0", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_0[0].bias), plane: 3 };
-		  this.rbf_plane_1 = {name: "side_0_rbf_plane_1", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_1[0].bias), plane: 4 };
-		  this.rbf_plane_2 = {name: "side_0_rbf_plane_2", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_2[0].bias), plane: 5 };
-		  this.rbf_plane_3 = {name: "side_0_rbf_plane_3", file: this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_plane_3[0].bias), plane: 6 };
-		  this.planes.push( this.hsh_plane_0);
-		  this.planes.push( this.hsh_plane_1);
-		  this.planes.push( this.hsh_plane_2);
-		  this.planes.push( this.hsh_plane_3);
-	  
-		  vec4ScaleHSH = [this.planes[3].scale, this.planes[4].scale, this.planes[5].scale, this.planes[6].scale];
-		  vec4BiasHSH = [this.planes[3].bias, this.planes[4].bias, this.planes[5].bias, this.planes[6].bias];
-		  this.njpegs +=4;
-		  if(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor){
-			  this.hsh_nor = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_nor[0].bias), plane: 7  };
-			  this.planes[7] = this.hsh_nor;
-			  this.njpegs +=1;
-		  } else { 
-			  this.hsh_nor = {file: null, scale: 1, bias: 0};
-		  }
-		  if(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb){
-			  this.hsh_amb = {file: this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].file, scale: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].scale), bias: parseFloat(this.scmlFiles[index].scmlFile.hsh[0].hsh_amb[0].bias), plane: 8 };
-			  this.planes[8] = this.hsh_amb;
-			  this.njpegs +=1;
-		  } else { 
-			  this.hsh_amb = {file: null, scale: 1, bias: 0};
-		  }
+		  this.pldScale = this.pldScale.concat(this.pld_wl_amb.scale);
+		  this.pldBias = this.pldBias.concat(this.pld_wl_amb.bias);
+	  }
+	 /* if(this.scmlFiles[index].scmlFile.side_0.pld.wl_depth){
+		boolDepthMap = true;
+		this.pld_wl_depth = {name: "pld_side_0_wl_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_depth.bias, plane: 3 };
+		  this.planes.push( this.pld_wl_depth );
+	  }
+	  */
+
+	}
+	if(this.scmlFiles[index].scmlFile.side_0.pld.r_nor){
+		this.reflectanceSource = 3;
+		boolMultiSpectral = true;
+		boolHasAmbient[0] = true;
+		this.boolPld = true;
+		this.pldScale = [];
+		this.pldBias = [];
+
+		this.pld_ir_nor = {name: "pld_side_0_ir_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_nor.bias, plane: 0 };
+		this.pld_r_nor = {name: "pld_side_0_r_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.r_nor.bias, plane: 0 };
+		this.pld_g_nor = {name: "pld_side_0_g_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.g_nor.bias, plane: 0 };
+		this.pld_b_nor = {name: "pld_side_0_b_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.b_nor.bias, plane: 0 };
+		this.pld_uv_nor = {name: "pld_side_0_uv_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.uv_nor.bias, plane: 0 };
+		this.pld_rgb_alb = {name: "pld_side_0_rgb_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.rgb_alb.bias, plane: 0 };
+		this.pld_iruv_alb = {name: "pld_side_0_iruv_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.iruv_alb.bias, plane: 0 };
+		this.pld_rgb_amb = {name: "pld_side_0_rgb_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.rgb_amb.bias, plane: 0 };
+		this.pld_iruv_amb = {name: "pld_side_0_iruv_amb", file: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.iruv_amb.bias, plane: 0 };
+		
+		for(var id = 0; id<3; id++){
+			this.pld_ir_nor.scale[i] = parseFloat(this.pld_ir_nor.scale[i]);
+			this.pld_ir_nor.bias[i] = parseFloat(this.pld_ir_nor.bias[i]);
+			this.pld_r_nor.scale[i] = parseFloat(this.pld_r_nor.scale[i]);
+			this.pld_r_nor.bias[i] = parseFloat(this.pld_r_nor.bias[i]);
+			this.pld_g_nor.scale[i] = parseFloat(this.pld_g_nor.scale[i]);
+			this.pld_g_nor.bias[i] = parseFloat(this.pld_g_nor.bias[i]);
+			this.pld_b_nor.scale[i] = parseFloat(this.pld_b_nor.scale[i]);
+			this.pld_b_nor.bias[i] = parseFloat(this.pld_b_nor.bias[i]);
+			this.pld_uv_nor.scale[i] = parseFloat(this.pld_uv_nor.scale[i]);
+			this.pld_uv_nor.bias[i] = parseFloat(this.pld_uv_nor.bias[i]);
+			this.pld_rgb_alb.scale[i] = parseFloat(this.pld_rgb_alb.scale[i]);
+			this.pld_rgb_alb.bias[i] = parseFloat(this.pld_rgb_alb.bias[i]);
+			this.pld_iruv_alb.scale[i] = parseFloat(this.pld_iruv_alb.scale[i]);
+			this.pld_iruv_alb.bias[i] = parseFloat(this.pld_iruv_alb.bias[i]);
+			this.pld_rgb_amb.scale[i] = parseFloat(this.pld_rgb_amb.scale[i]);
+			this.pld_rgb_amb.bias[i] = parseFloat(this.pld_rgb_amb.bias[i]);
+			this.pld_iruv_amb.scale[i] = parseFloat(this.pld_iruv_amb.scale[i]);
+			this.pld_iruv_amb.bias[i] = parseFloat(this.pld_iruv_amb.bias[i]);
 		}
-	*/  
+		this.planes.push(this.pld_ir_nor);
+		this.planes.push(this.pld_r_nor);
+		this.planes.push(this.pld_g_nor);
+		this.planes.push(this.pld_b_nor);
+		this.planes.push(this.pld_uv_nor);
+		this.planes.push(this.pld_rgb_alb);
+		this.planes.push(this.pld_iruv_alb);
+		this.planes.push(this.pld_rgb_amb);
+		this.planes.push(this.pld_iruv_amb);
+		this.njpegs +=9;
+		$("#lmsAmbPLD").button({disabled:false});
+		$("#lmsAlbPLD").button({disabled:false});
+		$("#normalI").button({disabled:false});
+		$("#normalR").button({disabled:false});
+		$("#normalB").button({disabled:false});
+		$("#normalG").button({disabled:false});
+		$("#normalU").button({disabled:false});
+		if(this.scmlFiles[index].scmlFile.side_0.pld.r_depth){
+			boolDepthMap = true;
+			this.pld_ir_depth = {name: "pld_side_0_ir_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.ir_depth.bias, plane: 0 };
+			this.pld_r_depth = {name: "pld_side_0_r_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.r_depth.bias, plane: 0 };
+			this.pld_g_depth = {name: "pld_side_0_g_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.g_depth.bias, plane: 0 };
+			this.pld_b_depth = {name: "pld_side_0_b_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.b_depth.bias, plane: 0 };
+			this.pld_uv_depth = {name: "pld_side_0_uv_depth", file: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.uv_depth.bias, plane: 0 };
+				for(var id = 0; id<3; id++){
+					this.pld_ir_depth.scale[i] = parseFloat(this.pld_ir_depth.scale[i]);
+					this.pld_ir_depth.bias[i] = parseFloat(this.pld_ir_depth.bias[i]);
+					this.pld_r_depth.scale[i] = parseFloat(this.pld_r_depth.scale[i]);
+					this.pld_r_depth.bias[i] = parseFloat(this.pld_r_depth.bias[i]);
+					this.pld_g_depth.scale[i] = parseFloat(this.pld_g_depth.scale[i]);
+					this.pld_g_depth.bias[i] = parseFloat(this.pld_g_depth.bias[i]);
+					this.pld_b_depth.scale[i] = parseFloat(this.pld_b_depth.scale[i]);
+					this.pld_b_depth.bias[i] = parseFloat(this.pld_b_depth.bias[i]);
+					this.pld_uv_depth.scale[i] = parseFloat(this.pld_uv_depth.scale[i]);
+					this.pld_uv_depth.bias[i] = parseFloat(this.pld_uv_depth.bias[i]);
+			}
+			this.planes.push(this.pld_ir_depth);
+			this.planes.push(this.pld_r_depth);
+			this.planes.push(this.pld_g_depth);
+			this.planes.push(this.pld_b_depth);
+			this.planes.push(this.pld_uv_depth);
+	}
+	  
+	}
+ }
   
    this.njpegs = 0;
    for(var ab = 0; ab < this.planes.length; ab++){
@@ -976,9 +1274,11 @@ if(!this.scmlFiles[index].scmlFile.hasOwnProperty("SCML Version") || !(this.scml
   
 	
 	this.populateFields(index);
-}
+
 	t.stop();
-  }
+}
+  
+}
 
 populateFields(index){
 var _this = this;
@@ -1820,7 +2120,7 @@ drawNode(pos, minlevel, level, x, y) {
 	
 	//gl.vertexAttribPointer(t.texattrib, 2, gl.FLOAT, false, 0, 0);
 	//gl.enableVertexAttribArray(t.texattrib);
-	//console.log(this.findPlaneIndex("side_0_pld_b_nor"));
+	//console.log(this.findPlaneIndex("pld_side_0_b_nor"));
 	//console.log(this.planes);
 	/*
 	
@@ -1834,56 +2134,56 @@ if(this.curPrg == program_hsh_default_color || this.curPrg == program_hsh_sharpe
 		//console.log(this.normalSource);
 		switch(this.normalSource){
 			case 0:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_ir_nor")]); break;
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 			case 1:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_r_nor")]); break;	
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 			case 2:
-				if(this.findPlaneIndex("side_0_pld_g_nor") > 0){
-					gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_nor")]); break;
+				if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
+					gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 				} else {
-					//console.log(this.findPlaneIndex("side_0_pld_wl_nor"));
-					gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_nor")]); break;
+					//console.log(this.findPlaneIndex("pld_side_0_wl_nor"));
+					gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
 				}
 			case 3:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_b_nor")]); break;
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 			case 4:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_uv_nor")]); break;
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 			case 5:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_nor")]); break;
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 			case 6:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_nor")]); break;
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
 			case 7:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_nor")]); break;	
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 		}
 		gl.uniform1i(this.curPrg.uNormalSampler, 1);
 	}
 
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_plane_0")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_plane_0")]);
 	gl.uniform1i(this.curPrg.scmlTex0, 2);
 
 	gl.activeTexture(gl.TEXTURE3);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_plane_1")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_plane_1")]);
 	gl.uniform1i(this.curPrg.scmlTex1, 3);
 
 	gl.activeTexture(gl.TEXTURE4);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_plane_2")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_plane_2")]);
 	gl.uniform1i(this.curPrg.scmlTex2, 4);
 
 	gl.activeTexture(gl.TEXTURE5);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_plane_3")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_plane_3")]);
 	gl.uniform1i(this.curPrg.scmlTex3, 5);
 
 	gl.activeTexture(gl.TEXTURE6);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_plane_4")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_plane_4")]);
 	gl.uniform1i(this.curPrg.scmlTex4, 6);
 
 	gl.activeTexture(gl.TEXTURE7);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_plane_5")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_plane_5")]);
 	gl.uniform1i(this.curPrg.scmlTex5, 7);
 
 } else if(this.curPrg == program_ptm_default_color || this.curPrg == program_ptm_spec_enh){
-//console.log(this.findPlaneIndex("side_0_ptm_plane_0"));
+//console.log(this.findPlaneIndex("ptm_side_0_plane_0"));
 	//gl.uniform1fv(t.curPrg.scmlBias, t.ptmBias);
 	//gl.uniform1fv(t.curPrg.scmlScale, t.ptmScale);
 	//gl.uniform1fv(curProgram.rtiWeights, t.lweights);
@@ -1892,51 +2192,51 @@ if( this.curPrg == program_ptm_spec_enh){
 	//console.log(this.normalSource);
 	switch(this.normalSource){
 		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_ir_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 		case 2:
-			if(this.findPlaneIndex("side_0_pld_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_nor")]); break;
+			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 			} else {
-				//console.log(this.findPlaneIndex("side_0_pld_wl_nor"));
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_nor")]); break;
+				//console.log(this.findPlaneIndex("pld_side_0_wl_nor"));
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
 			}
 		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_b_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
 		case 7:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);
 }
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_plane_0")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_plane_0")]);
 	gl.uniform1i(this.curPrg.scmlTex0, 2);
 
 	gl.activeTexture(gl.TEXTURE3);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_plane_1")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_plane_1")]);
 	gl.uniform1i(this.curPrg.scmlTex1, 3);
 
 	gl.activeTexture(gl.TEXTURE4);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_plane_2")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_plane_2")]);
 	gl.uniform1i(this.curPrg.scmlTex2, 4);
 
 	gl.activeTexture(gl.TEXTURE5);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_plane_3")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_plane_3")]);
 	gl.uniform1i(this.curPrg.scmlTex3, 5);
 
 	gl.activeTexture(gl.TEXTURE6);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_plane_4")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_plane_4")]);
 	gl.uniform1i(this.curPrg.scmlTex4, 6);
 
 	gl.activeTexture(gl.TEXTURE7);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_plane_5")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_plane_5")]);
 	gl.uniform1i(this.curPrg.scmlTex5, 7);
 	
 }
@@ -1946,59 +2246,59 @@ else if(this.curPrg == program_rbf_default_color || this.curPrg == program_rbf_s
 	//console.log(this.normalSource);
 	switch(this.normalSource){
 		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_ir_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 		case 2:
-			if(this.findPlaneIndex("side_0_pld_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_nor")]); break;
+			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 			} else {
-				//console.log(this.findPlaneIndex("side_0_pld_wl_nor"));
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_nor")]); break;
+				//console.log(this.findPlaneIndex("pld_side_0_wl_nor"));
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
 			}
 		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_b_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
 		case 7:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);}
 
 	gl.activeTexture(gl.TEXTURE2);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_0")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_0")]);
 	gl.uniform1i(this.curPrg.scmlTex0, 2);
 
 	gl.activeTexture(gl.TEXTURE3);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_1")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_1")]);
 	gl.uniform1i(this.curPrg.scmlTex1, 3);
 
 	gl.activeTexture(gl.TEXTURE4);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_2")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_2")]);
 	gl.uniform1i(this.curPrg.scmlTex2, 4);
 
 	gl.activeTexture(gl.TEXTURE5);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_3")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_3")]);
 	gl.uniform1i(this.curPrg.scmlTex3, 5);
 
 	gl.activeTexture(gl.TEXTURE6);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_4")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_4")]);
 	gl.uniform1i(this.curPrg.scmlTex4, 6);
 
 	gl.activeTexture(gl.TEXTURE7);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_5")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_5")]);
 	gl.uniform1i(this.curPrg.scmlTex5, 7);
 
 	/*gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_6")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_6")]);
 	gl.uniform1i(this.curPrg.scmlTex6, 0);
 
 	gl.activeTexture(gl.TEXTURE1);
-	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_plane_5")]);
+	gl.bindTexture(gl.TEXTURE_2D,  t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_plane_5")]);
 	gl.uniform1i(this.curPrg.scmlTex7, 1);
 	*/
 }
@@ -2007,63 +2307,60 @@ else if(this.curPrg == program_normals){
 	//console.log(this.normalSource);
 	switch(this.normalSource){
 		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_ir_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 2:
-			if(this.findPlaneIndex("side_0_pld_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_nor")]); break;
-			} else {
-				//console.log(this.findPlaneIndex("side_0_pld_wl_nor"));
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_nor")]); break;
-			}
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_b_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 7:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+		case 8:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);
 } else if(this.curPrg == program_refl){
 	switch(this.reflectanceSource){
 		case 0: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 1: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 2:
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_rgb_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 			gl.activeTexture(gl.TEXTURE3);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_iruv_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_iruv_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3); break;
 		case 3:
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_rgb_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 			gl.activeTexture(gl.TEXTURE3);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_iruv_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_iruv_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3); break;
 		case 4: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 5: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 6: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 			
 	}
@@ -2073,105 +2370,105 @@ else{ // all other PLD shaders
 	gl.activeTexture(gl.TEXTURE1);
 	switch(this.normalSource){
 		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_ir_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 		case 2:
-			if(this.findPlaneIndex("side_0_pld_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_nor")]); break;
+			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 			} else {
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_nor")]); break;
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
 			}
 		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_b_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
 		case 7:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);
 	switch(this.reflectanceSource){
 		case 0: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 1: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 2:
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_rgb_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 			gl.activeTexture(gl.TEXTURE3);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_iruv_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_iruv_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3); break;
 		case 3:
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_rgb_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 			gl.activeTexture(gl.TEXTURE3);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_iruv_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_iruv_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3); break;
 		case 4: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_ptm_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 5: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_hsh_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 		case 6: 
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_rbf_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2); break;
 			
 	}
 	
-/*	if(this.findPlaneIndex("side_0_pld_g_nor") > 0){
+/*	if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
 	
 
 			
 			if(useAmbient){
 				gl.activeTexture(gl.TEXTURE2);
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_rgb_amb")]);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_amb")]);
 				gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 				gl.activeTexture(gl.TEXTURE3);
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_iruv_amb")]);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_iruv_amb")]);
 				gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3);
 			}
 			else{
 				gl.activeTexture(gl.TEXTURE2);
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_rgb_alb")]);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_rgb_alb")]);
 				gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 				gl.activeTexture(gl.TEXTURE3);
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_iruv_alb")]);
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_iruv_alb")]);
 				gl.uniform1i(this.curPrg.uAlbedo2Sampler, 3);
-				//console.log(this.findPlaneIndex("side_0_pld_bu_alb"));
+				//console.log(this.findPlaneIndex("pld_side_0_bu_alb"));
 
 			}
 	} else{ //wl
 		if(useAmbient){
-			if(this.findPlaneIndex("side_0_pld_wl_amb") >0){
+			if(this.findPlaneIndex("pld_side_0_wl_amb") >0){
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_amb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_amb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 			}
 		}
 		else{
 			gl.activeTexture(gl.TEXTURE2);
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_wl_alb")]);
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_alb")]);
 			gl.uniform1i(this.curPrg.uAlbedoSampler, 2);
 		}
 	}
 	*/		
 if(boolDepthMap){
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("side_0_pld_g_depth")]);
+	gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_depth")]);
 	gl.uniform1i(this.curPrg.uDispSampler, 0);
 }
 }
@@ -2191,7 +2488,7 @@ findPlaneIndex( name){
 
 isRequested(name){
 	for(var i=0; i < this.neededTexPl.length; i++){
-		if(name.includes(this.neededTexPl[i])){return true;}
+		if(name.replace("side_0_", "").includes(this.neededTexPl[i])){return true;}
 	}
 	return false;
 }

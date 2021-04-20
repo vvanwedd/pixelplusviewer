@@ -134,6 +134,7 @@ function initInteraction(){
 	$("#normalG").button();
 	$("#normalB").button();
 	$("#normalU").button();
+	$("#normalWL").button();
 
 	if(!boolMultiSpectral){
 		$("#colorI").button("disable");
@@ -163,10 +164,8 @@ function initInteraction(){
 		$("#normalB").button("enable");
 		$("#normalU").button("enable");
 	}
-
-
-
 }
+
 function boolLightToggle(){
 	return (touchLightToggle||keyLightToggle);
 }
@@ -174,6 +173,26 @@ function boolLightToggle(){
 function openInNewTab(url) {
   var win = window.open(url, '_blank');
   win.focus();
+}
+
+function resetButtons(){
+	$("#lmsAmbPLD").button({disabled:true});
+	$("#lmsAlbPLD").button({disabled:true});
+	$("#lwlAmbPLD").button({disabled:true});
+	$("#lwlAlbPLD").button({disabled:true});
+	$("#lambPTM").button({disabled:true});
+	$("#lambHSH").button({disabled:true});
+	$("#lambRBF").button({disabled:true});	
+	
+	$("#normalWL").button({disabled:true});
+	$("#normalI").button({disabled:true});
+	$("#normalR").button({disabled:true});
+	$("#normalG").button({disabled:true});
+	$("#normalB").button({disabled:true});
+	$("#normalU").button({disabled:true});
+	$("#normalPTM").button({disabled:true});
+	$("#normalHSH").button({disabled:true});
+	$("#normalRBF").button({disabled:true});
 }
 
 //function to sync mouse mode and touch mode input
@@ -364,40 +383,46 @@ if(gl){render(0);}
 
 
  $("#normalSet" ).buttonset();
+ $("#normalI").button({disabled:true});
+
 	$("#normalSet").change(function(){
-                if($("#normalI")[0].checked==true){
-                        updateNormal(0);
+		if($("#normalWL")[0].checked==true){
+			updateNormal(0);
+			if(gl){render(0);}
+		}
+        if($("#normalI")[0].checked==true){
+                        updateNormal(1);
 			if(gl){render(0);}
 		}
 		if($("#normalR")[0].checked==true){
-                        updateNormal(1);
-			if(gl){render(0);}
-
-                }
-		if($("#normalG")[0].checked==true){
                         updateNormal(2);
 			if(gl){render(0);}
 
                 }
-		if($("#normalB")[0].checked==true){
+		if($("#normalG")[0].checked==true){
                         updateNormal(3);
 			if(gl){render(0);}
 
                 }
+		if($("#normalB")[0].checked==true){
+                        updateNormal(4);
+			if(gl){render(0);}
+
+                }
 		if($("#normalU")[0].checked==true){
-			updateNormal(4);
+			updateNormal(5);
                         if(gl){render(0);}
 				}
 		if($("#normalHSH")[0].checked==true){
-			updateNormal(5);
+			updateNormal(6);
 		 				if(gl){render(0);}
 				}
 		if($("#normalPTM")[0].checked==true){
-			updateNormal(6);
+			updateNormal(7);
 			if(gl){render(0);}
 		}
 		if($("#normalRBF")[0].checked==true){
-			updateNormal(7);
+			updateNormal(8);
 			if(gl){render(0);}
 		}
 
@@ -463,11 +488,11 @@ if(gl){render(0);}
 		}
 		else if($("#ambHSH")[0].checked==true){
 			useAmbient = true;
-			updateReflectance(4);
+			updateReflectance(5);
 		}
 		else if($("#ambRBF")[0].checked==true){
 			useAmbient = true;
-			updateReflectance(4);
+			updateReflectance(6);
 		}
 		if(gl){render(0)};
 	});
