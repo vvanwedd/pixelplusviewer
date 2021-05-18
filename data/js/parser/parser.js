@@ -971,7 +971,9 @@ function loadFile(arrayBuffer){
 		else if(stringTag.s.localeCompare("CSP")==0){
 			console.log("tag: CSP");
 			if (len>0) {
-				loadVersion41(arrayBuffer,dataView,bytePointer+len,i);
+				if(!loadVersion13(arrayBuffer,dataView,bytePointer+len,i)){
+					loadVersion41(arrayBuffer,dataView,bytePointer+len,i);
+				}
 				i++;
 			}
 		}
@@ -1015,6 +1017,124 @@ function loadFile(arrayBuffer){
 			workerOtherSides.postMessage({buffer: arrayBuffer, startPtr: beginPointer,},[arrayBuffer]);
 }
 
+function loadVersion13(ArrayBuffer,dataView,endpos,SideNr){
+	{
+
+		startPointer[SideNr] = bytePointer;
+		console.log("loadVersion13(fd): " + SideNr);
+		console.log("endpos: " + endpos);
+		endPos[SideNr] = endpos;
+	
+		var tag = "";
+	
+		//header
+		var uintHeader = new Uint8Array(ArrayBuffer,bytePointer,5);
+		//console.log(uintHeader1);
+		var stringHeader = { s: "" };
+		charCodeArrayToString(uintHeader,stringHeader);
+		console.log("header: "+stringHeader.s);
+		bytePointer+=5;
+	
+		if(stringHeader.s.localeCompare("CSP13")!=0 && stringHeader.s.localeCompare("CSP12")!=0 && stringHeader.s.localeCompare("CSP11")!=0 ){
+			//$("#progressIndicator").css("display","none");
+			//$("#errorMessages").css("display","block");
+			//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader1.s + " </h3>";
+			//setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file. Invalid header: " + stringHeader.s , true);
+			bytePointer-=5;
+			return false;
+		}
+		var sideData = new Object();
+		//dimension/offsets
+		var offsetX, offsetY;
+	
+		mWidth = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		console.log("mWidth: "+mWidth);
+		bytePointer +=4;
+	
+		mHeight = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		console.log("mHeight: "+mHeight);
+		bytePointer +=4;
+	
+		var offsetX = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		console.log("offsetX: "+offsetX);
+		bytePointer +=4;
+	
+		var offsetY = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		console.log("offsetY: "+offsetY);
+		bytePointer +=4;
+	
+		mMmPerPixel = 0;
+		if(stringHeader.s.localeCompare("CSP13")==0){
+			mMmPerPixel = dataView.getFloat32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+			console.log("mMmPerPixel: "+mMmPerPixel);
+			bytePointer +=4;
+		}
+	
+		console.log("bytepointer: " +bytePointer);
+	
+		var pos = bytePointer;
+		  var blocksize; // NOTE: we do not use long as it is not necessary yet and #bytes differs on 32-and 64-bit
+		var i = 0;
+	
+		while(((endPos[SideNr]==0) || (bytePointer<endPos[SideNr]) /*&& i<4*/ ) /*&& (fread(tag, 1, 4, fd) == 4)*/ ) {
+			var uintTag = new Uint8Array(ArrayBuffer,bytePointer,4);
+			var stringTag = { s: "" };
+			charCodeArrayToString(uintTag,stringTag);
+			bytePointer+=4;
+	
+			var blocksize = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+			bytePointer +=4;
+	
+			console.log("TAG: " + stringTag.s + " (" + blocksize + " bytes)");
+	
+			if(stringTag.s.localeCompare("INFO")==0){
+				loadBlockInfo(ArrayBuffer,dataView,SideNr);
+			}
+			else if(stringTag.s.localeCompare("NORC")==0){
+				loadBlockCompressedNormal(ArrayBuffer,dataView,SideNr);
+			}
+			else if(stringTag.s.localeCompare("NORZ")==0 || stringTag.s.localeCompare("NOZ2")==0 || stringTag.s.localeCompare("NOZ3")==0 || stringTag.s.localeCompare("NOZ4")==0 || stringTag.s.localeCompare("NOZ5")==0){
+				if(stringTag.s.localeCompare("NOZ2")==0){boolMultiSpectral = true;initInteraction();updateShaderList();}
+				loadBlockZippedNormal(ArrayBuffer,dataView,SideNr);
+			}
+			else if(stringTag.s.localeCompare("ALBC")==0){
+				loadBlockCompressedDiffuse(ArrayBuffer,dataView,0,SideNr);
+			}
+			else if(stringTag.s.localeCompare("ALBZ")==0 || stringTag.s.localeCompare("ALZ2")==0 ){
+				//console.log("before loadBlockZippedDiffuse : " + stringTag.s);
+				loadBlockZippedDiffuse(ArrayBuffer,dataView,0,SideNr);
+			}
+			else if(stringTag.s.localeCompare("AMBC")==0){
+				boolHasAmbient[SideNr] = true;
+				loadBlockCompressedDiffuse(ArrayBuffer,dataView,1,SideNr);
+			}
+			else if(stringTag.s.localeCompare("AMBZ")==0 || stringTag.s.localeCompare("AMZ2")==0){
+				boolHasAmbient[SideNr] = true;
+				loadBlockZippedDiffuse(ArrayBuffer,dataView,1,SideNr);
+			}
+			else{
+				//$("#loader").css("display","none");
+				//$("#errorMessages").css("display","block");
+				//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  Invalid compression tag: " + stringTag.s + " </h3>";
+				setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file.  Invalid compression tag: " + stringTag.s , true);
+				bytePointer-=5;
+				//abortExecution();
+			}
+	
+			console.log("Loaded " + stringTag.s);
+			sideData.width = mWidth;
+			sideData.height = mHeight;
+			sideData.mmPerPixel = mMmPerPixel;
+		i++;
+	
+		}
+		textureData.push(sideData);
+	
+		console.log("---------------------------------------------------Done with this side");
+		return true;
+	}
+
+}
 function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 
 	startPointer[SideNr] = bytePointer;
@@ -1036,7 +1156,7 @@ function loadVersion41(ArrayBuffer,dataView,endpos,SideNr){
 		//$("#progressIndicator").css("display","none");
 		//$("#errorMessages").css("display","block");
 		//document.getElementById("errorMessages").innerHTML= "<h1>:-( Error</h1><h3>The file could not be read. Please choose a different ZUN or CUN file.  LoadVersion41 Invalid header: " + stringHeader1.s + " </h3>";
-		setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file. Invalid header: " + stringHeader1.s , true);
+		setProgressText(false, "Error: The file could not be read. Please choose a different ZUN or CUN file. Invalid header: " + stringHeader.s , true);
 		bytePointer-=5;
 		abortExecution();
 	}

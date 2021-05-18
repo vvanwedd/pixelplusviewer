@@ -50,9 +50,10 @@ self.onmessage = function(event){
 		}
 		else if(stringTag.s.localeCompare("CSP")==0){	
 			if (len>0) {
-				loadVersion41(arrayBuffer,dataView,bytePointer+len,i);
-					
-				
+				if(!loadVersion13(arrayBuffer,dataView,bytePointer+len,i)){;
+					loadVersion41(arrayBuffer,dataView,bytePointer+len,i);
+				}
+
 			}
 		else{
 			break;
@@ -75,6 +76,153 @@ self.onmessage = function(event){
 
 }
 
+function loadVersion13(arrayBuffer,dataView,endpos,SideNr){
+	
+
+		endPos[SideNr] = endpos;
+	
+		var tag = "";  
+		
+		//header
+		var uintHeader = new Uint8Array(arrayBuffer,bytePointer,5);
+		var stringHeader = { s: "" };
+		charCodeArrayToString(uintHeader,stringHeader);
+		bytePointer+=5;
+	
+		if(stringHeader.s.localeCompare("CSP11")!=0 && stringHeader.s.localeCompare("CSP12")!=0 && stringHeader.s.localeCompare("CSP13")!=0){
+			console.log('    worker loadVersion13 Invalid header: ' + stringHeader.s);
+			bytePointer-=5;
+			return false;
+		}
+		
+		//dimension/offsets
+		var offsetX, offsetY;
+	
+		mWidth = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		bytePointer +=4;
+		
+		mHeight = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		bytePointer +=4;
+	
+		var offsetX = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		bytePointer +=4;
+	
+		var offsetY = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+		bytePointer +=4;
+	
+		if(stringHeader.s.localeCompare("CSP13")==0){
+			mMmPerPixel = dataView.getFloat32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+			bytePointer +=4;
+		}
+	  //cout << "    side has dimension: " << mWidth << "x" << mHeight << endl;
+	  //cout << "    data N/D/A (init): " << mNormalData << "," << mDiffuseData << "," << mAmbientData << endl; 
+	  //float dmin, dmax;
+	  //float amin, amax;
+	
+		var pos = bytePointer;
+		  var blocksize; // NOTE: we do not use long as it is not necessary yet and #bytes differs on 32-and 64-bit
+		var i = 0;
+	
+		sideData = {
+			//normals :  new ArrayBuffer(3*mWidth*mHeight),
+			//albedo : new ArrayBuffer(3*mWidth*mHeight),
+			msNormals0: new ArrayBuffer(3*mWidth*mHeight),
+			msNormals1: new ArrayBuffer(3*mWidth*mHeight),
+			msNormals2: new ArrayBuffer(3*mWidth*mHeight),
+			msNormals3: new ArrayBuffer(3*mWidth*mHeight),
+			msNormals4: new ArrayBuffer(3*mWidth*mHeight),
+			msAlbedo0: new ArrayBuffer(3*mWidth*mHeight),
+			msAlbedo1: new ArrayBuffer(3*mWidth*mHeight),
+			msAmbient0: new ArrayBuffer(3*mWidth*mHeight),
+			msAmbient1: new ArrayBuffer(3*mWidth*mHeight),
+			//ambient : new ArrayBuffer(3*mWidth*mHeight),
+			//MSnormals: new Array(6),
+			//MSAlbedo: new Array(2),
+			//MSAmbient: new Array(2)
+	};
+	
+		//var MSnormals = new Array(5);
+		while(((endPos[SideNr]==0) || (bytePointer<endPos[SideNr]) /*&& i<4*/ ) /*&& (fread(tag, 1, 4, fd) == 4)*/ ) {
+			mPercentLoaded = Math.round((bytePointer / endPos[SideNr]) * 100);
+			self.postMessage({percentLoaded:mPercentLoaded});
+			
+		   //var tag = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+			//bytePointer +=4;
+			var uintTag = new Uint8Array(arrayBuffer,bytePointer,4);
+			var stringTag = { s: "" };
+			charCodeArrayToString(uintTag,stringTag);
+			bytePointer+=4;		
+	
+			var blocksize = dataView.getUint32(bytePointer,true);	//interpret these 4 bytes as usigned 32 bit integer, use littleEndian (lb first)
+			bytePointer +=4;
+	
+			//fread(&blocksize, sizeof(unsigned int), 1, fd);
+	
+			if(stringTag.s.localeCompare("INFO")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading info for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				loadBlockInfo(ArrayBuffer,dataView,SideNr);
+			}	
+			else if(stringTag.s.localeCompare("NORC")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading surface normals for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				sideData.msNormals0 = loadBlockCompressedNormal(arrayBuffer,dataView,SideNr);
+			}	
+			else if(stringTag.s.localeCompare("NORZ")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading surface normals for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				sideData.msNormals0 = loadBlockZippedNormal(arrayBuffer,dataView,SideNr);
+			}	
+			else if(stringTag.s.localeCompare("ALBC")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading albedo data for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				sideData.msAlbedo0 = loadBlockCompressedDiffuse(arrayBuffer,dataView,0,SideNr);
+			}	
+			else if(stringTag.s.localeCompare("ALBZ")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading albedo data for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				//sideData.albedo = loadBlockZippedDiffuse(arrayBuffer,dataView,0,SideNr);
+				sideData.msAlbedo0 = loadBlockZippedDiffuse(arrayBuffer,dataView,0,SideNr);
+			}	
+			else if(stringTag.s.localeCompare("AMBC")==0){
+				var mProgressTextType = false;
+				var mProgressText = "Loading ambient data for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				boolHasAmbient[SideNr]=true;
+				sideData.msAmbient0 = loadBlockCompressedDiffuse(arrayBuffer,dataView,1,SideNr);
+			}
+			else if(stringTag.s.localeCompare("AMBZ")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading ambient data for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				boolHasAmbient[SideNr]=true;
+				//sideData.ambient = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
+				sideData.msAmbient0 = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
+			}
+			else if(stringTag.s.localeCompare("AMZ2")==0){	
+				var mProgressTextType = false;
+				var mProgressText = "Loading additional ambient data for side " + SideNr + " ...";
+				self.postMessage({progressText:mProgressText,progressTextType:mProgressTextType});
+				sideData.msAmbient1 = loadBlockZippedDiffuse(arrayBuffer,dataView,1,SideNr);
+			}	
+		
+			console.log("Parsed " + stringTag.s);
+			sideData.width = mWidth;
+			sideData.height = mHeight;
+		i++;
+		
+		}
+		//textureData.push(sideData);
+		
+		return true;
+
+}
+
 function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 
 	endPos[SideNr] = endpos;
@@ -88,7 +236,7 @@ function loadVersion41(arrayBuffer,dataView,endpos,SideNr){
 	bytePointer+=5;
 
 	if(stringHeader.s.localeCompare("CSP41")!=0 && stringHeader.s.localeCompare("CSP12")!=0){
-		alert('    loadVersion41 Invalid header: ' + stringHeader.s);
+		console.log('    loadVersion41 Invalid header: ' + stringHeader.s);
 		bytePointer-=5;
 		return;
 	}
