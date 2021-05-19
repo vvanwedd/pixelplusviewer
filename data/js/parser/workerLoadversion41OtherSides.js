@@ -90,7 +90,7 @@ function loadVersion13(arrayBuffer,dataView,endpos,SideNr){
 		bytePointer+=5;
 	
 		if(stringHeader.s.localeCompare("CSP11")!=0 && stringHeader.s.localeCompare("CSP12")!=0 && stringHeader.s.localeCompare("CSP13")!=0){
-			console.log('    worker loadVersion13 Invalid header: ' + stringHeader.s);
+			console.log('    worker loadVersion13 Invalid header: ' + stringHeader.s + '. Trying loadVersion41.');
 			bytePointer-=5;
 			return false;
 		}

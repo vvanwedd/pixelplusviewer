@@ -524,8 +524,8 @@ if(gl){render(0);}
 			document.getElementById("param2").innerHTML = "Kd";
 			document.getElementById("param3wrapper").style.display="none";
 			$("#sliderParam0").slider({value: 0.4});
-			$("#sliderParam1").slider({value: 0.8});
-			$("#sliderParam2").slider({value: 100});
+			$("#sliderParam1").slider({value: 0.5});
+			$("#sliderParam2").slider({value: 25});
 			$("#sliderParam3").slider({value: 0});
 
 			//param = [0.4, 0.8, 100, 0, 0];

@@ -12,9 +12,9 @@ function ObjectPlane(name,xres,yres,xScale,ratio,xOffset,yOffset,height,width){
 	this.isMiddle = false;
 	this.lightDirection0 = [0.0,0.0,1.0];
 	this.lightDirection1 = [0.0,0.0,1.0];
-	this.lightIntensity0 = 1.0;
-	this.lightIntensity1 = 0.0;
-	this.param = [0.1, 0.0, 0.0, 0.0, 0.0];
+	this.lightIntensity0 = 2.0;
+	this.lightIntensity1 = 1.0;
+	this.param = [2.0, 0.5, 25, 0, 0];
 	var v = [];
 	var i = [];
 	var uv = [];

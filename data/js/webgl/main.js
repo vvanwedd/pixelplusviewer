@@ -84,7 +84,7 @@ var lightDirection1 = [0.5,0.5,0.7];
 var lightIntensity0 = 3;
 var lightIntensity1 = 1;
 
-var param = [0,0,0,0,0];
+var param = [0.4, 0.5, 25, 0, 0];
 
 var useAmbient = false;
 
@@ -206,7 +206,7 @@ function initWebGL(){
 	lightIntensity0 = 3;
 	lightIntensity1 = 1;
  
-	param = [0.1, 0, 0, 0, 0];
+	param = [0.4, 0.5, 25, 0, 0];
 
 	useAmbient = false;
 	reflectanceChannelMix = [0.0, 1.0, 2.0];
@@ -1683,7 +1683,8 @@ function render(s) {
 				//gl.uniform1f(curProgram.uParam2, object.param2);
 				//gl.uniform1f(curProgram.uParam3, object.param3);
 			//}
-
+console.log("in render: ");
+console.log(object);
 			mat4.set(mvMatrixCopy,mvMatrix); //switch back to old mvMatrix
 
 			gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
