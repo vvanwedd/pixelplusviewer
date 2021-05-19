@@ -984,6 +984,7 @@ function intensity2Color(intensity){ // intensity between 0 and 10
 
 $(document).ready(function(){
 $("#canvasOverlay").bind('mousewheel DOMMouseScroll',function(e) {
+	//console.log("DOMMouseScroll: " + rotation[2]);
 	e.preventDefault();
 	var delta;
 	//to support all current browser implementations of positive and negative scrolling
@@ -1002,7 +1003,7 @@ $("#canvasOverlay").bind('mousewheel DOMMouseScroll',function(e) {
 			rotation[2]=(rotation[2]+90)%360;
 			rotationHelper +=90;
 		}
-console.log(rotation[2]);
+//console.log(rotation[2]);
 	changeSide(10);
 	}
 	else{
@@ -1037,7 +1038,11 @@ $(document).mouseup(function(e){
 	if(touchZRotationToggle&&!shiftToggle){
 		if(snappedTo90){rotationHelper=(rotationHelper+90)%360; snappedTo90 = false;}
 		if(snappedToMin90){rotationHelper=(rotationHelper-90)%360; snappedToMin90 = false;}
-		if(rotAngle!=90 || rotAngle!=-90){rotation[2]=rotationHelper;}
+		if(rotAngle!=90 || rotAngle!=-90){
+			//console.log(rotation[2]);
+			rotation[2]=rotationHelper;
+			//console.log("after: " + rotation[2]);
+		}
 		changeSide(10);
 	}
 	//mousup should stop the animation loop
@@ -1053,6 +1058,7 @@ $(document).keyup(function (e){
 });
 
 $(document).keydown(function (e){
+	//console.log("keydown");
 	if(e.altKey){updateUi(5);}
 	if(e.shiftKey){/*updateUi(2);*/ shiftToggle=true;document.getElementById("canvasOverlay").style.cursor="move";}		//pan
 	if(e.keyCode==76){keyLightToggle=!keyLightToggle;}  				//l for light
@@ -1133,6 +1139,7 @@ var snapped2;
 function handleMouseMove(event) {
 	//console.log("handleMouseMove");
 	if(!mouseDown){return;}
+	//console.log(rotation);
 	var newX = event.clientX - rect.left;
 	var newY = event.clientY - rect.top;
 	if(touchPanToggle==true || shiftToggle == true){
@@ -1141,7 +1148,7 @@ function handleMouseMove(event) {
 		position[1]=dragStartPosition[1]+(newY-oldY)/canvasHeight2*(position[2])*Math.tan(15/180*Math.PI)*2;
 		if(hasMeasurement){drawUpdatePan();}
 	}
-	else if((keyLightToggle==true||touchLightToggle==true)/*&&(mainPrg != prg2 || mainPrg != prg2)*/ ){
+	else if((keyLightToggle==true||touchLightToggle==true) ){ //&&(mainPrg != prg2 || mainPrg != prg2)
 		var closerToLight0;
 		if(Math.pow(newX-oldX0,2) + Math.pow(newY-oldY0,2) > Math.pow(newX-oldX1,2) + Math.pow(newY-oldY1,2)){
 			closerToLight0 = false;
@@ -1207,8 +1214,8 @@ function handleMouseMove(event) {
 		v2y = newY-canvasHeight2/2;
 		//console.log(v1x + " " + v1y);
 		rotAngle = Math.asin((-v1x*v2y+v1y*v2x)/(Math.sqrt(v1x*v1x+v1y*v1y)*Math.sqrt(v2x*v2x+v2y*v2y)))*180/Math.PI;
-		console.log(rotAngle);
-		console.log(rotation[2]);
+		//console.log(rotAngle);
+		//console.log(rotation[2]);
 		if(rotAngle <45 && rotAngle>-45){snapped2=false;}
 		if(rotAngle>=45){
 			rotAngle=90;
@@ -1235,10 +1242,11 @@ function handleMouseMove(event) {
 					rotationHelper+=90;
 					snapped2=true;
 				}
-				console.log("oldx: "+ oldX + "oldy: " + oldY);
+			//	console.log("oldx: "+ oldX + "oldy: " + oldY);
 			}
 
 		}
+		//console.log(rotation);
 		if(rotAngle<=-45){
 			rotAngle=-90;
 			snappedToMin90=true;
@@ -1247,6 +1255,7 @@ function handleMouseMove(event) {
 		if(rotation[2]==-90){rotation[2]+360;}
 		if(rotation[2]==360){rotation[2]=0;}
 		changeSide(10);
+	//	console.log(rotation);
 	}
 	else if(touchXyRotationToggle==true){
 		rotation[1]=(newX-canvasWidth2/2)/canvasWidth2*2*45;
@@ -1262,6 +1271,7 @@ function handleMouseMove(event) {
 		else if(-newX+oldX>0.2*canvasHeight2&&!boolAlreadyChangedSide){changeSideHelper(3); boolAlreadyChangedSide=true;}
 	}
 	//if(gl){render(0)};
+	//console.log(rotation);
 
 }
 
@@ -1385,16 +1395,17 @@ $("#introContentWrapper").hover(
 
 
 function handleOrientation(event) {
+//	console.log("handleOrientation");
 	var absolute = event.absolute;
 	var alpha    = event.alpha;
 	var x     = event.beta;
 	var y    = event.gamma;
 	if(gl){
 		if(window.innerHeight < window.innerWidth){
-			rotation = [-y*1.5,x*1.5,boolZRotation ? pZRotation : 0];
+		//	rotation = [-y*1.5,x*1.5,boolZRotation ? pZRotation : 0];
 		}
 		else{
-			rotation = [x*1.5,y*1.5,boolZRotation ? pZRotation : 0];
+		//	rotation = [x*1.5,y*1.5,boolZRotation ? pZRotation : 0];
 		}
 		render();
 

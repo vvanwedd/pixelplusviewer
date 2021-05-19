@@ -1133,7 +1133,7 @@ function changeSide(direction){//0 1 2 3 up bottom left right key
 			break;
 		default: break;
 	}
-	console.log("mainside: " + mainSide);
+	//console.log("mainside: " + mainSide);
 	//adjust new positions
 	switch(mainSide){
 		case 0: //front
@@ -1683,8 +1683,6 @@ function render(s) {
 				//gl.uniform1f(curProgram.uParam2, object.param2);
 				//gl.uniform1f(curProgram.uParam3, object.param3);
 			//}
-console.log("in render: ");
-console.log(object);
 			mat4.set(mvMatrixCopy,mvMatrix); //switch back to old mvMatrix
 
 			gl.bindBuffer(gl.ARRAY_BUFFER, object.vbo);
