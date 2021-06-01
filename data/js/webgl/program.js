@@ -51,10 +51,10 @@ function Programm(vss,fss,prg){
     this.uTextureLevel = gl.getUniformLocation(prg, "uTextureLevel");
     //this.gkernels = gl.getUniformLocation(prg, "gkernels");
     this.reflectanceChannelMix = gl.getUniformLocation(prg, "reflectanceChannelMix");
-    //this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");
-    //this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
-    //this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
-    //this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
+    this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");
+    this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
+    this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
+    this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
 
     //this.rbfCoeff0Tex = gl.getUniformLocation(prg, "rbfCoeff0Tex");
     //this.rbfCoeff1Tex = gl.getUniformLocation(prg, "rbfCoeff1Tex");
@@ -85,15 +85,15 @@ function Programm(vss,fss,prg){
     this.rtiWeights0 =  gl.getUniformLocation(prg, "rtiWeights0");
     this.rtiWeights1 =  gl.getUniformLocation(prg, "rtiWeights1");
     
-    //this.uScaleHSH = gl.getUniformLocation(prg, "uScaleHSH");
-    //this.uBiasHSH = gl.getUniformLocation(prg, "uBiasHSH");
-    //this.uScalePTM0 = gl.getUniformLocation(prg, "uScalePTM0");
-    //this.uBiasPTM0 = gl.getUniformLocation(prg, "uBiasPTM0");
-    //this.uScalePTM1 = gl.getUniformLocation(prg, "uScalePTM1");
-    //this.uBiasPTM1 = gl.getUniformLocation(prg, "uBiasPTM1");
-    //this.ptmCoeff0Tex = gl.getUniformLocation(prg, "ptmCoeff0Tex");
-    //this.ptmCoeff1Tex = gl.getUniformLocation(prg, "ptmCoeff1Tex");
-    //this.ptmRgbCoeffTex = gl.getUniformLocation(prg, "ptmRgbCoeffTex");
+    this.uScaleHSH = gl.getUniformLocation(prg, "uScaleHSH");
+    this.uBiasHSH = gl.getUniformLocation(prg, "uBiasHSH");
+    this.uScalePTM0 = gl.getUniformLocation(prg, "uScalePTM0");
+    this.uBiasPTM0 = gl.getUniformLocation(prg, "uBiasPTM0");
+    this.uScalePTM1 = gl.getUniformLocation(prg, "uScalePTM1");
+    this.uBiasPTM1 = gl.getUniformLocation(prg, "uBiasPTM1");
+    this.ptmCoeff0Tex = gl.getUniformLocation(prg, "ptmCoeff0Tex");
+    this.ptmCoeff1Tex = gl.getUniformLocation(prg, "ptmCoeff1Tex");
+    this.ptmRgbCoeffTex = gl.getUniformLocation(prg, "ptmRgbCoeffTex");
     //this.test = gl.getUniformLocation(prg, "test");
 }
 
