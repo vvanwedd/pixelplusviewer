@@ -168,7 +168,7 @@ header{
 	background-color: #353535 !important;
 	color: #777 !important;
 }
-#leftAside .ui-state-hover, #leftAside .ui-state-active,#rightAside .ui-state-hover, #rightAside .ui-state-active{
+#leftAside .ui-state-hover, #leftAside .ui-state-focus,#rightAside .ui-state-hover, #rightAside .ui-state-focus{
 	opacity:1;
 	border: 1px solid #eee;
 	background-image: none;
@@ -193,7 +193,7 @@ header{
 #buttonPrint{
 padding: 5px;
 }
-#shaderSet .ui-state-hover, #depthSet .ui-state-hover {
+#shaderSet .ui-state-hover, #depthSet .ui-state-hover, #shaderSet .ui-state-focus, #depthSet .ui-state-focus {
 	border: 1px solid #eee;
 }
 .paramwrapper{
@@ -286,6 +286,11 @@ float: left;
 	border-left: 1px solid #eee;
 	background-size:100% 100%;
 	cursor:pointer;
+}
+#rightAsideButton:active{
+	border-left: 1px solid #eee;
+	background-color: #222;
+	
 }
 
 

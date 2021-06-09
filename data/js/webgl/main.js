@@ -77,6 +77,7 @@ var HOME     = [0,0,-200];
 var position = [0,0,-200];
 var rotation = [0,0,0];
 var lrotation = [0,0,0];
+var reflectPosition = 1.0;
 
 var lightDirection0 = [-0.5,0.5,0.7];
 var lightDirection1 = [0.5,0.5,0.7];
@@ -199,6 +200,7 @@ function initWebGL(){
 	rotation = [0,0,0];
 	rotation[2] = boolZRotation ? pZRotation : 0;
 	lrotation = [0,0,0];
+	reflectPosition = 1.0;
 
 	lightDirection0 = [-0.5,0.5,0.7];
 	lightDirection1 = [0.5,0.5,0.7];
@@ -1631,6 +1633,10 @@ function render(s) {
 				mat4.rotateX(nMatrix,renderRotation[0]*piDev180);
 				mat4.rotateY(nMatrix,renderRotation[1]*piDev180);
 				mat4.rotateZ(nMatrix,renderRotation[2]*piDev180);
+				var reflMatrix = mat4.identity(reflMatrix);
+				reflMatrix[0] = reflectPosition;
+				//console.log(reflMatrix);
+				mat4.multiply(mvMatrix, reflMatrix, mvMatrix);
 			}
 
 

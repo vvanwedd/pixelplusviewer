@@ -814,8 +814,16 @@ if(gl){render(0);}
         event.preventDefault();
 		RotatePosition();
 	  });
-	  function RotatePosition(){
-		  rotation[2]-=90;
+	$( "#ButtonReflectY" )
+      .button()
+      .click(function( event ) {
+        event.preventDefault();
+		ReflectYPosition();
+	  });
+	  function ReflectYPosition(){
+		  if(reflectPosition === 1.0){
+			reflectPosition = -1.0;
+		  } else{reflectPosition = 1.0;}
 		  if(gl){render(0);}
 	  }
 

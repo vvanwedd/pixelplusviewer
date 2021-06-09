@@ -51,10 +51,10 @@ function Programm(vss,fss,prg){
     this.uTextureLevel = gl.getUniformLocation(prg, "uTextureLevel");
     //this.gkernels = gl.getUniformLocation(prg, "gkernels");
     this.reflectanceChannelMix = gl.getUniformLocation(prg, "reflectanceChannelMix");
-    //this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");
-    //this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
-    //this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
-    //this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
+    this.hshCoeff0Tex = gl.getUniformLocation(prg, "hshCoeff0Tex");
+    this.hshCoeff1Tex = gl.getUniformLocation(prg, "hshCoeff1Tex");
+    this.hshCoeff2Tex = gl.getUniformLocation(prg, "hshCoeff2Tex");
+    this.hshCoeff3Tex = gl.getUniformLocation(prg, "hshCoeff3Tex");
 
     //this.rbfCoeff0Tex = gl.getUniformLocation(prg, "rbfCoeff0Tex");
     //this.rbfCoeff1Tex = gl.getUniformLocation(prg, "rbfCoeff1Tex");
