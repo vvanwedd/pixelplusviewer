@@ -45,12 +45,12 @@ var beginPointer;
 var endPos = new Array(6);
 
 
-var vec3ScalePTM0 = [1.0, 1.0, 1.0];
-var vec3ScalePTM1 = [1.0, 1.0, 1.0];
+var vec3ScalePTM0 = [0.3, 0.3, 0.3];
+var vec3ScalePTM1 = [0.3, 0.3, 0.3];
 var vec3BiasPTM0 = [0.0, 0.0, 0.0];
 var vec3BiasPTM1 = [0.0, 0.0, 0.0];
 
-var vec4ScaleHSH = [1.0, 1.0, 1.0, 1.0];
+var vec4ScaleHSH = [0.3, 0.3, 0.3, 0.3];
 var vec4BiasHSH = [0.0, 0.0, 0.0, 0.0];
 
 
