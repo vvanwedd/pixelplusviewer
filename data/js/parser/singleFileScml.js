@@ -1661,13 +1661,13 @@ iproject(pos, x, y) {
 
 	//r[1] = -Math.tan(15*Math.PI/180.0)*(y)*this.object.position[2]/this.object.vertices[1]*this.height/2 + this.height/2 + cosRot*this.object.position[1]/this.object.vertices[1]*this.height/2*this.canvas.height/this.canvas.width;// +sinRot*this.object.position[0]/this.object.vertices[0]*this.width/2;
 	//r[0] = -Math.tan(15*Math.PI/180.0)*x*this.object.position[2]/this.object.vertices[0]*this.width/2*this.canvas.width/this.canvas.height  + this.width/2 + cosRot*this.object.position[0]/this.object.vertices[0]*this.width/2*this.canvas.height/this.canvas.width;;// -sinRot*this.object.position[1]/this.object.vertices[1]*this.height/2;
-	r[1] = -Math.tan(15*Math.PI/180.0)*(y)*this.object.position[2]/this.object.vertices[1]*this.height/2 + this.height/2 +this.object.position[1]/this.object.vertices[1]*this.height/2 *cosRot + sinRot*this.object.position[0]/this.object.vertices[0]*this.width/2*this.height/this.width;
-	r[0] = -Math.tan(15*Math.PI/180.0)*x*this.object.position[2]/this.object.vertices[0]*this.width/2*this.canvas.width/this.canvas.height  + this.width/2 + this.object.position[0]/this.object.vertices[0]*this.width/2 *cosRot - sinRot* this.object.position[1]/this.object.vertices[1]*this.height/2;
+	r[1] = -Math.tan(15*Math.PI/180.0)*(y)*this.object.position[2]/this.object.vertices[1]*this.height/2 + this.height/2 +this.object.position[1]/this.object.vertices[1]*this.height/2 *cosRot + sinRot*reflectPosition*this.object.position[0]/this.object.vertices[0]*this.width/2*this.height/this.width;
+	r[0] = -Math.tan(15*Math.PI/180.0)*x*this.object.position[2]/this.object.vertices[0]*this.width/2*this.canvas.width/this.canvas.height  + this.width/2 + reflectPosition*this.object.position[0]/this.object.vertices[0]*this.width/2 *cosRot - sinRot* this.object.position[1]/this.object.vertices[1]*this.height/2;
 	
-	var r2 = [];
+	//var r2 = [];
 
-	r2[0] = cosRot*r[0] - sinRot*r[1];
-	r2[1] = sinRot*r[0] + cosRot*r[1];
+	//r2[0] = cosRot*r[0] - sinRot*r[1];
+	//r2[1] = sinRot*r[0] + cosRot*r[1];
 
 	return r;
 }
