@@ -653,7 +653,7 @@ parseSCML_10(index){
 			this.ptm_nor = {name: "ptm_side_0_nor", file: this.scmlFiles[index].scmlFile.side_0.ptm.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.ptm.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.ptm.nor.bias, plane: 12 };
 			this.planes.push( this.ptm_nor);
 			this.njpegs+=1;
-			this.normalSource = 6;
+			this.normalSource = 7;
 			$("#normalPTM").button({disabled:false});
 			boolPhotometric = true;
 			for(var id = 0; id<3; id++){
@@ -702,7 +702,7 @@ parseSCML_10(index){
 			  this.hsh_nor = {name: "hsh_side_0_nor", file: this.scmlFiles[index].scmlFile.side_0.hsh.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.hsh.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.hsh.nor.bias, plane: 7  };
 			  this.planes.push( this.hsh_nor );
 			  this.njpegs +=1;
-			  this.normalSource = 5;
+			  this.normalSource = 6;
 			  boolPhotometric = true;
 			  $("#normalHSH").button({disabled:false});
 			  for(var id = 0; id<3; id++){
@@ -766,7 +766,7 @@ parseSCML_10(index){
 			this.rbf_nor = {name: "rbf_side_0_nor", file: this.scmlFiles[index].scmlFile.side_0.rbf.nor.file, scale: this.scmlFiles[index].scmlFile.side_0.rbf.nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.rbf.nor.bias, plane: 12 };
 			this.planes.push( this.rbf_nor);
 			this.njpegs+=1;
-			this.normalSource = 7;
+			this.normalSource = 8;
 			$("#normalRBF").button({disabled:false});
 			boolPhotometric = true;
 			for(var id = 0; id<3; id++){
@@ -792,7 +792,7 @@ parseSCML_10(index){
 	  this.boolPld = true;
 	  this.pldScale = [];
 	  this.pldBias = [];
-	  this.normalSource = 2;
+	  this.normalSource = 0;
 	  this.reflectanceSource = 0;
 
 	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_nor){
@@ -998,7 +998,7 @@ parseSCML_10(index){
 			this.ptm_nor = {name: "ptm_side_0_nor", file: this.scmlFiles[index].scmlFile.ptm.side_0.wl.nor.file, scale: this.scmlFiles[index].scmlFile.ptm.side_0.wl.nor.scale, bias: this.scmlFiles[index].scmlFile.ptm.side_0.wl.nor.bias, plane: 12 };
 			this.planes.push( this.ptm_nor);
 			this.njpegs+=1;
-			this.normalSource = 6;
+			this.normalSource = 7;
 			$("#normalPTM").button({disabled:false});
 			boolPhotometric = true;
 			for(var id = 0; id<3; id++){
@@ -1047,7 +1047,7 @@ parseSCML_10(index){
 			  this.hsh_nor = {name: "hsh_side_0_nor", file: this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor.file, scale: this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor.scale, bias: this.scmlFiles[index].scmlFile.hsh.side_0.wl.nor.bias, plane: 7  };
 			  this.planes.push( this.hsh_nor );
 			  this.njpegs +=1;
-			  this.normalSource = 5;
+			  this.normalSource = 6;
 			  boolPhotometric = true;
 			  $("#normalHSH").button({disabled:false});
 			  for(var id = 0; id<3; id++){
@@ -1113,7 +1113,7 @@ parseSCML_10(index){
 			this.rbf_nor = {name: "rbf_side_0_nor", file: this.scmlFiles[index].scmlFile.rbf.side_0.wl.nor.file, scale: this.scmlFiles[index].scmlFile.rbf.side_0.wl.nor.scale, bias: this.scmlFiles[index].scmlFile.rbf.side_0.wl.nor.bias, plane: 12 };
 			this.planes.push( this.rbf_nor);
 			this.njpegs+=1;
-			this.normalSource = 7;
+			this.normalSource = 8;
 			$("#normalRBF").button({disabled:false});
 			boolPhotometric = true;
 			for(var id = 0; id<3; id++){
@@ -1139,7 +1139,7 @@ parseSCML_10(index){
 	  this.boolPld = true;
 	  this.pldScale = [];
 	  this.pldBias = [];
-	  this.normalSource = 2;
+	  this.normalSource = 0;
 	  this.reflectanceSource = 0;
 
 	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_nor){
@@ -2145,17 +2145,14 @@ if(this.curPrg == program_hsh_default_color || this.curPrg == program_hsh_sharpe
 		gl.activeTexture(gl.TEXTURE1);
 		//console.log(this.normalSource);
 		switch(this.normalSource){
-			case 0:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
+			case 0: 
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;		
 			case 1:
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 			case 2:
-				if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
-					gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
-				} else {
-					//console.log(this.findPlaneIndex("pld_side_0_wl_nor"));
-					gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
-				}
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+			case 3:
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 			case 3:
 				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 			case 4:
@@ -2203,26 +2200,23 @@ if( this.curPrg == program_ptm_spec_enh){
 	gl.activeTexture(gl.TEXTURE1);
 	//console.log(this.normalSource);
 	switch(this.normalSource){
-		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
+		case 0: 
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;		
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 2:
-			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
-			} else {
-				//console.log(this.findPlaneIndex("pld_side_0_wl_nor"));
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
-			}
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 7:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+		case 8:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);
@@ -2257,26 +2251,23 @@ else if(this.curPrg == program_rbf_default_color || this.curPrg == program_rbf_s
 	gl.activeTexture(gl.TEXTURE1);
 	//console.log(this.normalSource);
 	switch(this.normalSource){
-		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
+		case 0: 
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;		
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 2:
-			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
-			} else {
-				//console.log(this.findPlaneIndex("pld_side_0_wl_nor"));
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
-			}
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
 		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 7:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+		case 8:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);}
@@ -2318,16 +2309,14 @@ else if(this.curPrg == program_normals){
 	gl.activeTexture(gl.TEXTURE1);
 	//console.log(this.normalSource);
 	switch(this.normalSource){
-		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
+		case 0: 
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;		
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 2:
-			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
-			} else {
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
-			}
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+		case 3:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 		case 4:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
@@ -2383,16 +2372,14 @@ else if(this.curPrg == program_normals){
 else{ // all other PLD shaders
 	gl.activeTexture(gl.TEXTURE1);
 	switch(this.normalSource){
-		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
+		case 0: 
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;		
 		case 1:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
 		case 2:
-			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
-			} else {
-				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
-			}
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
+		case 3:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
 		case 4:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
