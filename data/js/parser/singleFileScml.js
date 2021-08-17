@@ -2319,13 +2319,15 @@ else if(this.curPrg == program_normals){
 	//console.log(this.normalSource);
 	switch(this.normalSource){
 		case 0:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
-		case 1:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_ir_nor")]); break;
-		case 2:
+		case 1:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_r_nor")]); break;	
-		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
+		case 2:
+			if(this.findPlaneIndex("pld_side_0_g_nor") > 0){
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_g_nor")]); break;
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
+			}
 		case 4:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
@@ -2391,15 +2393,15 @@ else{ // all other PLD shaders
 			} else {
 				gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_wl_nor")]); break;
 			}
-		case 3:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 4:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_b_nor")]); break;
 		case 5:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("pld_side_0_uv_nor")]); break;
 		case 6:
-			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("hsh_side_0_nor")]); break;
 		case 7:
+			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("ptm_side_0_nor")]); break;
+		case 8:
 			gl.bindTexture(gl.TEXTURE_2D, t.nodes[index].tex[this.findPlaneIndex("rbf_side_0_nor")]); break;	
 	}
 	gl.uniform1i(this.curPrg.uNormalSampler, 1);
@@ -2753,51 +2755,49 @@ neededBox(pos, border, canvas) {
 neededTexturePlanes(curPrg){
 	var t = this;
 	t.curPrg = curPrg;
-//	console.log("neededTexturePlanes");
+	//console.log("neededTexturePlanes");
 		if(t.curPrg == program_pld_default_color || t.curPrg == program_pld_color_specular || t.curPrg == program_pld_sharpen_nor || t.curPrg == program_pld_sharpen_refl){
 				this.neededTexPl = [];
 				t.scmlScale = [];
 				t.scmlBias = [];
 				switch(t.normalSource){
-					case 0: 
+					case 0:
+						this.neededTexPl = ["pld_wl_nor"];
+						t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
+						t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
+					case 1: 
 						this.neededTexPl.push("pld_ir_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_ir_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_ir_nor.bias); break;
-					case 1: 					
+					case 2: 					
 						this.neededTexPl.push("pld_r_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_r_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_r_nor.bias); break;
-					case 2: 	
-						if(!boolMultiSpectral){
-							this.neededTexPl = ["pld_wl_nor"];
-							t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
-							t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
-						} else {				
-							this.neededTexPl.push("pld_g_nor"); 
-							t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
-							t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
-						}
-					case 3: 					
+					case 3: 	
+						this.neededTexPl.push("pld_g_nor"); 
+						t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
+						t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
+					case 4: 					
 						this.neededTexPl.push("pld_b_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_b_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_b_nor.bias); break;
-					case 4: 
+					case 5: 
 						this.neededTexPl.push("pld_uv_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_uv_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_uv_nor.bias); break;
-					case 5: 
+					case 6: 
 						this.neededTexPl.push("hsh_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.hsh_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.hsh_nor.bias);break;
-					case 6: 					
+					case 7: 					
 						this.neededTexPl.push("ptm_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.ptm_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.ptm_nor.bias);break;
-					case 7: 					
+					case 8: 					
 						this.neededTexPl.push("rbf_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.rbf_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.rbf_nor.bias);break;
-					}
+				}
 				switch(t.reflectanceSource)
 				{
 					case 0: //wl alb
@@ -2869,42 +2869,41 @@ neededTexturePlanes(curPrg){
 				this.neededTexPl = [];
 				t.scmlScale = [];
 				t.scmlBias = [];
+			//	console.log(t.normalSource);
 				switch(t.normalSource){
-					case 0: 
+					case 0:
+						this.neededTexPl = ["pld_wl_nor"];
+						t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
+						t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
+					case 1: 
 						this.neededTexPl.push("pld_ir_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_ir_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_ir_nor.bias); break;
-					case 1: 					
+					case 2: 					
 						this.neededTexPl.push("pld_r_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_r_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_r_nor.bias); break;
-					case 2: 	
-						if(!boolMultiSpectral){
-							this.neededTexPl = ["pld_wl_nor"];
-							t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
-							t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
-						} else {				
-							this.neededTexPl.push("pld_g_nor"); 
-							t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
-							t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
-						}
-					case 3: 					
+					case 3: 	
+						this.neededTexPl.push("pld_g_nor"); 
+						t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
+						t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
+					case 4: 					
 						this.neededTexPl.push("pld_b_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_b_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_b_nor.bias); break;
-					case 4: 
+					case 5: 
 						this.neededTexPl.push("pld_uv_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.pld_uv_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.pld_uv_nor.bias); break;
-					case 5: 
+					case 6: 
 						this.neededTexPl.push("hsh_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.hsh_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.hsh_nor.bias);break;
-					case 6: 					
+					case 7: 					
 						this.neededTexPl.push("ptm_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.ptm_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.ptm_nor.bias);break;
-					case 7: 					
+					case 8: 					
 						this.neededTexPl.push("rbf_nor"); 
 						t.scmlScale = t.scmlScale.concat(t.rbf_nor.scale);
 						t.scmlBias = t.scmlBias.concat(t.rbf_nor.bias);break;
@@ -2964,35 +2963,39 @@ neededTexturePlanes(curPrg){
 			t.scmlBias = t.hshBias;
 	
 			switch(t.normalSource){
-				case 0: 
+				case 0:
+					this.neededTexPl = ["pld_wl_nor"];
+					t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
+					t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
+				case 1: 
 					this.neededTexPl.push("pld_ir_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_ir_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_ir_nor.bias); break;
-				case 1: 					
+				case 2: 					
 					this.neededTexPl.push("pld_r_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_r_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_r_nor.bias); break;
-				case 2: 					
+				case 3: 	
 					this.neededTexPl.push("pld_g_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
-				case 3: 					
+				case 4: 					
 					this.neededTexPl.push("pld_b_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_b_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_b_nor.bias); break;
-				case 4: 
+				case 5: 
 					this.neededTexPl.push("pld_uv_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_uv_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_uv_nor.bias); break;
-				case 5: 
+				case 6: 
 					this.neededTexPl.push("hsh_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.hsh_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.hsh_nor.bias);break;
-				case 6: 					
+				case 7: 					
 					this.neededTexPl.push("ptm_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.ptm_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.ptm_nor.bias);break;
-				case 7: 					
+				case 8: 					
 					this.neededTexPl.push("rbf_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.rbf_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.rbf_nor.bias);break;
@@ -3012,35 +3015,39 @@ neededTexturePlanes(curPrg){
 			t.scmlBias = t.ptmBias;
 	
 			switch(t.normalSource){
-				case 0: 
+				case 0:
+					this.neededTexPl = ["pld_wl_nor"];
+					t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
+					t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
+				case 1: 
 					this.neededTexPl.push("pld_ir_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_ir_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_ir_nor.bias); break;
-				case 1: 					
+				case 2: 					
 					this.neededTexPl.push("pld_r_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_r_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_r_nor.bias); break;
-				case 2: 					
+				case 3: 	
 					this.neededTexPl.push("pld_g_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
-				case 3: 					
+				case 4: 					
 					this.neededTexPl.push("pld_b_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_b_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_b_nor.bias); break;
-				case 4: 
+				case 5: 
 					this.neededTexPl.push("pld_uv_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_uv_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_uv_nor.bias); break;
-				case 5: 
+				case 6: 
 					this.neededTexPl.push("hsh_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.hsh_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.hsh_nor.bias);break;
-				case 6: 					
+				case 7: 					
 					this.neededTexPl.push("ptm_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.ptm_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.ptm_nor.bias);break;
-				case 7: 					
+				case 8: 					
 					this.neededTexPl.push("rbf_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.rbf_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.rbf_nor.bias);break;
@@ -3056,39 +3063,43 @@ neededTexturePlanes(curPrg){
 			t.scmlScale = Array.from(t.factor);
 			t.scmlBias = Array.from(t.bias);
 			switch(t.normalSource){
-				case 0: 
+				case 0:
+					this.neededTexPl = ["pld_wl_nor"];
+					t.scmlScale = t.scmlScale.concat(t.pld_wl_nor.scale);
+					t.scmlBias = t.scmlBias.concat(t.pld_wl_nor.bias);break;
+				case 1: 
 					this.neededTexPl.push("pld_ir_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_ir_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_ir_nor.bias); break;
-				case 1: 					
+				case 2: 					
 					this.neededTexPl.push("pld_r_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_r_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_r_nor.bias); break;
-				case 2: 					
+				case 3: 	
 					this.neededTexPl.push("pld_g_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_g_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_g_nor.bias); break;
-				case 3: 					
+				case 4: 					
 					this.neededTexPl.push("pld_b_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_b_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_b_nor.bias); break;
-				case 4: 
+				case 5: 
 					this.neededTexPl.push("pld_uv_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.pld_uv_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.pld_uv_nor.bias); break;
-				case 5: 
+				case 6: 
 					this.neededTexPl.push("hsh_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.hsh_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.hsh_nor.bias);break;
-				case 6: 					
+				case 7: 					
 					this.neededTexPl.push("ptm_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.ptm_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.ptm_nor.bias);break;
-				case 7: 					
+				case 8: 					
 					this.neededTexPl.push("rbf_nor"); 
 					t.scmlScale = t.scmlScale.concat(t.rbf_nor.scale);
 					t.scmlBias = t.scmlBias.concat(t.rbf_nor.bias);break;
-			} 
+			}
 		} 
 	
 		if(boolDepthMap){this.neededTexPl.push("pld_rgb_depth");}

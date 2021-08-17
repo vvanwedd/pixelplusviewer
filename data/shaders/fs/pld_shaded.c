@@ -36,6 +36,9 @@ void main(void)
     gl_FragColor = uMaterialAmbient;
   }
   else{
+
+
+    
   vec3 reflectanceChannels = reflectanceChannelMix;
   
   // Unpack tangent-space normal from texture
