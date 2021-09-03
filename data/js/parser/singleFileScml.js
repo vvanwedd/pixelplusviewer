@@ -792,10 +792,14 @@ parseSCML_10(index){
 	  this.boolPld = true;
 	  this.pldScale = [];
 	  this.pldBias = [];
-	  this.normalSource = 0;
-	  this.reflectanceSource = 0;
+	  //this.normalSource = 0;
+	  //this.reflectanceSource = 0;
 
 	  if(this.scmlFiles[index].scmlFile.side_0.pld.wl_nor){
+
+          this.normalSource = 0;
+          this.reflectanceSource = 0;
+
 	  this.pld_wl_nor = {name: "pld_side_0_wl_nor", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_nor.bias, plane: 0 };
 	  this.pld_wl_alb = {name: "pld_side_0_wl_alb", file: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.file, scale: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.scale, bias: this.scmlFiles[index].scmlFile.side_0.pld.wl_alb.bias, plane: 1 }; 
 	  for(var id = 0; id<3; id++){
@@ -837,6 +841,7 @@ parseSCML_10(index){
 
 	}
 	if(this.scmlFiles[index].scmlFile.side_0.pld.r_nor){
+		this.normalSource = 3;
 		this.reflectanceSource = 3;
 		boolMultiSpectral = true;
 		boolHasAmbient[0] = true;
@@ -1319,7 +1324,10 @@ library.json = {
 	document.getElementById("inputFilesize").value =formatBytes(_this.fileSize,2);
 	document.getElementById("inputHttp206").value = (_this.http206) ? "Supported": "Not supported";
 	document.getElementById("inputNumberOfEntries").value = _this.entries.length;
-
+	document.getElementById("inputPublication").innerHTML = _this.scmlFiles[0].scmlFile.metadata["publication info"];
+	if(typeof  _this.scmlFiles[0].scmlFile.metadata["title"] !== 'undefined'){
+	 document.getElementById("inputTitle").value = _this.scmlFiles[0].scmlFile.metadata["title"];
+	}
 
 })
 

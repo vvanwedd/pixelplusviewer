@@ -12,7 +12,7 @@ updateMetaDataFields(){
   document.getElementById("inputType").value= this.Type;
   document.getElementById("inputDimensions").value= this.Dimensions;
 
-  document.getElementById("inputPublication").value= this.Publication;
+  document.getElementById("inputPublication").innerHTML= this.Publication;
   document.getElementById("inputDescription").value= this.Description;
   document.getElementById("inputNotes").value= this.Notes;
 

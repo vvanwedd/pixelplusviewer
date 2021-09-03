@@ -64,6 +64,10 @@ void main(void)
   vec3 hsh2;
   vec3 hsh3;
 
+ vec3 hshL0 = vec3(0.0, 0.0, 0.0);
+ vec3 hshL1 = vec3(0.0, 0.0, 0.0);
+
+
 if(uBoolScml != 1.0){
   if(uBoolFloatTexture!=1.0){
     hsh0 = uScaleHSH.x*vec3( texture2D(hshCoeff0Tex, vTextureCoord) ).rgb + vec3(uBiasHSH.x,uBiasHSH.x, uBiasHSH.x);
@@ -77,11 +81,49 @@ if(uBoolScml != 1.0){
     hsh2 = vec3( texture2D(hshCoeff2Tex, vTextureCoord) ).rgb;
     hsh3 = vec3( texture2D(hshCoeff3Tex, vTextureCoord) ).rgb;
   }
+ vec3 lightDirection = normalize(uLightDirection0.xyz);
+  float phi = atan(lightDirection.y, lightDirection.x);
+  if(phi < 0.0){phi = 2.0*M_PI+phi;}
+
+  float theta = min(acos(lightDirection.z), M_PI / 2.0 - 0.04);
+
+  float cosPhi = cos(phi);
+  float cosTheta = cos(theta);
+  float cosTheta2 = cosTheta * cosTheta;
+
+  float hweights0 = 1.0/sqrt(2.0*M_PI);
+        float hweights1 = sqrt(6.0/M_PI)      *  (cosPhi*sqrt(cosTheta-cosTheta2));
+        float hweights2 = sqrt(3.0/(2.0*M_PI))  *  (-1.0 + 2.0*cosTheta);
+        float hweights3 = sqrt(6.0/M_PI)      *  (sqrt(cosTheta - cosTheta2)*sin(phi));
+  //float hweights4 = sqrt(30.0f/M_PI)     *  (cos(2.0f*phi)*(-cosTheta + cosTheta2));
+        //float hweights5 = sqrt(30.0f/M_PI)     *  (cosPhi*(-1.0f + 2.0f*cosTheta)*sqrt(cosTheta - cosTheta2));
+
+   hshL0 = hweights0*hsh0 + hweights1*hsh1 + hweights2*hsh2 + hweights3*hsh3;
+   //hsh*= lightIntensity.x;
+
+  vec3 lightDirection1 = normalize(uLightDirection1.xyz);
+  float phi1 = atan(lightDirection1.y, lightDirection1.x);
+  if(phi1 < 0.0){phi1 = 2.0*M_PI+phi1;}
+
+  float theta1 = min(acos(lightDirection1.z), M_PI / 2.0 - 0.04);
+
+  float cosPhi1 = cos(phi1);
+  float cosTheta1 = cos(theta1);
+  float cosTheta21 = cosTheta1 * cosTheta1;
+
+  float hweights01 = 1.0/sqrt(2.0*M_PI);
+        float hweights11 = sqrt(6.0/M_PI)      *  (cosPhi1*sqrt(cosTheta1-cosTheta21));
+        float hweights21 = sqrt(3.0/(2.0*M_PI))  *  (-1.0 + 2.0*cosTheta1);
+        float hweights31 = sqrt(6.0/M_PI)      *  (sqrt(cosTheta1 - cosTheta21)*sin(phi1));
+  //float hweights4 = sqrt(30.0f/M_PI)     *  (cos(2.0f*phi)*(-cosTheta + cosTheta2));
+        //float hweights5 = sqrt(30.0f/M_PI)     *  (cosPhi*(-1.0f + 2.0f*cosTheta)*sqrt(cosTheta - cosTheta2));
+
+  hshL1 = hweights01*hsh0 + hweights11*hsh1 + hweights21*hsh2 + hweights31*hsh3;
+  //hshl1 *= lightIntensity.y;
+  //hsh += hshl1;
+
 }
 
-
-vec3 hshL0 = vec3(0.0, 0.0, 0.0);
-vec3 hshL1 = vec3(0.0, 0.0, 0.0);
 
 if(uBoolScml == 1.0){
   lightIntensity *= 0.33;
