@@ -499,9 +499,14 @@ loadEntry(entry){
 	return new Promise(function (resolve, reject) {
 	//_this.fileSize = parseInt(size);
 	//	console.log("The new size of " + _this.url + " is : " + _this.fileSize + " bytes.");
-	var from = entry.offset + 30 + entry.filenameLength ;//+ entry.extraFieldLength; //should be 0, but should check extrafieldlength by reading local header
-	//console.log(from);
-	var to = 	entry.offset + 29 + entry.filenameLength + entry.compressedSize; // + entry.extraFieldLength
+        var fix = 0;
+	if(entry.extraFieldLength == 24){
+	  fix = 28;
+	}
+	var from = entry.offset + 30 + entry.filenameLength + fix; //should be 0, but should check extrafieldlength by reading local header
+	//console.log(entry);
+
+	var to = 	entry.offset + 29 + entry.filenameLength + entry.compressedSize +fix; // + entry.extraFieldLength
 	const xhr = new XMLHttpRequest();
     xhr.open('GET', _this.url, true);
     xhr.responseType = 'arraybuffer';
@@ -514,8 +519,8 @@ loadEntry(entry){
 			if(extension === 'png' || extension === 'jpeg' || extension ==='jpg'){
 				resolve(this.response);
 			} else if(extension === 'scml' || extension === 'json' ){
-				//console.log(_this.buf2hex(this.response));
-				//console.log(String.fromCharCode.apply(null, new Uint8Array(this.response)));
+	//			console.log(_this.buf2hex(this.response));
+	//			console.log(String.fromCharCode.apply(null, new Uint8Array(this.response)));
 				entry.scmlFile = JSON.parse(new TextDecoder().decode(this.response));
 				//entry.scmlFile = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(this.response)));
 				resolve();
